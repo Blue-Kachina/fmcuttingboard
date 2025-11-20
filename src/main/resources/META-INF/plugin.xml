@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<idea-plugin>
+    <!-- Phase 0.1: Initial project structure created. -->
+    <!-- Metadata (id, name, vendor, version) and compatibility will be filled in subsequent tasks. -->
+
+    <description><![CDATA[
+        FMCuttingBoard plugin — initial skeleton. Metadata to be added in Phase 0.1 tasks.
+    ]]></description>
+</idea-plugin>
