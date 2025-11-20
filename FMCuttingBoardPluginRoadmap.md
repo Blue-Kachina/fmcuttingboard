@@ -37,11 +37,11 @@ Each phase is broken down into small, AI-friendly tasks.
 
 ### 1.2 — Tools Menu Integration
 
-- [ ] Define a new submenu under **Tools** named `FMCuttingBoard`
-- [ ] Register **Convert FileMaker Clipboard To XML** action under the submenu
-- [ ] Register **Read Clipboard Into New XML File** action under the submenu
-- [ ] Register **Push Clipboard Into FileMaker** action under the submenu
-- [ ] Provide default keyboard shortcuts (optional) and ensure they are overridable
+- [x] Define a new submenu under **Tools** named `FMCuttingBoard`
+- [x] Register **Convert FileMaker Clipboard To XML** action under the submenu
+- [x] Register **Read Clipboard Into New XML File** action under the submenu
+- [x] Register **Push Clipboard Into FileMaker** action under the submenu
+- [x] Provide default keyboard shortcuts (optional) and ensure they are overridable
 
 ### 1.3 — Action UI Wiring
 
