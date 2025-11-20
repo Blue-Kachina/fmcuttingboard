@@ -62,8 +62,8 @@ Each phase is broken down into small, AI-friendly tasks.
 ### 2.1 — Clipboard Access Abstraction
 
 - [x] Implement a small service/class to read from the system clipboard
-- [ ] Implement a method to write text into the system clipboard
-- [ ] Add error handling for clipboard access failures (e.g., locked, unsupported content)
+- [x] Implement a method to write text into the system clipboard
+- [x] Add error handling for clipboard access failures (e.g., locked, unsupported content)
 - [ ] Add unit tests (where possible) for clipboard read/write wrapper
 
 ### 2.2 — FileMaker Clipboard Content Detection

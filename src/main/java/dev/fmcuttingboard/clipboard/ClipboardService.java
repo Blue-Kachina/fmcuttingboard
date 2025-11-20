@@ -15,5 +15,11 @@ public interface ClipboardService {
      */
     Optional<String> readText() throws ClipboardAccessException;
 
-    // writeText will be added in a subsequent task as per roadmap 2.1
+    /**
+     * Writes the provided text into the system clipboard.
+     *
+     * @param text text to write (null treated as empty string)
+     * @throws ClipboardAccessException when clipboard cannot be written
+     */
+    void writeText(String text) throws ClipboardAccessException;
 }
