@@ -1,4 +1,8 @@
 # FMCuttingBoard
+
+<!-- CI Status Badges -->
+![Build](https://github.com/Blue-Kachina/fmcuttingboard/actions/workflows/ci.yml/badge.svg)
+![Tests](https://github.com/Blue-Kachina/fmcuttingboard/actions/workflows/ci.yml/badge.svg)
 - A plugin for JetBrains IDEs
 - When installed, the user will have a new menu item in their IDE's `Tools` menu
 - The new menu item will be named the same as this plugin
@@ -32,3 +36,10 @@ If it contains an fmxmlsnippet of script steps, then we'd be able to paste Scrip
 ## Inspiration
 Please review inspiration/GetFmClipboard.ps1.
 It works similarly to how we will want the Convert FileMaker Clipboard To XML to work.
+
+
+## Development
+
+- Run the plugin in a sandbox IDE: `./gradlew runIde` (or `gradlew.bat runIde` on Windows)
+- Run tests: `./gradlew test`
+- The project uses JUnit 5 for unit tests and a GitHub Actions workflow to build and run tests on pushes/PRs.
