@@ -14,7 +14,7 @@ Each phase is broken down into small, AI-friendly tasks.
 - [x] Set plugin metadata (name, ID, description, version, vendor)
 - [x] Configure plugin compatibility with target IDE versions
 - [x] Set up basic `.gitignore` for the project
-- [ ] Add initial `README.md` and `ROADMAP.md` to the repository
+- [x] Add initial `README.md` and `ROADMAP.md` to the repository
 
 ### 0.2 — Development Environment & CI
 
