@@ -64,17 +64,17 @@ Each phase is broken down into small, AI-friendly tasks.
 - [x] Implement a small service/class to read from the system clipboard
 - [x] Implement a method to write text into the system clipboard
 - [x] Add error handling for clipboard access failures (e.g., locked, unsupported content)
-- [ ] Add unit tests (where possible) for clipboard read/write wrapper
+- [x] Add unit tests (where possible) for clipboard read/write wrapper
 
 ### 2.2 — FileMaker Clipboard Content Detection
 
-- [ ] Research FileMaker clipboard format(s) relevant to this plugin
-- [ ] Define a small interface/protocol for “FileMakerClipboardParser”
-- [ ] Implement a first pass parser that:
+- [x] Research FileMaker clipboard format(s) relevant to this plugin
+ - [ ] Define a small interface/protocol for “FileMakerClipboardParser”
+ - [ ] Implement a first pass parser that:
   - [ ] Detects whether clipboard content is likely FileMaker-related
   - [ ] Extracts or normalizes the text representation that will become XML
-- [ ] Implement basic heuristics for rejecting non-FileMaker content
-- [ ] Add unit tests for detection and parsing with small sample payloads (sanitized or synthetic)
+ - [ ] Implement basic heuristics for rejecting non-FileMaker content
+ - [ ] Add unit tests for detection and parsing with small sample payloads (sanitized or synthetic)
 
 ---
 
