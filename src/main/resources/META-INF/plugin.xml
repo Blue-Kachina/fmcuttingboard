@@ -11,8 +11,24 @@
     <!-- Compatibility configured via Gradle's patchPluginXml -->
 
     <description><![CDATA[
-        A JetBrains IDE plugin that helps you to work with FileMaker's clipboard as XML
-        
-        This is an initial skeleton; functionality will be implemented in later phases.
+        A JetBrains IDE plugin that helps you work with FileMaker's clipboard as XML.
+
+        When installed, the plugin adds a new "FMCuttingBoard" submenu under the IDE's Tools menu.
+        Planned actions include:
+        - Convert FileMaker Clipboard To XML
+        - Read Clipboard Into New XML File
+        - Push Clipboard Into FileMaker
+
+        This is an initial skeleton; functionality will be implemented progressively per the roadmap.
     ]]></description>
+
+    <!-- Phase 1.1: Register base actions group under Tools menu -->
+    <actions>
+        <group id="dev.fmcuttingboard.toolsGroup"
+               text="FMCuttingBoard"
+               description="FMCuttingBoard tools"
+               popup="true">
+            <add-to-group group-id="ToolsMenu" anchor="last"/>
+        </group>
+    </actions>
 </idea-plugin>

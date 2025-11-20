@@ -31,9 +31,9 @@ Each phase is broken down into small, AI-friendly tasks.
 
 ### 1.1 — Plugin Registration
 
-- [ ] Create plugin entry point files and configuration (e.g., `plugin.xml`)
-- [ ] Define plugin display name and description per README
-- [ ] Register plugin actions group for the Tools menu
+- [x] Create plugin entry point files and configuration (e.g., `plugin.xml`)
+- [x] Define plugin display name and description per README
+- [x] Register plugin actions group for the Tools menu
 
 ### 1.2 — Tools Menu Integration
 
