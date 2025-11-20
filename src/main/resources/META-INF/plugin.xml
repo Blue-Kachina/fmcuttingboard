@@ -6,7 +6,7 @@
     <id>dev.bluekachina.fmcuttingboard</id>
     <name>FMCuttingBoard</name>
     <version>0.0.1</version>
-    <vendor email="" url="">FMCuttingBoard</vendor>
+    <vendor email="to_be_filled@example.com" url="http://www.example.com">FMCuttingBoard</vendor>
 
     <!-- Compatibility configured via Gradle's patchPluginXml -->
 

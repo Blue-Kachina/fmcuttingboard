@@ -103,11 +103,11 @@ Each phase is broken down into small, AI-friendly tasks.
 
 ### 4.1 — `.fmCuttingBoard` Directory Management
 
-- [ ] Implement utility for locating the current project root directory
-- [ ] Implement a helper to ensure `.fmCuttingBoard` directory exists under project root
-- [ ] Implement creation of `.fmCuttingBoard` directory if missing
-- [ ] Implement creation of `.fmCuttingBoard/.gitignore` containing only `*` when directory is created
-- [ ] Add tests for directory and `.gitignore` creation logic
+- [x] Implement utility for locating the current project root directory
+- [x] Implement a helper to ensure `.fmCuttingBoard` directory exists under project root
+- [x] Implement creation of `.fmCuttingBoard` directory if missing
+- [x] Implement creation of `.fmCuttingBoard/.gitignore` containing only `*` when directory is created
+- [x] Add tests for directory and `.gitignore` creation logic
 
 ### 4.2 — Timestamped XML File Creation
 

@@ -46,6 +46,9 @@ tasks.withType<JavaCompile>().configureEach {
 dependencies {
     testImplementation(platform("org.junit:junit-bom:5.10.2"))
     testImplementation("org.junit.jupiter:junit-jupiter")
+    // For IntelliJ Platform test environment which may require JUnit 4 classes
+    testImplementation("junit:junit:4.13.2")
+    testRuntimeOnly("org.junit.vintage:junit-vintage-engine:5.10.2")
 }
 
 tasks.test {
