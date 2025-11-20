@@ -111,10 +111,10 @@ Each phase is broken down into small, AI-friendly tasks.
 
 ### 4.2 — Timestamped XML File Creation
 
-- [ ] Implement a function to generate a timestamped filename (e.g., epoch-based) with `.xml` extension
-- [ ] Implement file creation inside `.fmCuttingBoard` using the generated filename
-- [ ] Implement robust error handling for file I/O failures
-- [ ] Add tests for filename format and file creation behavior (where feasible)
+- [x] Implement a function to generate a timestamped filename (e.g., epoch-based) with `.xml` extension
+- [x] Implement file creation inside `.fmCuttingBoard` using the generated filename
+- [x] Implement robust error handling for file I/O failures
+- [x] Add tests for filename format and file creation behavior (where feasible)
 
 ### 4.3 — Action Implementation
 
