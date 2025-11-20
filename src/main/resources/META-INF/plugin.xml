@@ -29,6 +29,27 @@
                description="FMCuttingBoard tools"
                popup="true">
             <add-to-group group-id="ToolsMenu" anchor="last"/>
+            <!-- Phase 1.2: Register submenu actions -->
+            <action id="dev.fmcuttingboard.actions.ConvertClipboardToXml"
+                    class="dev.fmcuttingboard.actions.ConvertClipboardToXmlAction"
+                    text="Convert FileMaker Clipboard To XML"
+                    description="Convert FileMaker clipboard contents to XML and place on clipboard">
+                <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt C" second-keystroke="X"/>
+            </action>
+
+            <action id="dev.fmcuttingboard.actions.ReadClipboardIntoNewXmlFile"
+                    class="dev.fmcuttingboard.actions.ReadClipboardIntoNewXmlFileAction"
+                    text="Read Clipboard Into New XML File"
+                    description="Create a new XML file from the current clipboard contents">
+                <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt C" second-keystroke="F"/>
+            </action>
+
+            <action id="dev.fmcuttingboard.actions.PushClipboardIntoFileMaker"
+                    class="dev.fmcuttingboard.actions.PushClipboardIntoFileMakerAction"
+                    text="Push Clipboard Into FileMaker"
+                    description="Push XML or supported content on clipboard into FileMaker">
+                <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt C" second-keystroke="P"/>
+            </action>
         </group>
     </actions>
 </idea-plugin>
