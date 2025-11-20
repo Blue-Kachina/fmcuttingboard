@@ -18,7 +18,7 @@ Each phase is broken down into small, AI-friendly tasks.
 
 ### 0.2 — Development Environment & CI
 
-- [ ] Configure plugin run/debug configuration in the IDE
+- [x] Configure plugin run/debug configuration in the IDE
 - [ ] Add basic unit test framework setup (e.g., JUnit)
 - [ ] Add minimal sample test to verify test pipeline
 - [ ] Set up CI pipeline (e.g., GitHub Actions) to build plugin on push
