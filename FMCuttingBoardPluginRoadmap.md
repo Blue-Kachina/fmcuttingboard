@@ -82,11 +82,11 @@ Each phase is broken down into small, AI-friendly tasks.
 
 ### 3.1 — Core Conversion Logic
 
-- [ ] Design data model for internal representation of FileMaker clipboard snippet(s)
-- [ ] Implement a converter from raw FileMaker clipboard data to XML string (fmxmlsnippet-like)
-- [ ] Handle common element types (e.g., fields, script steps, layouts) as needed by the plugin
-- [ ] Add error/exception handling for unexpected clipboard structures
-- [ ] Add unit tests for conversion with known sample inputs and expected XML outputs
+- [x] Design data model for internal representation of FileMaker clipboard snippet(s)
+- [x] Implement a converter from raw FileMaker clipboard data to XML string (fmxmlsnippet-like)
+- [x] Handle common element types (e.g., fields, script steps, layouts) as needed by the plugin
+- [x] Add error/exception handling for unexpected clipboard structures
+- [x] Add unit tests for conversion with known sample inputs and expected XML outputs
 
 ### 3.2 — Action Implementation
 
