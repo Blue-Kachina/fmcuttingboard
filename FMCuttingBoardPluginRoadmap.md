@@ -10,7 +10,7 @@ Each phase is broken down into small, AI-friendly tasks.
 ### 0.1 — Repository & Build Setup
 
 - [x] Initialize plugin project structure for JetBrains IDEs (IntelliJ Platform Plugin)
-- [ ] Configure Gradle/Maven build for the plugin
+- [x] Configure Gradle/Maven build for the plugin
 - [ ] Set plugin metadata (name, ID, description, version, vendor)
 - [ ] Configure plugin compatibility with target IDE versions
 - [ ] Set up basic `.gitignore` for the project
