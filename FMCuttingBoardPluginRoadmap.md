@@ -118,14 +118,14 @@ Each phase is broken down into small, AI-friendly tasks.
 
 ### 4.3 — Action Implementation
 
-- [ ] Wire **Read Clipboard Into New XML File** action to:
-  - [ ] Read current clipboard content
-  - [ ] Parse/detect FileMaker clipboard content
-  - [ ] Convert recognized content to XML if needed
-  - [ ] Write XML content to a new timestamped file in `.fmCuttingBoard`
-- [ ] Show notification on success, including created file path
-- [ ] Show descriptive notification if clipboard does not contain recognizable FileMaker content
-- [ ] Add logging for file creation and failures
+- [x] Wire **Read Clipboard Into New XML File** action to:
+  - [x] Read current clipboard content
+  - [x] Parse/detect FileMaker clipboard content
+  - [x] Convert recognized content to XML if needed
+  - [x] Write XML content to a new timestamped file in `.fmCuttingBoard`
+- [x] Show notification on success, including created file path
+- [x] Show descriptive notification if clipboard does not contain recognizable FileMaker content
+- [x] Add logging for file creation and failures
 - [ ] Add integration tests (where feasible) for the end-to-end workflow
 
 ---

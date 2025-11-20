@@ -2,34 +2,98 @@ package dev.fmcuttingboard.actions;
 
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.notification.Notification;
-import com.intellij.notification.NotificationGroup;
-import com.intellij.notification.NotificationGroupManager;
-import com.intellij.notification.NotificationType;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.notification.NotificationType;
 import com.intellij.openapi.project.Project;
+import dev.fmcuttingboard.clipboard.ClipboardAccessException;
+import dev.fmcuttingboard.clipboard.ClipboardService;
+import dev.fmcuttingboard.clipboard.DefaultClipboardService;
+import dev.fmcuttingboard.fm.ClipboardToXmlConverter;
+import dev.fmcuttingboard.fm.ConversionException;
+import dev.fmcuttingboard.fs.ProjectFiles;
+import dev.fmcuttingboard.util.Notifier;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Phase 1.2: Placeholder for creating a new XML file from clipboard contents.
+ * Phase 4.3 — Action Implementation
+ * Reads clipboard, attempts to parse FileMaker content, converts to XML,
+ * and writes it into a new timestamped file inside .fmCuttingBoard.
  */
 public class ReadClipboardIntoNewXmlFileAction extends AnAction {
     private static final Logger LOG = Logger.getInstance(ReadClipboardIntoNewXmlFileAction.class);
-    @Override
-    public void actionPerformed(@NotNull AnActionEvent e) {
-        // Placeholder: actual implementation will arrive in Phase 4.
-        Project project = e.getProject();
-        LOG.info("Invoke: ReadClipboardIntoNewXmlFileAction");
-        notifyNotImplemented(project, "Read Clipboard Into New XML File");
+    private final ClipboardService clipboardService;
+    private final ClipboardToXmlConverter converter;
+
+    public ReadClipboardIntoNewXmlFileAction() {
+        this(new DefaultClipboardService(), new ClipboardToXmlConverter());
     }
 
-    private static void notifyNotImplemented(Project project, String actionName) {
-        NotificationGroup group = NotificationGroupManager.getInstance().getNotificationGroup("FMCuttingBoard");
-        Notification notification = group.createNotification(
-                actionName + " — Not implemented yet",
-                "This action is a placeholder and will be implemented in a later phase.",
-                NotificationType.INFORMATION
-        );
-        notification.notify(project);
+    // Visible for testing / DI
+    public ReadClipboardIntoNewXmlFileAction(ClipboardService clipboardService, ClipboardToXmlConverter converter) {
+        this.clipboardService = clipboardService;
+        this.converter = converter;
+    }
+    @Override
+    public void actionPerformed(@NotNull AnActionEvent e) {
+        Project project = e.getProject();
+        LOG.info("Invoke: ReadClipboardIntoNewXmlFileAction");
+
+        // 1) Read clipboard text
+        final String clipboardText;
+        try {
+            clipboardText = clipboardService.readText().orElse("");
+        } catch (ClipboardAccessException ex) {
+            LOG.warn("Clipboard read failed", ex);
+            Notifier.notify(project, NotificationType.ERROR, "Read Clipboard Into New XML File",
+                    "Could not read clipboard: " + safeMessage(ex));
+            return;
+        }
+
+        if (clipboardText.isBlank()) {
+            LOG.info("Clipboard is empty or does not contain text.");
+            Notifier.notify(project, NotificationType.INFORMATION, "Read Clipboard Into New XML File",
+                    "Clipboard is empty or contains no text to save.");
+            return;
+        }
+
+        // 2) Convert using parser/converter
+        final String xml;
+        try {
+            xml = converter.convertToXml(clipboardText);
+        } catch (ConversionException ce) {
+            LOG.info("Clipboard does not contain recognizable FileMaker content.");
+            Notifier.notify(project, NotificationType.WARNING, "Read Clipboard Into New XML File",
+                    "Clipboard does not contain recognizable FileMaker content or fmxmlsnippet.");
+            return;
+        } catch (Throwable t) {
+            LOG.warn("Unexpected error during conversion", t);
+            Notifier.notify(project, NotificationType.ERROR, "Read Clipboard Into New XML File",
+                    "Unexpected error during conversion: " + safeMessage(t));
+            return;
+        }
+
+        // 3) Create timestamped file inside .fmCuttingBoard and write XML
+        try {
+            Path projectRoot = ProjectFiles.getProjectRoot(project);
+            Path file = ProjectFiles.createTimestampedXmlFile(projectRoot);
+            Files.writeString(file, xml, StandardCharsets.UTF_8);
+            LOG.info("Wrote XML to: " + file);
+            Notifier.notify(project, NotificationType.INFORMATION, "Read Clipboard Into New XML File",
+                    "Success: Wrote XML to file: " + file.toString());
+        } catch (IllegalArgumentException | IOException ex) {
+            LOG.warn("Failed to create/write XML file", ex);
+            Notifier.notify(project, NotificationType.ERROR, "Read Clipboard Into New XML File",
+                    "Failed to create/write XML file: " + safeMessage(ex));
+            return;
+        }
+    }
+
+    private static String safeMessage(Throwable t) {
+        String msg = t.getMessage();
+        return (msg == null || msg.isBlank()) ? t.getClass().getSimpleName() : msg;
     }
 }
