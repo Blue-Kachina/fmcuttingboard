@@ -90,11 +90,11 @@ Each phase is broken down into small, AI-friendly tasks.
 
 ### 3.2 — Action Implementation
 
-- [ ] Integrate clipboard reader in **Convert FileMaker Clipboard To XML** action
-- [ ] Invoke FileMaker clipboard detection/parsing when action is executed
-- [ ] If content recognized, convert to XML and replace clipboard with XML string
-- [ ] If content not recognized, show user-friendly notification explaining why
-- [ ] Add logging for success/failure outcomes of the action
+- [x] Integrate clipboard reader in **Convert FileMaker Clipboard To XML** action
+- [x] Invoke FileMaker clipboard detection/parsing when action is executed
+- [x] If content recognized, convert to XML and replace clipboard with XML string
+- [x] If content not recognized, show user-friendly notification explaining why
+- [x] Add logging for success/failure outcomes of the action
 - [ ] Add regression tests (as far as possible) covering user-facing behavior
 
 ---
