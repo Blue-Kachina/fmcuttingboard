@@ -18,7 +18,8 @@ public interface ClipboardService {
     /**
      * Writes the provided text into the system clipboard.
      *
-     * @param text text to write (null treated as empty string)
+     * @param text text to write (null treated as empty string). Implementations should replace
+     *             the current clipboard content with the provided text.
      * @throws ClipboardAccessException when clipboard cannot be written
      */
     void writeText(String text) throws ClipboardAccessException;
