@@ -42,6 +42,10 @@ Each phase is broken down into small, AI-friendly tasks.
 - [x] Register **Read Clipboard Into New XML File** action under the submenu
 - [x] Register **Push Clipboard Into FileMaker** action under the submenu
 - [x] Provide default keyboard shortcuts (optional) and ensure they are overridable
+  - Defaults added in plugin.xml (overridable via Keymap):
+    - Convert FileMaker Clipboard To XML: Ctrl+Alt+C, X
+    - Read Clipboard Into New XML File: Ctrl+Alt+C, F
+    - Push Clipboard Into FileMaker: Ctrl+Alt+C, P
 
 ### 1.3 — Action UI Wiring
 
