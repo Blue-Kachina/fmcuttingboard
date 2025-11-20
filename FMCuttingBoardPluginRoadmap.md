@@ -61,7 +61,7 @@ Each phase is broken down into small, AI-friendly tasks.
 
 ### 2.1 — Clipboard Access Abstraction
 
-- [ ] Implement a small service/class to read from the system clipboard
+- [x] Implement a small service/class to read from the system clipboard
 - [ ] Implement a method to write text into the system clipboard
 - [ ] Add error handling for clipboard access failures (e.g., locked, unsupported content)
 - [ ] Add unit tests (where possible) for clipboard read/write wrapper
