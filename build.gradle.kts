@@ -7,9 +7,10 @@ group = "dev.fmcuttingboard"
 version = providers.gradleProperty("pluginVersion").orNull ?: "0.0.1"
 
 java {
+    // IMPORTANT: IntelliJ Platform 2024.3 requires plugins to be compiled to Java 17 bytecode
     toolchain {
         languageVersion.set(org.gradle.jvm.toolchain.JavaLanguageVersion.of(
-            (providers.gradleProperty("javaVersion").orNull ?: "21").toInt()
+            (providers.gradleProperty("javaVersion").orNull ?: "17").toInt()
         ))
     }
 }
@@ -31,6 +32,15 @@ tasks.patchPluginXml {
 tasks.runIde {
     // Provide reasonable default heap for early development
     jvmArgs = listOf("-Xmx1g")
+}
+
+// Ensure targetCompatibility that the IntelliJ Gradle plugin verifies is set to 17
+java.sourceCompatibility = JavaVersion.VERSION_17
+java.targetCompatibility = JavaVersion.VERSION_17
+
+tasks.withType<JavaCompile>().configureEach {
+    // Enforce Java 17 bytecode level
+    options.release.set(17)
 }
 
 dependencies {

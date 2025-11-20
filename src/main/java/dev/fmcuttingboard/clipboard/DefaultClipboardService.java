@@ -4,8 +4,6 @@ import com.intellij.openapi.ide.CopyPasteManager;
 
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
-import java.awt.datatransfer.UnsupportedFlavorException;
-import java.io.IOException;
 import java.util.Optional;
 
 /**
@@ -33,8 +31,6 @@ public class DefaultClipboardService implements ClipboardService {
             return Optional.ofNullable(s);
         } catch (IllegalStateException e) { // clipboard busy/locked
             throw new ClipboardAccessException("Clipboard is currently unavailable (locked).", e);
-        } catch (UnsupportedFlavorException | IOException e) {
-            throw new ClipboardAccessException("Clipboard does not contain readable text.", e);
         } catch (Throwable t) {
             throw new ClipboardAccessException("Unexpected clipboard error while reading.", t);
         }

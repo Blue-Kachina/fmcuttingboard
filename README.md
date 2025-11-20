@@ -52,15 +52,15 @@ Follow these steps:
 
 1) Prerequisites
 - Install IntelliJ IDEA Community or Ultimate (2024.3 or newer recommended).
-- Ensure JDK 21 is installed (the project targets Java 21 via Gradle toolchains).
+- Install a JDK: 17 preferred (as required by IntelliJ Platform 2024.3).
 
 2) Open/Import the Project
 - In IntelliJ IDEA: File > Open… and select the project root (the folder containing `settings.gradle.kts`).
 - When prompted, choose “Open as Project”. IDEA will detect and import the Gradle project automatically.
 
 3) Gradle JVM and Toolchain
-- In Settings > Build, Execution, Deployment > Build Tools > Gradle, set “Gradle JVM” to a JDK 21 installation.
-- The project declares a Java toolchain (21) and enables Foojay toolchain resolver, so Gradle can auto‑download a matching JDK if it isn’t installed. Keeping the Gradle JVM at 21 avoids IDE/Gradle mismatch issues.
+- In Settings > Build, Execution, Deployment > Build Tools > Gradle, set “Gradle JVM” to a local JDK 17 (recommended) or 21.
+- The project declares a Java toolchain of 17 and enables the Foojay toolchain resolver. Gradle will compile with Java 17 bytecode (required by IntelliJ Platform 2024.3) and can auto‑download a matching toolchain if needed.
 
 4) IntelliJ Platform SDK Plugin
 - The Gradle IntelliJ Plugin (`org.jetbrains.intellij`) will download the target IDE platform as needed. No manual SDK setup is required.
@@ -75,7 +75,7 @@ Follow these steps:
 - Tests are standard JUnit 5 tests under `src/test/java`.
 - You can run them in two ways:
   - Gradle: use the Gradle tool window and run the `test` task, or Run Configuration for the Gradle `test` task.
-  - IntelliJ test runner: open a test class (e.g., `DefaultClipboardServiceTest`) and click the gutter run icon. Make sure the test runner uses the Gradle build system (recommended) or that your Project SDK is set to JDK 21.
+  - IntelliJ test runner: open a test class (e.g., `DefaultClipboardServiceTest`) and click the gutter run icon. Make sure the test runner uses the Gradle build system (recommended) or that your Project SDK is set to JDK 17.
 
 7) Building the Plugin Artifact
 - From a terminal: `./gradlew build` (or `gradlew.bat build` on Windows) runs compilation and tests.
@@ -83,7 +83,8 @@ Follow these steps:
 
 8) Common Troubleshooting
 - If classes don’t resolve after opening the project, wait for indexing and the first Gradle sync to finish.
-- If `runIde` fails due to JVM version problems, ensure both “Gradle JVM” and the Project SDK are set to JDK 21.
+- If `runIde` fails due to JVM version problems, ensure “Gradle JVM” is set to a valid JDK install (17 recommended, 21 is fine) and the Project SDK is set to JDK 17.
+- If you see a path error like `...\.jdks\ms-21.0.x\Packages does not exist`, switch Gradle JVM to a the JetBrains Runtime variant
 - If tests fail to discover, confirm “Use Gradle” is enabled for test running (Settings > Build, Execution, Deployment > Build Tools > Gradle > Run tests using: Gradle), or switch to “IntelliJ IDEA” if preferred.
 
 That’s it—no extra IDEA build configuration is needed beyond the Gradle setup included in this repo.
