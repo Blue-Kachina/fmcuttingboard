@@ -75,4 +75,13 @@ public final class ProjectFiles {
     /** Result data for ensureCuttingBoardDir. */
     public record EnsureResult(Path directory, boolean createdDirectory, boolean createdGitignore) {
     }
+
+    // ----- Phase 4.2 — Timestamped XML File Creation -----
+    /**
+     * Generates a timestamp-based filename with an .xml extension.
+     * Uses epoch milliseconds, e.g. "1732100000123.xml".
+     */
+    public static String generateTimestampedXmlFileName() {
+        return System.currentTimeMillis() + ".xml";
+    }
 }
