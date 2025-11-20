@@ -11,9 +11,9 @@ Each phase is broken down into small, AI-friendly tasks.
 
 - [x] Initialize plugin project structure for JetBrains IDEs (IntelliJ Platform Plugin)
 - [x] Configure Gradle/Maven build for the plugin
-- [ ] Set plugin metadata (name, ID, description, version, vendor)
-- [ ] Configure plugin compatibility with target IDE versions
-- [ ] Set up basic `.gitignore` for the project
+- [x] Set plugin metadata (name, ID, description, version, vendor)
+- [x] Configure plugin compatibility with target IDE versions
+- [x] Set up basic `.gitignore` for the project
 - [ ] Add initial `README.md` and `ROADMAP.md` to the repository
 
 ### 0.2 — Development Environment & CI
