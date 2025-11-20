@@ -69,10 +69,10 @@ Each phase is broken down into small, AI-friendly tasks.
 ### 2.2 — FileMaker Clipboard Content Detection
 
 - [x] Research FileMaker clipboard format(s) relevant to this plugin
- - [ ] Define a small interface/protocol for “FileMakerClipboardParser”
- - [ ] Implement a first pass parser that:
-  - [ ] Detects whether clipboard content is likely FileMaker-related
-  - [ ] Extracts or normalizes the text representation that will become XML
+ - [x] Define a small interface/protocol for “FileMakerClipboardParser”
+ - [x] Implement a first pass parser that:
+  - [x] Detects whether clipboard content is likely FileMaker-related
+  - [x] Extracts or normalizes the text representation that will become XML
  - [ ] Implement basic heuristics for rejecting non-FileMaker content
  - [ ] Add unit tests for detection and parsing with small sample payloads (sanitized or synthetic)
 
