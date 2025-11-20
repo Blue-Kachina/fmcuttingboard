@@ -9,7 +9,7 @@ version = providers.gradleProperty("pluginVersion").orNull ?: "0.0.1"
 java {
     toolchain {
         languageVersion.set(org.gradle.jvm.toolchain.JavaLanguageVersion.of(
-            (providers.gradleProperty("javaVersion").orNull ?: "17").toInt()
+            (providers.gradleProperty("javaVersion").orNull ?: "21").toInt()
         ))
     }
 }
@@ -19,12 +19,13 @@ repositories {
 }
 
 intellij {
-    version.set(providers.gradleProperty("platformVersion").orNull ?: "2024.1")
+    version.set(providers.gradleProperty("platformVersion").orNull ?: "2024.3")
     type.set(providers.gradleProperty("platformType").orNull ?: "IC")
 }
 
 tasks.patchPluginXml {
-    sinceBuild.set("241")
+    // 243 = IntelliJ Platform 2024.3 baseline
+    sinceBuild.set("243")
 }
 
 tasks.runIde {
