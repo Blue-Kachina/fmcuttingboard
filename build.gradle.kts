@@ -31,3 +31,12 @@ tasks.runIde {
     // Provide reasonable default heap for early development
     jvmArgs = listOf("-Xmx1g")
 }
+
+dependencies {
+    testImplementation(platform("org.junit:junit-bom:5.10.2"))
+    testImplementation("org.junit.jupiter:junit-jupiter")
+}
+
+tasks.test {
+    useJUnitPlatform()
+}
