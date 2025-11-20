@@ -80,12 +80,17 @@ public class ReadClipboardIntoNewXmlFileAction extends AnAction {
         try {
             Path projectRoot = ProjectFiles.getProjectRoot(project);
             Path file = ProjectFiles.createTimestampedXmlFile(projectRoot);
+            long startNs = System.nanoTime();
             Files.writeString(file, xml, StandardCharsets.UTF_8);
-            LOG.info("Wrote XML to: " + file);
+            long elapsedMs = (System.nanoTime() - startNs) / 1_000_000L;
+            int byteCount = xml.getBytes(StandardCharsets.UTF_8).length;
+            int charCount = xml.length();
+            LOG.info("Wrote XML to: " + file + " (bytes=" + byteCount + ", chars=" + charCount + ", took=" + elapsedMs + "ms)");
+            String display = displayPath(projectRoot, file);
             Notifier.notify(project, NotificationType.INFORMATION, "Read Clipboard Into New XML File",
-                    "Success: Wrote XML to file: " + file.toString());
+                    "Success: Wrote XML to file: " + display);
         } catch (IllegalArgumentException | IOException ex) {
-            LOG.warn("Failed to create/write XML file", ex);
+            LOG.warn("Failed to create/write XML file in projectRoot=" + safeProjectRoot(project), ex);
             Notifier.notify(project, NotificationType.ERROR, "Read Clipboard Into New XML File",
                     "Failed to create/write XML file: " + safeMessage(ex));
             return;
@@ -95,5 +100,24 @@ public class ReadClipboardIntoNewXmlFileAction extends AnAction {
     private static String safeMessage(Throwable t) {
         String msg = t.getMessage();
         return (msg == null || msg.isBlank()) ? t.getClass().getSimpleName() : msg;
+    }
+
+    private static String safeProjectRoot(Project project) {
+        try {
+            return ProjectFiles.getProjectRoot(project).toString();
+        } catch (Throwable t) {
+            return "<unknown>";
+        }
+    }
+
+    private static String displayPath(Path projectRoot, Path file) {
+        try {
+            if (file.startsWith(projectRoot)) {
+                return projectRoot.relativize(file).toString();
+            }
+        } catch (Throwable ignore) {
+            // fallthrough
+        }
+        return file.toString();
     }
 }
