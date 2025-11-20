@@ -84,4 +84,23 @@ public final class ProjectFiles {
     public static String generateTimestampedXmlFileName() {
         return System.currentTimeMillis() + ".xml";
     }
+
+    /**
+     * Creates a new empty XML file with a timestamped filename inside the `.fmCuttingBoard` directory.
+     * Basic implementation (robust error handling added in next task step).
+     * @param projectRoot project root (non-null)
+     * @return path to created file
+     * @throws IOException on I/O errors
+     * @throws IllegalArgumentException if projectRoot is null
+     */
+    public static Path createTimestampedXmlFile(Path projectRoot) throws IOException {
+        if (projectRoot == null) {
+            throw new IllegalArgumentException("projectRoot must not be null");
+        }
+        EnsureResult res = ensureCuttingBoardDir(projectRoot);
+        Path dir = res.directory();
+        String fileName = generateTimestampedXmlFileName();
+        Path target = dir.resolve(fileName);
+        return Files.createFile(target);
+    }
 }
