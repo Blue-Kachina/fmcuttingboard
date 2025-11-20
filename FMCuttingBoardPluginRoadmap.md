@@ -74,7 +74,7 @@ Each phase is broken down into small, AI-friendly tasks.
   - [x] Detects whether clipboard content is likely FileMaker-related
   - [x] Extracts or normalizes the text representation that will become XML
  - [x] Implement basic heuristics for rejecting non-FileMaker content
- - [ ] Add unit tests for detection and parsing with small sample payloads (sanitized or synthetic)
+ - [x] Add unit tests for detection and parsing with small sample payloads (sanitized or synthetic)
 
 ---
 
