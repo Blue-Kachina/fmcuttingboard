@@ -20,7 +20,7 @@ Each phase is broken down into small, AI-friendly tasks.
 
 - [x] Configure plugin run/debug configuration in the IDE
 - [x] Add basic unit test framework setup (e.g., JUnit)
-- [ ] Add minimal sample test to verify test pipeline
+- [x] Add minimal sample test to verify test pipeline
 - [ ] Set up CI pipeline (e.g., GitHub Actions) to build plugin on push
 - [ ] Configure CI to run tests on each commit
 - [ ] Add status badges (build, tests) to `README.md` (if applicable)
