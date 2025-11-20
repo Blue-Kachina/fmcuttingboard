@@ -1,0 +1,261 @@
+# ROADMAP
+
+This roadmap outlines the development phases for the **FMCuttingBoard** JetBrains plugin.  
+Each phase is broken down into small, AI-friendly tasks.
+
+---
+
+## Phase 0 — Project Skeleton & Infrastructure
+
+### 0.1 — Repository & Build Setup
+
+- [ ] Initialize plugin project structure for JetBrains IDEs (IntelliJ Platform Plugin)
+- [ ] Configure Gradle/Maven build for the plugin
+- [ ] Set plugin metadata (name, ID, description, version, vendor)
+- [ ] Configure plugin compatibility with target IDE versions
+- [ ] Set up basic `.gitignore` for the project
+- [ ] Add initial `README.md` and `ROADMAP.md` to the repository
+
+### 0.2 — Development Environment & CI
+
+- [ ] Configure plugin run/debug configuration in the IDE
+- [ ] Add basic unit test framework setup (e.g., JUnit)
+- [ ] Add minimal sample test to verify test pipeline
+- [ ] Set up CI pipeline (e.g., GitHub Actions) to build plugin on push
+- [ ] Configure CI to run tests on each commit
+- [ ] Add status badges (build, tests) to `README.md` (if applicable)
+
+---
+
+## Phase 1 — Base Plugin UI & Actions
+
+### 1.1 — Plugin Registration
+
+- [ ] Create plugin entry point files and configuration (e.g., `plugin.xml`)
+- [ ] Define plugin display name and description per README
+- [ ] Register plugin actions group for the Tools menu
+
+### 1.2 — Tools Menu Integration
+
+- [ ] Define a new submenu under **Tools** named `FMCuttingBoard`
+- [ ] Register **Convert FileMaker Clipboard To XML** action under the submenu
+- [ ] Register **Read Clipboard Into New XML File** action under the submenu
+- [ ] Register **Push Clipboard Into FileMaker** action under the submenu
+- [ ] Provide default keyboard shortcuts (optional) and ensure they are overridable
+
+### 1.3 — Action UI Wiring
+
+- [ ] Implement base action classes for each menu item
+- [ ] Wire actions to IDE’s `ActionManager` via `plugin.xml`
+- [ ] Implement placeholder execute handlers (e.g., showing “Not implemented yet” notifications)
+- [ ] Ensure actions appear correctly in the Tools menu and submenu
+- [ ] Implement basic logging of action invocations (for debugging)
+
+---
+
+## Phase 2 — Clipboard Access & FileMaker Clipboard Detection
+
+### 2.1 — Clipboard Access Abstraction
+
+- [ ] Implement a small service/class to read from the system clipboard
+- [ ] Implement a method to write text into the system clipboard
+- [ ] Add error handling for clipboard access failures (e.g., locked, unsupported content)
+- [ ] Add unit tests (where possible) for clipboard read/write wrapper
+
+### 2.2 — FileMaker Clipboard Content Detection
+
+- [ ] Research FileMaker clipboard format(s) relevant to this plugin
+- [ ] Define a small interface/protocol for “FileMakerClipboardParser”
+- [ ] Implement a first pass parser that:
+  - [ ] Detects whether clipboard content is likely FileMaker-related
+  - [ ] Extracts or normalizes the text representation that will become XML
+- [ ] Implement basic heuristics for rejecting non-FileMaker content
+- [ ] Add unit tests for detection and parsing with small sample payloads (sanitized or synthetic)
+
+---
+
+## Phase 3 — Convert FileMaker Clipboard To XML
+
+### 3.1 — Core Conversion Logic
+
+- [ ] Design data model for internal representation of FileMaker clipboard snippet(s)
+- [ ] Implement a converter from raw FileMaker clipboard data to XML string (fmxmlsnippet-like)
+- [ ] Handle common element types (e.g., fields, script steps, layouts) as needed by the plugin
+- [ ] Add error/exception handling for unexpected clipboard structures
+- [ ] Add unit tests for conversion with known sample inputs and expected XML outputs
+
+### 3.2 — Action Implementation
+
+- [ ] Integrate clipboard reader in **Convert FileMaker Clipboard To XML** action
+- [ ] Invoke FileMaker clipboard detection/parsing when action is executed
+- [ ] If content recognized, convert to XML and replace clipboard with XML string
+- [ ] If content not recognized, show user-friendly notification explaining why
+- [ ] Add logging for success/failure outcomes of the action
+- [ ] Add regression tests (as far as possible) covering user-facing behavior
+
+---
+
+## Phase 4 — Read Clipboard Into New XML File
+
+### 4.1 — `.fmCuttingBoard` Directory Management
+
+- [ ] Implement utility for locating the current project root directory
+- [ ] Implement a helper to ensure `.fmCuttingBoard` directory exists under project root
+- [ ] Implement creation of `.fmCuttingBoard` directory if missing
+- [ ] Implement creation of `.fmCuttingBoard/.gitignore` containing only `*` when directory is created
+- [ ] Add tests for directory and `.gitignore` creation logic
+
+### 4.2 — Timestamped XML File Creation
+
+- [ ] Implement a function to generate a timestamped filename (e.g., epoch-based) with `.xml` extension
+- [ ] Implement file creation inside `.fmCuttingBoard` using the generated filename
+- [ ] Implement robust error handling for file I/O failures
+- [ ] Add tests for filename format and file creation behavior (where feasible)
+
+### 4.3 — Action Implementation
+
+- [ ] Wire **Read Clipboard Into New XML File** action to:
+  - [ ] Read current clipboard content
+  - [ ] Parse/detect FileMaker clipboard content
+  - [ ] Convert recognized content to XML if needed
+  - [ ] Write XML content to a new timestamped file in `.fmCuttingBoard`
+- [ ] Show notification on success, including created file path
+- [ ] Show descriptive notification if clipboard does not contain recognizable FileMaker content
+- [ ] Add logging for file creation and failures
+- [ ] Add integration tests (where feasible) for the end-to-end workflow
+
+---
+
+## Phase 5 — Push Clipboard Into FileMaker
+
+### 5.1 — XML Parsing & Model
+
+- [ ] Define parser for the XML format generated or used by the plugin
+- [ ] Map XML elements back into an internal representation that can be transformed into FileMaker clipboard format
+- [ ] Implement validation for the expected XML structure (e.g., fmxmlsnippet)
+- [ ] Add tests verifying that valid/invalid XML cases are handled correctly
+
+### 5.2 — Conversion to FileMaker Clipboard Format
+
+- [ ] Research required format for FileMaker clipboard payloads (data + metadata, if any)
+- [ ] Design converter from XML-based representation to FileMaker-compatible clipboard content
+- [ ] Implement conversion logic for:
+  - [ ] Database fields snippets
+  - [ ] Script steps snippets
+  - [ ] Other supported snippet types as needed
+- [ ] Add graceful error handling for unsupported snippet types or malformed XML
+- [ ] Add unit tests for each supported snippet type conversion
+
+### 5.3 — Action Implementation & Context Awareness
+
+- [ ] Implement **Push Clipboard Into FileMaker** action to:
+  - [ ] Read XML content from the currently active editor file (if applicable)
+  - [ ] Validate that the current file is an XML file
+  - [ ] Convert XML to FileMaker clipboard format
+  - [ ] Write FileMaker-formatted data to the system clipboard
+- [ ] Ensure the action is only enabled when:
+  - [ ] A project is open
+  - [ ] An XML file is active in the editor (as per README)
+- [ ] Provide clear user notifications on success/failure
+- [ ] Add logging for conversion and clipboard write operations
+- [ ] Add tests for enabling/disabling the action under different editor contexts
+
+---
+
+## Phase 6 — UX, Error Handling & Logging Enhancements
+
+### 6.1 — Notifications & Messaging
+
+- [ ] Standardize all user-facing messages and notifications
+- [ ] Introduce helper utilities for showing notifications with consistent style
+- [ ] Add detailed error messages for common failure scenarios
+- [ ] Optionally add a “Show Details” link for advanced error info (e.g., logs)
+
+### 6.2 — Logging & Diagnostics
+
+- [ ] Introduce a logging facade or use platform logging consistently
+- [ ] Add structured logs around:
+  - [ ] Clipboard reads/writes
+  - [ ] Conversion success/fail
+  - [ ] File I/O operations
+- [ ] Add a simple diagnostic mode (e.g., verbose logging flag) if needed
+- [ ] Document where logs can be found for troubleshooting
+
+---
+
+## Phase 7 — Configuration & Extensibility
+
+### 7.1 — Plugin Settings
+
+- [ ] Add a settings/configuration UI page in IDE settings for the plugin
+- [ ] Add options such as:
+  - [ ] Custom base directory for saved XML files (default `.fmCuttingBoard`)
+  - [ ] Custom filename format for new XML files
+  - [ ] Toggle for automatic clipboard format detection nuances (if applicable)
+- [ ] Persist settings using IDE’s settings mechanism
+- [ ] Add tests (if supported) for settings persistence
+
+### 7.2 — Advanced Behaviors (Optional)
+
+- [ ] Provide optional preview dialog before writing to clipboard
+- [ ] Add quick actions or context menu entries in Project View or Editor (if beneficial)
+
+---
+
+## Phase 8 — Testing, Hardening & Polish
+
+### 8.1 — Extended Testing
+
+- [ ] Expand unit test coverage for all critical components
+- [ ] Add integration tests simulating full workflows:
+  - [ ] Convert → Save XML → Push to Clipboard
+- [ ] Perform manual testing across supported IDE versions
+- [ ] Test behavior with large snippets and edge cases
+
+### 8.2 — Performance & Robustness
+
+- [ ] Profile any heavy parsing/conversion logic
+- [ ] Optimize for typical payload sizes
+- [ ] Ensure plugin fails gracefully without crashing the IDE
+- [ ] Add timeouts or guards where necessary
+
+### 8.3 — Documentation
+
+- [ ] Update `README.md` with usage instructions, screenshots, and examples
+- [ ] Add a short in-IDE help section or link to documentation
+- [ ] Document known limitations and future ideas
+
+---
+
+## Phase 9 — Packaging & Release
+
+### 9.1 — Build & Distribution
+
+- [ ] Configure release build (versioning, changelog)
+- [ ] Generate plugin artifact (e.g., `.zip` or `.jar`) suitable for distribution
+- [ ] Test manual installation of the plugin in supported IDE(s)
+- [ ] Validate that all actions and menus function correctly in a fresh environment
+
+### 9.2 — Publication
+
+- [ ] Prepare plugin listing text, description, and metadata for JetBrains Marketplace (or chosen distribution channel)
+- [ ] Prepare icon and branding (if desired)
+- [ ] Publish initial version
+- [ ] Document installation steps in `README.md`
+
+---
+
+## Phase 10 — Feedback & Iteration
+
+### 10.1 — Feedback Loop
+
+- [ ] Add a simple “Provide Feedback” link somewhere in the plugin (about box, settings, etc.)
+- [ ] Collect initial user feedback and bug reports
+- [ ] Prioritize fixes and small quality-of-life improvements
+
+### 10.2 — Future Enhancements (Backlog Seeding)
+
+- [ ] Track feature requests for additional snippet types or formats
+- [ ] Consider richer transformations or refactorings of fmxmlsnippet content
+- [ ] Explore interoperability with other FileMaker tools and workflows
+- [ ] Periodically review and update this roadmap as the project evolves
