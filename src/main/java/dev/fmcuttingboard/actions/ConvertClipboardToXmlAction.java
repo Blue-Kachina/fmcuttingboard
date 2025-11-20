@@ -2,6 +2,12 @@ package dev.fmcuttingboard.actions;
 
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.notification.Notification;
+import com.intellij.notification.NotificationGroup;
+import com.intellij.notification.NotificationGroupManager;
+import com.intellij.notification.NotificationType;
+import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -9,8 +15,22 @@ import org.jetbrains.annotations.NotNull;
  * Actual behavior will be implemented in later phases per roadmap.
  */
 public class ConvertClipboardToXmlAction extends AnAction {
+    private static final Logger LOG = Logger.getInstance(ConvertClipboardToXmlAction.class);
+
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
-        // Placeholder: functionality will be implemented in Phase 3 per roadmap.
+        Project project = e.getProject();
+        LOG.info("Invoke: ConvertClipboardToXmlAction");
+        notifyNotImplemented(project, "Convert FileMaker Clipboard To XML");
+    }
+
+    private static void notifyNotImplemented(Project project, String actionName) {
+        NotificationGroup group = NotificationGroupManager.getInstance().getNotificationGroup("FMCuttingBoard");
+        Notification notification = group.createNotification(
+                actionName + " — Not implemented yet",
+                "This action is a placeholder and will be implemented in a later phase.",
+                NotificationType.INFORMATION
+        );
+        notification.notify(project);
     }
 }

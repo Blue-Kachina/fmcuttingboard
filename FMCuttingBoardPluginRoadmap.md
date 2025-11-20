@@ -49,11 +49,11 @@ Each phase is broken down into small, AI-friendly tasks.
 
 ### 1.3 — Action UI Wiring
 
-- [ ] Implement base action classes for each menu item
+- [x] Implement base action classes for each menu item
 - [ ] Wire actions to IDE’s `ActionManager` via `plugin.xml`
-- [ ] Implement placeholder execute handlers (e.g., showing “Not implemented yet” notifications)
-- [ ] Ensure actions appear correctly in the Tools menu and submenu
-- [ ] Implement basic logging of action invocations (for debugging)
+ - [ ] Implement placeholder execute handlers (e.g., showing “Not implemented yet” notifications)
+ - [ ] Ensure actions appear correctly in the Tools menu and submenu
+ - [ ] Implement basic logging of action invocations (for debugging)
 
 ---
 

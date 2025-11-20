@@ -22,6 +22,11 @@
         This is an initial skeleton; functionality will be implemented progressively per the roadmap.
     ]]></description>
 
+    <!-- Notifications group for user-facing balloon messages -->
+    <notifications>
+        <group id="FMCuttingBoard" displayType="BALLOON"/>
+    </notifications>
+
     <!-- Phase 1.1: Register base actions group under Tools menu -->
     <actions>
         <group id="dev.fmcuttingboard.toolsGroup"
