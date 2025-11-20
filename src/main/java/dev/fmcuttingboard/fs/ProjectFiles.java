@@ -99,8 +99,25 @@ public final class ProjectFiles {
         }
         EnsureResult res = ensureCuttingBoardDir(projectRoot);
         Path dir = res.directory();
-        String fileName = generateTimestampedXmlFileName();
-        Path target = dir.resolve(fileName);
-        return Files.createFile(target);
+
+        String baseName = generateTimestampedXmlFileName();
+        Path candidate = dir.resolve(baseName);
+
+        // Handle unlikely collisions by appending -N suffix before .xml
+        int attempt = 0;
+        while (Files.exists(candidate)) {
+            attempt++;
+            String withSuffix = baseName.replaceFirst("\\.xml$", "-" + attempt + ".xml");
+            candidate = dir.resolve(withSuffix);
+            if (attempt > 1000) {
+                throw new IOException("Unable to create a unique timestamped filename after 1000 attempts");
+            }
+        }
+
+        try {
+            return Files.createFile(candidate);
+        } catch (IOException ioe) {
+            throw new IOException("Failed to create timestamped XML file at: " + candidate, ioe);
+        }
     }
 }
