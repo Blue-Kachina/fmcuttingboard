@@ -136,7 +136,7 @@ Each phase is broken down into small, AI-friendly tasks.
 
 - [x] Define parser for the XML format generated or used by the plugin
 - [x] Map XML elements back into an internal representation that can be transformed into FileMaker clipboard format
-- [ ] Implement validation for the expected XML structure (e.g., fmxmlsnippet)
+- [x] Implement validation for the expected XML structure (e.g., fmxmlsnippet)
 - [ ] Add tests verifying that valid/invalid XML cases are handled correctly
 
 ### 5.2 — Conversion to FileMaker Clipboard Format
