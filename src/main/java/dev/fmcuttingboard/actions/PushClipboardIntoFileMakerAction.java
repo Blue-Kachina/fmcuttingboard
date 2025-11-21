@@ -137,12 +137,27 @@ public class PushClipboardIntoFileMakerAction extends AnAction {
     static boolean isXmlFile(VirtualFile vf) {
         if (vf == null || vf.isDirectory()) return false;
         String ext = vf.getExtension();
-        return ext != null && ext.equalsIgnoreCase("xml");
+        return isXmlFileExtension(ext);
     }
 
     // Visible for testing: enablement predicate
     boolean isEnabled(Project project, VirtualFile vf) {
         return project != null && isXmlFile(vf);
+    }
+
+    // Overload for tests that don't require a Project instance
+    boolean isEnabled(boolean hasProject, VirtualFile vf) {
+        return hasProject && isXmlFile(vf);
+    }
+
+    // Overload for tests with only an extension available
+    boolean isEnabled(boolean hasProject, String fileExtension) {
+        return hasProject && isXmlFileExtension(fileExtension);
+    }
+
+    // Helper exposed for tests
+    static boolean isXmlFileExtension(String ext) {
+        return ext != null && ext.equalsIgnoreCase("xml");
     }
 
     // Package-private for tests: processes provided xml and writes to clipboard

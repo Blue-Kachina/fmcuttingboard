@@ -325,20 +325,96 @@ public class DefaultClipboardService implements ClipboardService {
     @Override
     public void writeText(String text) throws ClipboardAccessException {
         try {
-            StringSelection selection = new StringSelection(text == null ? "" : text);
+            // Publish multiple text flavors to improve compatibility with apps like FileMaker on macOS
+            // that may probe XML, UTF-16, or generic text representations. This mirrors the breadth
+            // of formats we read and increases the chance that FileMaker recognizes fmxmlsnippet
+            // as an object paste, not plain text.
+            Transferable multi = new MultiFlavorTextTransferable(text == null ? "" : text);
             if (manager != null) {
-                manager.setContents(selection);
+                manager.setContents(multi);
             } else {
                 Clipboard sysClipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
                 if (sysClipboard == null) {
                     throw new ClipboardAccessException("System clipboard not available.");
                 }
-                sysClipboard.setContents(selection, null);
+                sysClipboard.setContents(multi, null);
             }
         } catch (IllegalStateException e) { // clipboard busy/locked
             throw new ClipboardAccessException("Clipboard is currently unavailable (locked).", e);
         } catch (Throwable t) {
             throw new ClipboardAccessException("Unexpected clipboard error while writing.", t);
+        }
+    }
+
+    /**
+     * Transferable that exposes a wide range of text flavors (String, XML, UTF-16 streams, etc.)
+     * to match the formats we probe on read, helping apps (incl. FileMaker on macOS) detect
+     * fmxmlsnippet content as structured clipboard data.
+     */
+    @SuppressWarnings("ClassCanBeLocal")
+    private static final class MultiFlavorTextTransferable implements Transferable {
+        private final String text;
+        private final DataFlavor[] flavors;
+
+        MultiFlavorTextTransferable(String text) {
+            this.text = text == null ? "" : text;
+            // Build flavors array. Keep stringFlavor first as a fast path.
+            DataFlavor[] tmp;
+            try {
+                tmp = new DataFlavor[] {
+                        DataFlavor.stringFlavor,
+                        new DataFlavor("text/plain;class=java.lang.String"),
+                        new DataFlavor("text/xml;class=java.lang.String"),
+                        new DataFlavor("application/xml;class=java.lang.String"),
+                        new DataFlavor("text/html;class=java.lang.String"),
+                        // UTF-16 variants exposed as streams are often preferred by macOS pasteboards
+                        new DataFlavor("text/plain;charset=utf-16;class=java.io.InputStream"),
+                        new DataFlavor("text/plain;charset=unicode;class=java.io.InputStream")
+                };
+            } catch (ClassNotFoundException e) {
+                // Should not happen for core JRE classes; fall back to string-only
+                tmp = new DataFlavor[] { DataFlavor.stringFlavor };
+            }
+            this.flavors = tmp;
+        }
+
+        @Override
+        public DataFlavor[] getTransferDataFlavors() {
+            // Return a copy to be safe
+            return flavors.clone();
+        }
+
+        @Override
+        public boolean isDataFlavorSupported(DataFlavor flavor) {
+            for (DataFlavor f : flavors) {
+                if (f.equals(flavor)) return true;
+            }
+            return false;
+        }
+
+        @Override
+        public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException {
+            // String flavors
+            if (flavor.equals(DataFlavor.stringFlavor)) return text;
+            if ("java.lang.String".equals(flavor.getRepresentationClass().getName())) {
+                return text;
+            }
+
+            // InputStream UTF-16 variants
+            if (InputStream.class.equals(flavor.getRepresentationClass())) {
+                String mime = flavor.getMimeType().toLowerCase();
+                if (mime.contains("charset=utf-16") || mime.contains("charset=unicode")) {
+                    // Provide BOM to be explicit; many macOS apps accept with or without BOM
+                    byte[] bom = new byte[] {(byte)0xFE, (byte)0xFF};
+                    byte[] body = text.getBytes(StandardCharsets.UTF_16BE);
+                    byte[] all = new byte[bom.length + body.length];
+                    System.arraycopy(bom, 0, all, 0, bom.length);
+                    System.arraycopy(body, 0, all, bom.length, body.length);
+                    return new ByteArrayInputStream(all);
+                }
+            }
+
+            throw new UnsupportedFlavorException(flavor);
         }
     }
 

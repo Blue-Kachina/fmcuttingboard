@@ -52,4 +52,19 @@ class PushClipboardIntoFileMakerActionTest {
 
         assertThrows(ConversionException.class, () -> action.processXmlToClipboard(xml));
     }
+
+    @Test
+    void enablement_requiresProjectAndXmlExtension() {
+        PushClipboardIntoFileMakerAction action = new PushClipboardIntoFileMakerAction(
+                new CapturingClipboard(), new DefaultXmlToClipboardConverter(), NOOP_NOTIFIER);
+
+        // No project -> disabled (regardless of extension)
+        assertFalse(action.isEnabled(false, "xml"));
+
+        // Simulate non-XML file by extension
+        assertFalse(action.isEnabled(true, "txt"));
+
+        // XML file -> enabled
+        assertTrue(action.isEnabled(true, "xml"));
+    }
 }
