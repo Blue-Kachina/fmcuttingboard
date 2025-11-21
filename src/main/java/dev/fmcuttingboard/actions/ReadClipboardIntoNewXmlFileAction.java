@@ -95,7 +95,7 @@ public class ReadClipboardIntoNewXmlFileAction extends AnAction {
         // 3) Create timestamped file inside .fmCuttingBoard and write XML
         try {
             Path projectRoot = ProjectFiles.getProjectRoot(project);
-            Path file = processIntoNewXmlFile(projectRoot, xml);
+            Path file = processIntoNewXmlFile(project, projectRoot, xml);
             String display = displayPath(projectRoot, file);
 
             // 3a) Refresh VFS for the new file and its parent directory
@@ -136,9 +136,30 @@ public class ReadClipboardIntoNewXmlFileAction extends AnAction {
         }
     }
 
-    // Package-private for testing: writes provided xml to new timestamped file under projectRoot
-    Path processIntoNewXmlFile(Path projectRoot, String xml) throws IOException {
-        Path file = ProjectFiles.createTimestampedXmlFile(projectRoot);
+    // Package-private for testing: writes provided xml to new settings-based file under projectRoot
+    Path processIntoNewXmlFile(Project project, Path projectRoot, String xml) throws IOException {
+        // Try to use settings; fall back to defaults if unavailable.
+        String baseDir = null;
+        String pattern = null;
+        try {
+            if (project != null) {
+                dev.fmcuttingboard.settings.FmCuttingBoardSettingsState settings =
+                        dev.fmcuttingboard.settings.FmCuttingBoardSettingsState.getInstance(project);
+                if (settings != null) {
+                    baseDir = settings.getBaseDirName();
+                    pattern = settings.getFileNamePattern();
+                }
+            }
+        } catch (Throwable ignore) {
+            // use defaults
+        }
+
+        Path file;
+        if (baseDir != null || pattern != null) {
+            file = ProjectFiles.createSettingsBasedXmlFile(projectRoot, baseDir, pattern);
+        } else {
+            file = ProjectFiles.createTimestampedXmlFile(projectRoot);
+        }
         long startNs = System.nanoTime();
         Files.writeString(file, xml, StandardCharsets.UTF_8);
         long elapsedMs = (System.nanoTime() - startNs) / 1_000_000L;

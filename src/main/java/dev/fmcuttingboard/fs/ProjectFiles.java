@@ -78,11 +78,11 @@ public final class ProjectFiles {
 
     // ----- Phase 4.2 — Timestamped XML File Creation -----
     /**
-     * Generates a timestamp-based filename with an .xml extension.
-     * Uses epoch milliseconds, e.g. "1732100000123.xml".
+     * Generates a timestamp-based filename with the default prefix and .xml extension.
+     * Default format: "fmclip-{timestamp}.xml" where timestamp is epoch milliseconds.
      */
     public static String generateTimestampedXmlFileName() {
-        return System.currentTimeMillis() + ".xml";
+        return "fmclip-" + System.currentTimeMillis() + ".xml";
     }
 
     /**
@@ -118,6 +118,70 @@ public final class ProjectFiles {
             return Files.createFile(candidate);
         } catch (IOException ioe) {
             throw new IOException("Failed to create timestamped XML file at: " + candidate, ioe);
+        }
+    }
+
+    // ----- Phase 7.1 — Settings-aware helpers -----
+    /**
+     * Ensures a custom-named base directory exists under the provided project root.
+     * If created, also creates a .gitignore inside with a single "*" line.
+     */
+    public static EnsureResult ensureCustomBaseDir(Path projectRoot, String baseDirName) throws IOException {
+        if (projectRoot == null) throw new IllegalArgumentException("projectRoot must not be null");
+        if (baseDirName == null || baseDirName.isBlank()) baseDirName = CUTTING_BOARD_DIR;
+        Path dir = projectRoot.resolve(baseDirName);
+        boolean createdDir = false;
+        boolean createdGitignore = false;
+        if (Files.notExists(dir)) {
+            Files.createDirectories(dir);
+            createdDir = true;
+            Path gi = dir.resolve(GITIGNORE);
+            Files.writeString(gi, "*\n", StandardCharsets.UTF_8,
+                    StandardOpenOption.CREATE_NEW, StandardOpenOption.WRITE);
+            createdGitignore = true;
+        }
+        return new EnsureResult(dir, createdDir, createdGitignore);
+    }
+
+    /**
+     * Creates a new empty XML file using a settings-provided base directory and filename pattern.
+     * Supported pattern tokens: {timestamp} (epoch millis). Any other text remains literal.
+     * If pattern is null/blank, defaults to fmclip-{timestamp}.xml
+     */
+    public static Path createSettingsBasedXmlFile(Path projectRoot, String baseDirName, String fileNamePattern) throws IOException {
+        if (projectRoot == null) throw new IllegalArgumentException("projectRoot must not be null");
+        EnsureResult res = ensureCustomBaseDir(projectRoot, baseDirName);
+        Path dir = res.directory();
+
+        String pattern = (fileNamePattern == null || fileNamePattern.isBlank())
+                ? "fmclip-{timestamp}.xml"
+                : fileNamePattern;
+        String baseName = pattern.replace("{timestamp}", String.valueOf(System.currentTimeMillis()));
+        if (!baseName.endsWith(".xml")) {
+            baseName = baseName + ".xml"; // ensure extension
+        }
+
+        Path candidate = dir.resolve(baseName);
+        int attempt = 0;
+        while (Files.exists(candidate)) {
+            attempt++;
+            String withSuffix;
+            int dot = baseName.lastIndexOf('.')
+                    ;
+            if (dot > 0) {
+                withSuffix = baseName.substring(0, dot) + "-" + attempt + baseName.substring(dot);
+            } else {
+                withSuffix = baseName + "-" + attempt;
+            }
+            candidate = dir.resolve(withSuffix);
+            if (attempt > 1000) {
+                throw new IOException("Unable to create a unique filename after 1000 attempts for baseName=" + baseName);
+            }
+        }
+        try {
+            return Files.createFile(candidate);
+        } catch (IOException ioe) {
+            throw new IOException("Failed to create XML file at: " + candidate, ioe);
         }
     }
 }

@@ -48,7 +48,7 @@ class ReadClipboardIntoNewXmlFileIntegrationTest {
         ReadClipboardIntoNewXmlFileAction action = new ReadClipboardIntoNewXmlFileAction(
                 new NoOpClipboardService(), new ClipboardToXmlConverter(), (p, t, title, content) -> {}
         );
-        Path written = action.processIntoNewXmlFile(tmpDir, xml);
+        Path written = action.processIntoNewXmlFile(null, tmpDir, xml);
 
         // Then the file exists, is inside .fmCuttingBoard, and contains the XML snippet
         assertTrue(Files.exists(written), "Output file should exist");

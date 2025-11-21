@@ -25,6 +25,10 @@
     <!-- Notifications group for user-facing balloon messages (registered via extensions) -->
     <extensions defaultExtensionNs="com.intellij">
         <notificationGroup id="FMCuttingBoard" displayType="BALLOON"/>
+        <!-- Phase 7.1: Register project-level settings page -->
+        <projectConfigurable id="dev.fmcuttingboard.settings"
+                             displayName="FMCuttingBoard"
+                             instance="dev.fmcuttingboard.settings.FmCuttingBoardConfigurable"/>
     </extensions>
 
     <!-- Phase 1.1: Register base actions group under Tools menu -->

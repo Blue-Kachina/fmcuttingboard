@@ -14,7 +14,7 @@ class TimestampedFileCreationTest {
     @Test
     void filenameHasEpochMillisAndXmlExtension() {
         String name = ProjectFiles.generateTimestampedXmlFileName();
-        assertTrue(name.matches("\\d+\\.xml"), "Filename should be digits followed by .xml, got: " + name);
+        assertTrue(name.matches("fmclip-\\d+\\.xml"), "Filename should be fmclip- followed by digits and .xml, got: " + name);
     }
 
     @Test
