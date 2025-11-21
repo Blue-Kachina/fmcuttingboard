@@ -7,6 +7,11 @@ pluginManagement {
         // Keep Maven Central as a generic fallback (not used for Plugin Portal, but harmless here)
         mavenCentral()
     }
+    // Centralize plugin versions here so build scripts don't hardcode them
+    plugins {
+        // Use IntelliJ Platform Gradle Plugin 2.x — required for IntelliJ Platform 2024.2+
+        id("org.jetbrains.intellij.platform") version "2.0.1"
+    }
 }
 
 plugins {
