@@ -33,11 +33,6 @@ The trick will be in getting the format right.
 If the fmxmlsnippet represents database fields, then after running this command the user would be able to paste fields into FileMaker's Manage Database dialog.
 If it contains an fmxmlsnippet of script steps, then we'd be able to paste Script Steps into FileMaker Script Workspace window, etc...
 
-## Inspiration
-Please review inspiration/GetFmClipboard.ps1.
-It works similarly to how we will want the Convert FileMaker Clipboard To XML to work.
-
-
 ## Development
 
 - Run the plugin in a sandbox IDE: `./gradlew runIde` (or `gradlew.bat runIde` on Windows)
