@@ -126,7 +126,7 @@ Each phase is broken down into small, AI-friendly tasks.
 - [x] Show notification on success, including created file path
 - [x] Show descriptive notification if clipboard does not contain recognizable FileMaker content
 - [x] Add logging for file creation and failures
-- [ ] Add integration tests (where feasible) for the end-to-end workflow
+- [x] Add integration tests (where feasible) for the end-to-end workflow
 
 ---
 

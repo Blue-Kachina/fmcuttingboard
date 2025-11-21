@@ -12,6 +12,7 @@ import dev.fmcuttingboard.fm.ClipboardToXmlConverter;
 import dev.fmcuttingboard.fm.ConversionException;
 import dev.fmcuttingboard.fs.ProjectFiles;
 import dev.fmcuttingboard.util.Notifier;
+import dev.fmcuttingboard.util.UserNotifier;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -27,15 +28,24 @@ public class ReadClipboardIntoNewXmlFileAction extends AnAction {
     private static final Logger LOG = Logger.getInstance(ReadClipboardIntoNewXmlFileAction.class);
     private final ClipboardService clipboardService;
     private final ClipboardToXmlConverter converter;
+    private final UserNotifier notifier;
 
     public ReadClipboardIntoNewXmlFileAction() {
-        this(new DefaultClipboardService(), new ClipboardToXmlConverter());
+        this(new DefaultClipboardService(), new ClipboardToXmlConverter(), Notifier::notify);
     }
 
     // Visible for testing / DI
     public ReadClipboardIntoNewXmlFileAction(ClipboardService clipboardService, ClipboardToXmlConverter converter) {
+        this(clipboardService, converter, Notifier::notify);
+    }
+
+    // Visible for testing / DI
+    public ReadClipboardIntoNewXmlFileAction(ClipboardService clipboardService,
+                                             ClipboardToXmlConverter converter,
+                                             UserNotifier notifier) {
         this.clipboardService = clipboardService;
         this.converter = converter;
+        this.notifier = notifier;
     }
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
@@ -48,14 +58,14 @@ public class ReadClipboardIntoNewXmlFileAction extends AnAction {
             clipboardText = clipboardService.readText().orElse("");
         } catch (ClipboardAccessException ex) {
             LOG.warn("Clipboard read failed", ex);
-            Notifier.notify(project, NotificationType.ERROR, "Read Clipboard Into New XML File",
+            notifier.notify(project, NotificationType.ERROR, "Read Clipboard Into New XML File",
                     "Could not read clipboard: " + safeMessage(ex));
             return;
         }
 
         if (clipboardText.isBlank()) {
             LOG.info("Clipboard is empty or does not contain text.");
-            Notifier.notify(project, NotificationType.INFORMATION, "Read Clipboard Into New XML File",
+            notifier.notify(project, NotificationType.INFORMATION, "Read Clipboard Into New XML File",
                     "Clipboard is empty or contains no text to save.");
             return;
         }
@@ -66,12 +76,12 @@ public class ReadClipboardIntoNewXmlFileAction extends AnAction {
             xml = converter.convertToXml(clipboardText);
         } catch (ConversionException ce) {
             LOG.info("Clipboard does not contain recognizable FileMaker content.");
-            Notifier.notify(project, NotificationType.WARNING, "Read Clipboard Into New XML File",
+            notifier.notify(project, NotificationType.WARNING, "Read Clipboard Into New XML File",
                     "Clipboard does not contain recognizable FileMaker content or fmxmlsnippet.");
             return;
         } catch (Throwable t) {
             LOG.warn("Unexpected error during conversion", t);
-            Notifier.notify(project, NotificationType.ERROR, "Read Clipboard Into New XML File",
+            notifier.notify(project, NotificationType.ERROR, "Read Clipboard Into New XML File",
                     "Unexpected error during conversion: " + safeMessage(t));
             return;
         }
@@ -79,22 +89,28 @@ public class ReadClipboardIntoNewXmlFileAction extends AnAction {
         // 3) Create timestamped file inside .fmCuttingBoard and write XML
         try {
             Path projectRoot = ProjectFiles.getProjectRoot(project);
-            Path file = ProjectFiles.createTimestampedXmlFile(projectRoot);
-            long startNs = System.nanoTime();
-            Files.writeString(file, xml, StandardCharsets.UTF_8);
-            long elapsedMs = (System.nanoTime() - startNs) / 1_000_000L;
-            int byteCount = xml.getBytes(StandardCharsets.UTF_8).length;
-            int charCount = xml.length();
-            LOG.info("Wrote XML to: " + file + " (bytes=" + byteCount + ", chars=" + charCount + ", took=" + elapsedMs + "ms)");
+            Path file = processIntoNewXmlFile(projectRoot, xml);
             String display = displayPath(projectRoot, file);
-            Notifier.notify(project, NotificationType.INFORMATION, "Read Clipboard Into New XML File",
+            notifier.notify(project, NotificationType.INFORMATION, "Read Clipboard Into New XML File",
                     "Success: Wrote XML to file: " + display);
         } catch (IllegalArgumentException | IOException ex) {
             LOG.warn("Failed to create/write XML file in projectRoot=" + safeProjectRoot(project), ex);
-            Notifier.notify(project, NotificationType.ERROR, "Read Clipboard Into New XML File",
+            notifier.notify(project, NotificationType.ERROR, "Read Clipboard Into New XML File",
                     "Failed to create/write XML file: " + safeMessage(ex));
             return;
         }
+    }
+
+    // Package-private for testing: writes provided xml to new timestamped file under projectRoot
+    Path processIntoNewXmlFile(Path projectRoot, String xml) throws IOException {
+        Path file = ProjectFiles.createTimestampedXmlFile(projectRoot);
+        long startNs = System.nanoTime();
+        Files.writeString(file, xml, StandardCharsets.UTF_8);
+        long elapsedMs = (System.nanoTime() - startNs) / 1_000_000L;
+        int byteCount = xml.getBytes(StandardCharsets.UTF_8).length;
+        int charCount = xml.length();
+        LOG.info("Wrote XML to: " + file + " (bytes=" + byteCount + ", chars=" + charCount + ", took=" + elapsedMs + "ms)");
+        return file;
     }
 
     private static String safeMessage(Throwable t) {
