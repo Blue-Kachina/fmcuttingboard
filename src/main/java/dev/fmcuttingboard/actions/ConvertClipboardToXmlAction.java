@@ -56,14 +56,14 @@ public class ConvertClipboardToXmlAction extends AnAction {
             clipboardText = clipboardService.readText().orElse("");
         } catch (ClipboardAccessException ex) {
             LOG.warn("Clipboard read failed", ex);
-            Notifier.notifyWithDetails(project, NotificationType.ERROR, "Convert FileMaker Clipboard To XML",
+            Notifier.notifyWithDetails(project, NotificationType.ERROR, "Convert FM Clipboard To XML Clipboard",
                     "Could not read clipboard: " + safeMessage(ex), ex);
             return;
         }
 
         if (clipboardText.isBlank()) {
             LOG.info("Clipboard is empty or does not contain text.");
-            notifier.notify(project, NotificationType.INFORMATION, "Convert FileMaker Clipboard To XML",
+            notifier.notify(project, NotificationType.INFORMATION, "Convert FM Clipboard To XML Clipboard",
                     "Clipboard is empty or contains no text to convert.");
             return;
         }
@@ -75,12 +75,12 @@ public class ConvertClipboardToXmlAction extends AnAction {
             xml = converter.convertToXml(clipboardText);
         } catch (ConversionException ce) {
             LOG.info("Clipboard does not contain recognizable FileMaker content.");
-            notifier.notify(project, NotificationType.WARNING, "Convert FileMaker Clipboard To XML",
+            notifier.notify(project, NotificationType.WARNING, "Convert FM Clipboard To XML Clipboard",
                     "Clipboard does not contain recognizable FileMaker content or fmxmlsnippet.");
             return;
         } catch (Throwable t) {
             LOG.warn("Unexpected error during conversion", t);
-            Notifier.notifyWithDetails(project, NotificationType.ERROR, "Convert FileMaker Clipboard To XML",
+            Notifier.notifyWithDetails(project, NotificationType.ERROR, "Convert FM Clipboard To XML Clipboard",
                     "Unexpected error during conversion: " + safeMessage(t), t);
             return;
         }
@@ -91,12 +91,12 @@ public class ConvertClipboardToXmlAction extends AnAction {
                 FmCuttingBoardSettingsState st = FmCuttingBoardSettingsState.getInstance(project);
                 if (st.isPreviewBeforeClipboardWrite()) {
                     boolean proceed = PreviewDialogs.confirmWrite(project,
-                            "Preview: Convert FileMaker Clipboard To XML",
+                            "Preview: Convert FM Clipboard To XML Clipboard",
                             xml,
                             800);
                     if (!proceed) {
                         LOG.info("User canceled clipboard write after preview.");
-                        notifier.notify(project, NotificationType.INFORMATION, "Convert FileMaker Clipboard To XML",
+                        notifier.notify(project, NotificationType.INFORMATION, "Convert FM Clipboard To XML Clipboard",
                                 "Canceled: No changes were made to the clipboard.");
                         return;
                     }
@@ -111,14 +111,14 @@ public class ConvertClipboardToXmlAction extends AnAction {
             clipboardService.writeText(xml);
         } catch (ClipboardAccessException ex) {
             LOG.warn("Clipboard write failed", ex);
-            Notifier.notifyWithDetails(project, NotificationType.ERROR, "Convert FileMaker Clipboard To XML",
+            Notifier.notifyWithDetails(project, NotificationType.ERROR, "Convert FM Clipboard To XML Clipboard",
                     "Converted XML generated, but failed to write to clipboard: " + safeMessage(ex), ex);
             return;
         }
 
         LOG.info("Conversion successful; XML placed on clipboard.");
         Diagnostics.vInfo(LOG, "XML preview (first 120 chars): " + xml.substring(0, Math.min(120, xml.length())));
-        notifier.notify(project, NotificationType.INFORMATION, "Convert FileMaker Clipboard To XML",
+        notifier.notify(project, NotificationType.INFORMATION, "Convert FM Clipboard To XML Clipboard",
                 "Success: Converted FileMaker clipboard content to XML and placed it on the clipboard.");
     }
 

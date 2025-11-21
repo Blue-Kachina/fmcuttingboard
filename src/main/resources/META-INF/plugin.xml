@@ -6,20 +6,20 @@
     <id>dev.bluekachina.fmcuttingboard</id>
     <name>FMCuttingBoard</name>
     <version>0.0.1</version>
-    <vendor email="to_be_filled@example.com" url="http://www.example.com">FMCuttingBoard</vendor>
+    <vendor url="https://github.com/Blue-Kachina/fmcuttingboard">Blue Kachina</vendor>
 
     <!-- Compatibility configured via Gradle's patchPluginXml -->
 
     <description><![CDATA[
-        A JetBrains IDE plugin that helps you work with FileMaker's clipboard as XML.
+        Work with FileMaker clipboard content as XML (fmxmlsnippet) directly from your JetBrains IDE.
 
-        When installed, the plugin adds a new "FMCuttingBoard" submenu under the IDE's Tools menu.
-        Planned actions include:
-        - Convert FileMaker Clipboard To XML
-        - Read Clipboard Into New XML File
+        The plugin adds a "FMCuttingBoard" submenu under the Tools menu with actions to:
+        - Convert FM Clipboard To XML Clipboard
+        - New XML File From FM Clipboard
         - Push Clipboard Into FileMaker
 
-        This is an initial skeleton; functionality will be implemented progressively per the roadmap.
+        Use it to inspect and version-control fmxmlsnippet payloads, and to reconstruct clipboard
+        content from XML for pasting back into FileMaker (fields, scripts, etc.).
     ]]></description>
 
     <!-- Notifications group for user-facing balloon messages (registered via extensions) -->
@@ -41,7 +41,7 @@
             <!-- Phase 1.2: Register submenu actions -->
             <action id="dev.fmcuttingboard.actions.ConvertClipboardToXml"
                     class="dev.fmcuttingboard.actions.ConvertClipboardToXmlAction"
-                    text="Convert FileMaker Clipboard To XML"
+                    text="Convert FM Clipboard To XML Clipboard"
                     description="Convert FileMaker clipboard contents to XML and place on clipboard">
                 <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt C" second-keystroke="X"/>
                 <!-- Phase 7.2: Quick access in context menus -->
@@ -51,7 +51,7 @@
 
             <action id="dev.fmcuttingboard.actions.ReadClipboardIntoNewXmlFile"
                     class="dev.fmcuttingboard.actions.ReadClipboardIntoNewXmlFileAction"
-                    text="Read Clipboard Into New XML File"
+                    text="New XML File From FM Clipboard"
                     description="Create a new XML file from the current clipboard contents">
                 <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt C" second-keystroke="F"/>
                 <!-- Phase 7.2: Quick access in context menus -->

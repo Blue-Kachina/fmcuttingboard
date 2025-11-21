@@ -7,15 +7,15 @@
 - When installed, the user will have a new menu item in their IDE's `Tools` menu
 - The new menu item will be named the same as this plugin
 - The new menu item will itself be a submenu:
-  - Convert FileMaker Clipboard To XML 
-  - Read Clipboard Into New XML File
+  - Convert FM Clipboard To XML Clipboard 
+  - New XML File From FM Clipboard
   - Push Clipboard Into FileMaker (only enabled when XML file is currently active)
 
-## Convert FileMaker Clipboard To XML
+## Convert FM Clipboard To XML Clipboard
 When this option is selected, we will attempt to read FileMaker content from the clipboard.
 If we are successful in finding FileMaker content, then the clipboard will be replaced with it
 
-## Read Clipboard Into New XML File
+## New XML File From FM Clipboard
 When this option is selected, we will attempt to read FileMaker content from the clipboard.  
 If we are successful in finding FileMaker content, it will be written to file.
 The file it's written to should be a file whose name is timestamped (perhaps using unix/epoch).
@@ -27,7 +27,7 @@ The .gitigore will contain only a `*` character.
 
 ## Push Clipboard Into FileMaker
 When this option is selected, we will attempt to populate the clipboard with content FileMaker will properly recognize.
-In essence, this option is doing the opposite of what we're doing in `Read Clipboard Into New XML File`.
+In essence, this option is doing the opposite of what we're doing in `New XML File From FM Clipboard`.
 We're taking plain XML, and repackaging it into a new clipboard that we'll later be able to paste into FileMaker.
 The trick will be in getting the format right.  
 If the fmxmlsnippet represents database fields, then after running this command the user would be able to paste fields into FileMaker's Manage Database dialog.
@@ -46,10 +46,11 @@ If it contains an fmxmlsnippet of script steps, then we'd be able to paste Scrip
 - Install it in your IDE via: Settings/Preferences > Plugins > Gear icon > Install Plugin from Disk… and select the generated ZIP.
 
 ### Branding
-- The plugin includes light and dark icons as required by JetBrains Marketplace conventions.
-- Icon assets are located at:
+- The plugin uses a single SVG icon provided by the project owner; no dark variant is used.
+- Icon asset location used by the IDE:
   - src/main/resources/META-INF/pluginIcon.svg
-  - src/main/resources/META-INF/pluginIcon_dark.svg
+- Source artwork kept in repo (for editing/exporting):
+  - resources/fmCuttingBoardIcon.svg
 
 ### Logging and Diagnostics
 - The plugin uses the IDE's built-in logging (idea.log). To view logs:

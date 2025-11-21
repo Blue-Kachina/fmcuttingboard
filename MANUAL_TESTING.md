@@ -12,9 +12,9 @@ Environments to check
 - (Optional) IntelliJ IDEA Ultimate 2024.3 or later
 
 Checklist
-1) Read Clipboard Into New XML File
+1) New XML File From FM Clipboard
    - Copy a valid FileMaker fmxmlsnippet text (e.g., a <fmxmlsnippet> with a FieldDefinition or Script) to the system clipboard.
-   - Invoke the action “FM: Read Clipboard Into New XML File”.
+   - Invoke the action “FM: New XML File From FM Clipboard”.
    - Expected: A new timestamped XML file is created under .fmCuttingBoard at the project root and opened in the editor.
    - Expected: Notification indicates success and filepath.
 

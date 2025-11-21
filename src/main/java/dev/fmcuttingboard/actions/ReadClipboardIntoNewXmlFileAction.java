@@ -64,14 +64,14 @@ public class ReadClipboardIntoNewXmlFileAction extends AnAction {
             clipboardText = clipboardService.readText().orElse("");
         } catch (ClipboardAccessException ex) {
             LOG.warn("Clipboard read failed", ex);
-            Notifier.notifyWithDetails(project, NotificationType.ERROR, "Read Clipboard Into New XML File",
+            Notifier.notifyWithDetails(project, NotificationType.ERROR, "New XML File From FM Clipboard",
                     "Could not read clipboard: " + safeMessage(ex), ex);
             return;
         }
 
         if (clipboardText.isBlank()) {
             LOG.info("Clipboard is empty or does not contain text.");
-            notifier.notify(project, NotificationType.INFORMATION, "Read Clipboard Into New XML File",
+            notifier.notify(project, NotificationType.INFORMATION, "New XML File From FM Clipboard",
                     "Clipboard is empty or contains no text to save.");
             return;
         }
@@ -82,12 +82,12 @@ public class ReadClipboardIntoNewXmlFileAction extends AnAction {
             xml = converter.convertToXml(clipboardText);
         } catch (ConversionException ce) {
             LOG.info("Clipboard does not contain recognizable FileMaker content.");
-            notifier.notify(project, NotificationType.WARNING, "Read Clipboard Into New XML File",
+            notifier.notify(project, NotificationType.WARNING, "New XML File From FM Clipboard",
                     "Clipboard does not contain recognizable FileMaker content or fmxmlsnippet.");
             return;
         } catch (Throwable t) {
             LOG.warn("Unexpected error during conversion", t);
-            Notifier.notifyWithDetails(project, NotificationType.ERROR, "Read Clipboard Into New XML File",
+            Notifier.notifyWithDetails(project, NotificationType.ERROR, "New XML File From FM Clipboard",
                     "Unexpected error during conversion: " + safeMessage(t), t);
             return;
         }
@@ -126,11 +126,11 @@ public class ReadClipboardIntoNewXmlFileAction extends AnAction {
                     }
                 });
             }
-            notifier.notify(project, NotificationType.INFORMATION, "Read Clipboard Into New XML File",
+            notifier.notify(project, NotificationType.INFORMATION, "New XML File From FM Clipboard",
                     "Success: Wrote XML to file: " + display);
         } catch (IllegalArgumentException | IOException ex) {
             LOG.warn("Failed to create/write XML file in projectRoot=" + safeProjectRoot(project), ex);
-            notifier.notify(project, NotificationType.ERROR, "Read Clipboard Into New XML File",
+            notifier.notify(project, NotificationType.ERROR, "New XML File From FM Clipboard",
                     "Failed to create/write XML file: " + safeMessage(ex));
             return;
         }
