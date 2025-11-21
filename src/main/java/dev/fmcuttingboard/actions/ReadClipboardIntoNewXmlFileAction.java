@@ -18,6 +18,7 @@ import dev.fmcuttingboard.fm.ConversionException;
 import dev.fmcuttingboard.fs.ProjectFiles;
 import dev.fmcuttingboard.util.Notifier;
 import dev.fmcuttingboard.util.UserNotifier;
+import dev.fmcuttingboard.util.Diagnostics;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -63,8 +64,8 @@ public class ReadClipboardIntoNewXmlFileAction extends AnAction {
             clipboardText = clipboardService.readText().orElse("");
         } catch (ClipboardAccessException ex) {
             LOG.warn("Clipboard read failed", ex);
-            notifier.notify(project, NotificationType.ERROR, "Read Clipboard Into New XML File",
-                    "Could not read clipboard: " + safeMessage(ex));
+            Notifier.notifyWithDetails(project, NotificationType.ERROR, "Read Clipboard Into New XML File",
+                    "Could not read clipboard: " + safeMessage(ex), ex);
             return;
         }
 
@@ -86,8 +87,8 @@ public class ReadClipboardIntoNewXmlFileAction extends AnAction {
             return;
         } catch (Throwable t) {
             LOG.warn("Unexpected error during conversion", t);
-            notifier.notify(project, NotificationType.ERROR, "Read Clipboard Into New XML File",
-                    "Unexpected error during conversion: " + safeMessage(t));
+            Notifier.notifyWithDetails(project, NotificationType.ERROR, "Read Clipboard Into New XML File",
+                    "Unexpected error during conversion: " + safeMessage(t), t);
             return;
         }
 
@@ -144,6 +145,7 @@ public class ReadClipboardIntoNewXmlFileAction extends AnAction {
         int byteCount = xml.getBytes(StandardCharsets.UTF_8).length;
         int charCount = xml.length();
         LOG.info("Wrote XML to: " + file + " (bytes=" + byteCount + ", chars=" + charCount + ", took=" + elapsedMs + "ms)");
+        Diagnostics.vInfo(LOG, "XML preview (first 120 chars): " + xml.substring(0, Math.min(120, xml.length())));
         return file;
     }
 

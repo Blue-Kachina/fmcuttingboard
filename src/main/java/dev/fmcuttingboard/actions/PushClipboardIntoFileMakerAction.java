@@ -17,6 +17,7 @@ import dev.fmcuttingboard.fm.DefaultXmlToClipboardConverter;
 import dev.fmcuttingboard.fm.XmlToClipboardConverter;
 import dev.fmcuttingboard.util.Notifier;
 import dev.fmcuttingboard.util.UserNotifier;
+import dev.fmcuttingboard.util.Diagnostics;
 import java.nio.charset.StandardCharsets;
 import org.jetbrains.annotations.NotNull;
 
@@ -90,8 +91,8 @@ public class PushClipboardIntoFileMakerAction extends AnAction {
             xml = VfsUtilCore.loadText(vf);
         } catch (Throwable t) {
             LOG.warn("Failed to read active XML file: " + safeName(vf), t);
-            notifier.notify(project, NotificationType.ERROR, "Push Clipboard Into FileMaker",
-                    "Failed to read the active XML file: " + safeMessage(t));
+            Notifier.notifyWithDetails(project, NotificationType.ERROR, "Push Clipboard Into FileMaker",
+                    "Failed to read the active XML file: " + safeMessage(t), t);
             return;
         }
 
@@ -105,6 +106,7 @@ public class PushClipboardIntoFileMakerAction extends AnAction {
         // 2) Convert XML to FileMaker-compatible clipboard payload
         final String payload;
         try {
+            Diagnostics.vInfo(LOG, "Converting XML to FileMaker clipboard payload; xmlLen=" + xml.length());
             payload = converter.convertToClipboardPayload(xml);
         } catch (ConversionException ce) {
             LOG.info("XML content is not a supported fmxmlsnippet.");
@@ -113,8 +115,8 @@ public class PushClipboardIntoFileMakerAction extends AnAction {
             return;
         } catch (Throwable t) {
             LOG.warn("Unexpected error during XML→clipboard conversion", t);
-            notifier.notify(project, NotificationType.ERROR, "Push Clipboard Into FileMaker",
-                    "Unexpected error during conversion: " + safeMessage(t));
+            Notifier.notifyWithDetails(project, NotificationType.ERROR, "Push Clipboard Into FileMaker",
+                    "Unexpected error during conversion: " + safeMessage(t), t);
             return;
         }
 
@@ -123,13 +125,14 @@ public class PushClipboardIntoFileMakerAction extends AnAction {
             clipboardService.writeText(payload);
         } catch (ClipboardAccessException ex) {
             LOG.warn("Clipboard write failed", ex);
-            notifier.notify(project, NotificationType.ERROR, "Push Clipboard Into FileMaker",
-                    "Converted payload ready, but failed to write to clipboard: " + safeMessage(ex));
+            Notifier.notifyWithDetails(project, NotificationType.ERROR, "Push Clipboard Into FileMaker",
+                    "Converted payload ready, but failed to write to clipboard: " + safeMessage(ex), ex);
             return;
         }
 
         int bytes = payload.getBytes(StandardCharsets.UTF_8).length;
         LOG.info("Push successful; payload written to clipboard (bytes=" + bytes + ")");
+        Diagnostics.vInfo(LOG, "Payload preview (first 120 chars): " + payload.substring(0, Math.min(120, payload.length())));
         notifier.notify(project, NotificationType.INFORMATION, "Push Clipboard Into FileMaker",
                 "Success: Converted XML and placed FileMaker-compatible content on the clipboard.");
     }

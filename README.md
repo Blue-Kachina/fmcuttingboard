@@ -38,3 +38,11 @@ If it contains an fmxmlsnippet of script steps, then we'd be able to paste Scrip
 - Run the plugin in a sandbox IDE: `./gradlew runIde` (or `gradlew.bat runIde` on Windows)
 - Run tests: `./gradlew test`
 - The project uses JUnit 5 for unit tests and a GitHub Actions workflow to build and run tests on pushes/PRs.
+
+### Logging and Diagnostics
+- The plugin uses the IDE's built-in logging (idea.log). To view logs:
+  - Help -> Show Log in Explorer/Finder, then open idea.log
+- Verbose diagnostics can be enabled for troubleshooting by starting the IDE with:
+  - JVM option: `-Dfmcuttingboard.verbose=true`
+  - Or environment variable: `FMCUTTINGBOARD_VERBOSE=true`
+- When errors occur, notifications may include a "Show Details" action with a stack trace to assist debugging.
