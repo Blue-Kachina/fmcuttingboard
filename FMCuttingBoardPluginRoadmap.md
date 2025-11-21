@@ -171,7 +171,7 @@ Each phase is broken down into small, AI-friendly tasks.
 ### 6.1 — Notifications & Messaging
 
 - [x] Standardize all user-facing messages and notifications
-- [ ] Introduce helper utilities for showing notifications with consistent style
+- [x] Introduce helper utilities for showing notifications with consistent style
 - [ ] Add detailed error messages for common failure scenarios
 - [ ] Optionally add a “Show Details” link for advanced error info (e.g., logs)
 
