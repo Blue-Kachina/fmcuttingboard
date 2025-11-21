@@ -44,6 +44,11 @@ tasks.withType<JavaCompile>().configureEach {
 }
 
 dependencies {
+    // JNA for Windows native clipboard fallback — rely on IDE-bundled JNA at runtime
+    // Use compileOnly to avoid bundling conflicting versions inside the plugin
+    compileOnly("net.java.dev.jna:jna:5.14.0")
+    compileOnly("net.java.dev.jna:jna-platform:5.14.0")
+
     testImplementation(platform("org.junit:junit-bom:5.10.2"))
     testImplementation("org.junit.jupiter:junit-jupiter")
     // For IntelliJ Platform test environment which may require JUnit 4 classes

@@ -22,10 +22,10 @@
         This is an initial skeleton; functionality will be implemented progressively per the roadmap.
     ]]></description>
 
-    <!-- Notifications group for user-facing balloon messages -->
-    <notifications>
-        <group id="FMCuttingBoard" displayType="BALLOON"/>
-    </notifications>
+    <!-- Notifications group for user-facing balloon messages (registered via extensions) -->
+    <extensions defaultExtensionNs="com.intellij">
+        <notificationGroup id="FMCuttingBoard" displayType="BALLOON"/>
+    </extensions>
 
     <!-- Phase 1.1: Register base actions group under Tools menu -->
     <actions>
@@ -55,6 +55,7 @@
                     description="Push XML or supported content on clipboard into FileMaker">
                 <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt C" second-keystroke="P"/>
             </action>
+
         </group>
     </actions>
 </idea-plugin>
