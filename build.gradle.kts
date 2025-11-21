@@ -8,10 +8,10 @@ group = "dev.fmcuttingboard"
 version = providers.gradleProperty("pluginVersion").orNull ?: "0.0.1"
 
 java {
-    // IMPORTANT: IntelliJ Platform 2024.3 requires plugins to be compiled to Java 17 bytecode
+    // IMPORTANT: IntelliJ Platform 2024.3 requires plugins to target Java 21 bytecode
     toolchain {
         languageVersion.set(org.gradle.jvm.toolchain.JavaLanguageVersion.of(
-            (providers.gradleProperty("javaVersion").orNull ?: "17").toInt()
+            (providers.gradleProperty("javaVersion").orNull ?: "21").toInt()
         ))
     }
 }
@@ -46,6 +46,8 @@ dependencies {
     // For IntelliJ Platform test environment which may require JUnit 4 classes
     testImplementation("junit:junit:4.13.2")
     testRuntimeOnly("org.junit.vintage:junit-vintage-engine:5.10.2")
+    // Ensure JUnit Platform launcher is present on Gradle 9 test runtime
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher:1.10.2")
 }
 
 tasks.patchPluginXml {
@@ -58,13 +60,13 @@ tasks.runIde {
     jvmArgs = listOf("-Xmx1g")
 }
 
-// Ensure targetCompatibility that the IntelliJ Gradle plugin verifies is set to 17
-java.sourceCompatibility = JavaVersion.VERSION_17
-java.targetCompatibility = JavaVersion.VERSION_17
+// Ensure targetCompatibility that the IntelliJ Gradle plugin verifies is set to 21
+java.sourceCompatibility = JavaVersion.VERSION_21
+java.targetCompatibility = JavaVersion.VERSION_21
 
 tasks.withType<JavaCompile>().configureEach {
-    // Enforce Java 17 bytecode level
-    options.release.set(17)
+    // Enforce Java 21 bytecode level
+    options.release.set(21)
 }
 
 tasks.test {
