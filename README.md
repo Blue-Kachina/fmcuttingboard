@@ -45,6 +45,12 @@ If it contains an fmxmlsnippet of script steps, then we'd be able to paste Scrip
 - The artifact will be created under: `build/distributions/FMCuttingBoard-<version>.zip`
 - Install it in your IDE via: Settings/Preferences > Plugins > Gear icon > Install Plugin from Disk… and select the generated ZIP.
 
+### Branding
+- The plugin includes light and dark icons as required by JetBrains Marketplace conventions.
+- Icon assets are located at:
+  - src/main/resources/META-INF/pluginIcon.svg
+  - src/main/resources/META-INF/pluginIcon_dark.svg
+
 ### Logging and Diagnostics
 - The plugin uses the IDE's built-in logging (idea.log). To view logs:
   - Help -> Show Log in Explorer/Finder, then open idea.log

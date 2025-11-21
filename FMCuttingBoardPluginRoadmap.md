@@ -237,14 +237,14 @@ Each phase is broken down into small, AI-friendly tasks.
 - [x] Configure release build (versioning, changelog)
 - [x] Generate plugin artifact (e.g., `.zip` or `.jar`) suitable for distribution
 - [x] Test manual installation of the plugin in supported IDE(s)
-- [ ] Validate that all actions and menus function correctly in a fresh environment
+- [x] Validate that all actions and menus function correctly in a fresh environment
 
 ### 9.2 — Publication
 
-- [ ] Prepare plugin listing text, description, and metadata for JetBrains Marketplace (or chosen distribution channel)
-- [ ] Prepare icon and branding (if desired)
+- [x] Prepare plugin listing text, description, and metadata for JetBrains Marketplace (or chosen distribution channel)
+- [x] Prepare icon and branding (if desired)
 - [ ] Publish initial version
-- [ ] Document installation steps in `README.md`
+- [x] Document installation steps in `README.md`
 
 ---
 
