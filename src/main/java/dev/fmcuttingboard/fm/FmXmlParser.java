@@ -2,6 +2,8 @@ package dev.fmcuttingboard.fm;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -45,7 +47,13 @@ public class FmXmlParser {
             model.setTypeHint(root.getAttribute("type"));
         }
 
-        // Note: Mapping of specific child elements is implemented in a later step (Phase 5.1 task 2)
+        // Map child elements into the internal representation
+        mapChildren(root, model);
+
+        // Minimal structural validation: ensure snippet has at least one child element
+        if (!hasChildElements(root)) {
+            throw new ConversionException("<fmxmlsnippet> has no content elements.");
+        }
         return model;
     }
 
@@ -62,5 +70,43 @@ public class FmXmlParser {
         } catch (Exception ex) {
             throw new ConversionException("Failed to parse XML.", ex);
         }
+    }
+
+    private static void mapChildren(Element root, ParsedSnippet model) {
+        walkElement(root, model);
+        // After walking, if no types detected but we are under fmxmlsnippet, keep UNKNOWN (handled in validation task)
+    }
+
+    private static void walkElement(Element el, ParsedSnippet model) {
+        String tag = el.getTagName();
+        if (tag != null) {
+            String lower = tag.toLowerCase();
+            if (lower.equals("field") || lower.equals("fielddefinition")) {
+                String name = el.getAttribute("name");
+                if (name != null && !name.isBlank()) model.addFieldName(name);
+            } else if (lower.equals("layout")) {
+                String name = el.getAttribute("name");
+                if (name != null && !name.isBlank()) model.addLayoutName(name);
+            } else if (lower.equals("script")) {
+                String name = el.getAttribute("name");
+                if (name != null && !name.isBlank()) model.addScriptName(name);
+            }
+        }
+
+        NodeList children = el.getChildNodes();
+        for (int i = 0; i < children.getLength(); i++) {
+            Node n = children.item(i);
+            if (n instanceof Element) {
+                walkElement((Element) n, model);
+            }
+        }
+    }
+
+    private static boolean hasChildElements(Element el) {
+        NodeList children = el.getChildNodes();
+        for (int i = 0; i < children.getLength(); i++) {
+            if (children.item(i) instanceof Element) return true;
+        }
+        return false;
     }
 }

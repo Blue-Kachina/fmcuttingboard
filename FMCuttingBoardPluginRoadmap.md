@@ -135,7 +135,7 @@ Each phase is broken down into small, AI-friendly tasks.
 ### 5.1 — XML Parsing & Model
 
 - [x] Define parser for the XML format generated or used by the plugin
-- [ ] Map XML elements back into an internal representation that can be transformed into FileMaker clipboard format
+- [x] Map XML elements back into an internal representation that can be transformed into FileMaker clipboard format
 - [ ] Implement validation for the expected XML structure (e.g., fmxmlsnippet)
 - [ ] Add tests verifying that valid/invalid XML cases are handled correctly
 
