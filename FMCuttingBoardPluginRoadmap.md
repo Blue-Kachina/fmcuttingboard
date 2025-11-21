@@ -177,13 +177,13 @@ Each phase is broken down into small, AI-friendly tasks.
 
 ### 6.2 — Logging & Diagnostics
 
-- [x] Introduce a logging facade or use platform logging consistently
-- [x] Add structured logs around:
-  - [x] Clipboard reads/writes
-  - [x] Conversion success/fail
-  - [x] File I/O operations
-- [x] Add a simple diagnostic mode (e.g., verbose logging flag) if needed
-- [x] Document where logs can be found for troubleshooting
+- [x] Introduce a logging facade or use platform logging consistently — completed
+- [x] Add structured logs around: — completed
+  - [x] Clipboard reads/writes — completed
+  - [x] Conversion success/fail — completed
+  - [x] File I/O operations — completed
+- [x] Add a simple diagnostic mode (e.g., verbose logging flag) if needed — completed
+- [x] Document where logs can be found for troubleshooting — completed
 
 ---
 
