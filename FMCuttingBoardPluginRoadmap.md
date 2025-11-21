@@ -173,17 +173,17 @@ Each phase is broken down into small, AI-friendly tasks.
 - [x] Standardize all user-facing messages and notifications
 - [x] Introduce helper utilities for showing notifications with consistent style
 - [x] Add detailed error messages for common failure scenarios
-- [ ] Optionally add a “Show Details” link for advanced error info (e.g., logs)
+- [x] Optionally add a “Show Details” link for advanced error info (e.g., logs)
 
 ### 6.2 — Logging & Diagnostics
 
-- [ ] Introduce a logging facade or use platform logging consistently
-- [ ] Add structured logs around:
-  - [ ] Clipboard reads/writes
-  - [ ] Conversion success/fail
-  - [ ] File I/O operations
-- [ ] Add a simple diagnostic mode (e.g., verbose logging flag) if needed
-- [ ] Document where logs can be found for troubleshooting
+- [x] Introduce a logging facade or use platform logging consistently
+- [x] Add structured logs around:
+  - [x] Clipboard reads/writes
+  - [x] Conversion success/fail
+  - [x] File I/O operations
+- [x] Add a simple diagnostic mode (e.g., verbose logging flag) if needed
+- [x] Document where logs can be found for troubleshooting
 
 ---
 

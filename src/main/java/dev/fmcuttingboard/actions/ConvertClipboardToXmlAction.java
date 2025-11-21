@@ -12,6 +12,7 @@ import dev.fmcuttingboard.fm.ClipboardToXmlConverter;
 import dev.fmcuttingboard.fm.ConversionException;
 import dev.fmcuttingboard.util.Notifier;
 import dev.fmcuttingboard.util.UserNotifier;
+import dev.fmcuttingboard.util.Diagnostics;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -68,6 +69,7 @@ public class ConvertClipboardToXmlAction extends AnAction {
         // 2) Convert using parser/converter
         final String xml;
         try {
+            Diagnostics.vInfo(LOG, "Converting clipboard text to XML; textLen=" + clipboardText.length());
             xml = converter.convertToXml(clipboardText);
         } catch (ConversionException ce) {
             LOG.info("Clipboard does not contain recognizable FileMaker content.");
@@ -92,6 +94,7 @@ public class ConvertClipboardToXmlAction extends AnAction {
         }
 
         LOG.info("Conversion successful; XML placed on clipboard.");
+        Diagnostics.vInfo(LOG, "XML preview (first 120 chars): " + xml.substring(0, Math.min(120, xml.length())));
         notifier.notify(project, NotificationType.INFORMATION, "Convert FileMaker Clipboard To XML",
                 "Success: Converted FileMaker clipboard content to XML and placed it on the clipboard.");
     }
