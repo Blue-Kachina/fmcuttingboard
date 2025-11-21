@@ -217,10 +217,10 @@ Each phase is broken down into small, AI-friendly tasks.
 
 ### 8.2 — Performance & Robustness
 
-- [ ] Profile any heavy parsing/conversion logic
-- [ ] Optimize for typical payload sizes
-- [ ] Ensure plugin fails gracefully without crashing the IDE
-- [ ] Add timeouts or guards where necessary
+- [x] Profile any heavy parsing/conversion logic
+- [x] Optimize for typical payload sizes
+- [x] Ensure plugin fails gracefully without crashing the IDE
+- [x] Add timeouts or guards where necessary
 
 ### 8.3 — Documentation
 
@@ -234,7 +234,7 @@ Each phase is broken down into small, AI-friendly tasks.
 
 ### 9.1 — Build & Distribution
 
-- [ ] Configure release build (versioning, changelog)
+- [x] Configure release build (versioning, changelog)
 - [ ] Generate plugin artifact (e.g., `.zip` or `.jar`) suitable for distribution
 - [ ] Test manual installation of the plugin in supported IDE(s)
 - [ ] Validate that all actions and menus function correctly in a fresh environment

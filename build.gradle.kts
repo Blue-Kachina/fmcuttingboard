@@ -72,3 +72,10 @@ tasks.withType<JavaCompile>().configureEach {
 tasks.test {
     useJUnitPlatform()
 }
+
+// Convenience task to build distributable plugin artifact
+tasks.register("releasePlugin") {
+    group = "build"
+    description = "Builds the plugin distribution zip for release"
+    dependsOn("buildPlugin")
+}
