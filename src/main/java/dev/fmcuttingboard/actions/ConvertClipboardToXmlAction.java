@@ -13,6 +13,8 @@ import dev.fmcuttingboard.fm.ConversionException;
 import dev.fmcuttingboard.util.Notifier;
 import dev.fmcuttingboard.util.UserNotifier;
 import dev.fmcuttingboard.util.Diagnostics;
+import dev.fmcuttingboard.util.PreviewDialogs;
+import dev.fmcuttingboard.settings.FmCuttingBoardSettingsState;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -83,7 +85,28 @@ public class ConvertClipboardToXmlAction extends AnAction {
             return;
         }
 
-        // 3) Write XML back to clipboard
+        // 3) Optional preview before writing
+        if (project != null) {
+            try {
+                FmCuttingBoardSettingsState st = FmCuttingBoardSettingsState.getInstance(project);
+                if (st.isPreviewBeforeClipboardWrite()) {
+                    boolean proceed = PreviewDialogs.confirmWrite(project,
+                            "Preview: Convert FileMaker Clipboard To XML",
+                            xml,
+                            800);
+                    if (!proceed) {
+                        LOG.info("User canceled clipboard write after preview.");
+                        notifier.notify(project, NotificationType.INFORMATION, "Convert FileMaker Clipboard To XML",
+                                "Canceled: No changes were made to the clipboard.");
+                        return;
+                    }
+                }
+            } catch (Throwable t) {
+                LOG.warn("Preview handling failed; proceeding without preview", t);
+            }
+        }
+
+        // 4) Write XML back to clipboard
         try {
             clipboardService.writeText(xml);
         } catch (ClipboardAccessException ex) {

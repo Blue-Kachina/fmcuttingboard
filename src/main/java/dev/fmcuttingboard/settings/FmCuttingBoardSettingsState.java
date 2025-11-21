@@ -23,6 +23,7 @@ public final class FmCuttingBoardSettingsState implements PersistentStateCompone
     public static class State {
         public String baseDirName = ".fmCuttingBoard";
         public String fileNamePattern = "fmclip-{timestamp}.xml";
+        public boolean previewBeforeClipboardWrite = false;
     }
 
     private State state = new State();
@@ -46,6 +47,8 @@ public final class FmCuttingBoardSettingsState implements PersistentStateCompone
         if (this.state.fileNamePattern == null || this.state.fileNamePattern.isBlank()) {
             this.state.fileNamePattern = "fmclip-{timestamp}.xml";
         }
+        // ensure non-null booleans have sensible defaults
+        // (boolean defaults to false if missing from persisted state)
     }
 
     // Convenience getters/setters
@@ -54,4 +57,7 @@ public final class FmCuttingBoardSettingsState implements PersistentStateCompone
 
     public String getFileNamePattern() { return state.fileNamePattern; }
     public void setFileNamePattern(String v) { state.fileNamePattern = (v == null || v.isBlank()) ? "fmclip-{timestamp}.xml" : v; }
+
+    public boolean isPreviewBeforeClipboardWrite() { return state.previewBeforeClipboardWrite; }
+    public void setPreviewBeforeClipboardWrite(boolean v) { state.previewBeforeClipboardWrite = v; }
 }

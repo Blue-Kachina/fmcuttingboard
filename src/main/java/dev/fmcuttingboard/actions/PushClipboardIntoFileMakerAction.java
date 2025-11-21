@@ -18,6 +18,8 @@ import dev.fmcuttingboard.fm.XmlToClipboardConverter;
 import dev.fmcuttingboard.util.Notifier;
 import dev.fmcuttingboard.util.UserNotifier;
 import dev.fmcuttingboard.util.Diagnostics;
+import dev.fmcuttingboard.util.PreviewDialogs;
+import dev.fmcuttingboard.settings.FmCuttingBoardSettingsState;
 import java.nio.charset.StandardCharsets;
 import org.jetbrains.annotations.NotNull;
 
@@ -120,7 +122,28 @@ public class PushClipboardIntoFileMakerAction extends AnAction {
             return;
         }
 
-        // 3) Write payload to system clipboard
+        // 3) Optional preview before writing
+        if (project != null) {
+            try {
+                FmCuttingBoardSettingsState st = FmCuttingBoardSettingsState.getInstance(project);
+                if (st.isPreviewBeforeClipboardWrite()) {
+                    boolean proceed = PreviewDialogs.confirmWrite(project,
+                            "Preview: Push Clipboard Into FileMaker",
+                            payload,
+                            800);
+                    if (!proceed) {
+                        LOG.info("User canceled clipboard write after preview.");
+                        notifier.notify(project, NotificationType.INFORMATION, "Push Clipboard Into FileMaker",
+                                "Canceled: No changes were made to the clipboard.");
+                        return;
+                    }
+                }
+            } catch (Throwable t) {
+                LOG.warn("Preview handling failed; proceeding without preview", t);
+            }
+        }
+
+        // 4) Write payload to system clipboard
         try {
             clipboardService.writeText(payload);
         } catch (ClipboardAccessException ex) {

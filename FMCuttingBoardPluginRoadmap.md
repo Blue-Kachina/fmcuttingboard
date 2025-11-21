@@ -200,7 +200,7 @@ Each phase is broken down into small, AI-friendly tasks.
 
 ### 7.2 — Advanced Behaviors (Optional)
 
-- [ ] Provide optional preview dialog before writing to clipboard (add toggle in settings)
+- [x] Provide optional preview dialog before writing to clipboard (add toggle in settings)
 - [ ] Add quick actions or context menu entries in Project View or Editor (if beneficial)
 
 ---
