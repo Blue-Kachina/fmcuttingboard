@@ -183,7 +183,7 @@ Each phase is broken down into small, AI-friendly tasks.
   - [x] Conversion success/fail — completed
   - [x] File I/O operations — completed (file writes, VFS refresh)
  - [x] Add a simple diagnostic mode (e.g., verbose logging flag) if needed — completed (Diagnostics helper).
- - [x] Document where logs can be found for troubleshooting — completed (see README: Logging and Diagnostics section).
+ - [x] Document where logs can be found for troubleshooting — completed (see README: Logging and Diagnostics section; idea.log path and verbose flag usage documented).
 
 ---
 
