@@ -11,6 +11,8 @@ pluginManagement {
     plugins {
         // Use IntelliJ Platform Gradle Plugin 2.x — required for IntelliJ Platform 2024.2+
         id("org.jetbrains.intellij.platform") version "2.0.1"
+        // Changelog plugin to manage release notes
+        id("org.jetbrains.changelog") version "2.2.0"
     }
 }
 

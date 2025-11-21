@@ -25,9 +25,19 @@ public class ClipboardToXmlConverter {
      */
     public FmSnippet convert(String clipboardText) throws ConversionException {
         try {
+            long t0 = System.nanoTime();
             return parser.normalizeToXmlText(clipboardText)
                     .map(xml -> {
+                        long t1 = System.nanoTime();
                         EnumSet<ElementType> types = FmSnippet.detectTypes(xml);
+                        long t2 = System.nanoTime();
+                        // Lightweight diagnostics; only logs when verbose is enabled
+                        if (dev.fmcuttingboard.util.Diagnostics.isVerbose()) {
+                            long parseMs = (t1 - t0) / 1_000_000L;
+                            long typeMs = (t2 - t1) / 1_000_000L;
+                            com.intellij.openapi.diagnostic.Logger.getInstance(ClipboardToXmlConverter.class)
+                                    .info("[PERF] normalizeToXmlText=" + parseMs + "ms, detectTypes=" + typeMs + "ms");
+                        }
                         return new FmSnippet(xml, types);
                     })
                     .orElseThrow(() -> new ConversionException("Clipboard does not contain a recognizable FileMaker fmxmlsnippet."));

@@ -4,8 +4,8 @@ Scope
 - This project targets IntelliJ-based IDEs per plugin.xml since API-level UI tests are out-of-scope for CI. Use this guide to validate core workflows manually.
 
 Pre-requisites
-- Build the plugin via Gradle: gradlew build
-- Install the built plugin from the generated zip/jar via Settings > Plugins > Install from Disk.
+- Build the plugin via Gradle: `gradlew buildPlugin` (or `gradlew releasePlugin`)
+- Install the built plugin from the generated ZIP via Settings > Plugins > Gear icon > Install from Disk…
 
 Environments to check
 - IntelliJ IDEA Community 2024.3 or later
@@ -41,3 +41,9 @@ Notes
 Recordkeeping
 - Date of latest manual verification: 2025-11-21
 - IDEs verified: IntelliJ IDEA Community 2024.3 (Windows)
+
+Fresh environment validation
+- Start the IDE with a fresh config directory (or use the Gradle `runIde` sandbox) to simulate a new user profile.
+- Verify the Tools > FMCuttingBoard menu appears with all three actions.
+- Confirm keyboard shortcuts are registered and do not conflict.
+- Perform the full workflow using the checklist above. Expect no prior settings; defaults should be applied.

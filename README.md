@@ -39,6 +39,12 @@ If it contains an fmxmlsnippet of script steps, then we'd be able to paste Scrip
 - Run tests: `./gradlew test`
 - The project uses JUnit 5 for unit tests and a GitHub Actions workflow to build and run tests on pushes/PRs.
 
+### Build & Install from Disk
+- Build a distributable plugin ZIP: `./gradlew buildPlugin` (or `gradlew.bat buildPlugin` on Windows)
+- Or use the convenience alias: `./gradlew releasePlugin`
+- The artifact will be created under: `build/distributions/FMCuttingBoard-<version>.zip`
+- Install it in your IDE via: Settings/Preferences > Plugins > Gear icon > Install Plugin from Disk… and select the generated ZIP.
+
 ### Logging and Diagnostics
 - The plugin uses the IDE's built-in logging (idea.log). To view logs:
   - Help -> Show Log in Explorer/Finder, then open idea.log

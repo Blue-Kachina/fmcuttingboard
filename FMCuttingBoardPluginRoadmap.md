@@ -235,8 +235,8 @@ Each phase is broken down into small, AI-friendly tasks.
 ### 9.1 — Build & Distribution
 
 - [x] Configure release build (versioning, changelog)
-- [ ] Generate plugin artifact (e.g., `.zip` or `.jar`) suitable for distribution
-- [ ] Test manual installation of the plugin in supported IDE(s)
+- [x] Generate plugin artifact (e.g., `.zip` or `.jar`) suitable for distribution
+- [x] Test manual installation of the plugin in supported IDE(s)
 - [ ] Validate that all actions and menus function correctly in a fresh environment
 
 ### 9.2 — Publication
