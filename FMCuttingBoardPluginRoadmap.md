@@ -213,7 +213,7 @@ Each phase is broken down into small, AI-friendly tasks.
 - [x] Add integration tests simulating full workflows:
   - [x] Convert → Save XML → Push to Clipboard
 - [x] Perform manual testing across supported IDE versions
-- [ ] Test behavior with large snippets and edge cases
+- [x] Test behavior with large snippets and edge cases
 
 ### 8.2 — Performance & Robustness
 
