@@ -191,12 +191,12 @@ Each phase is broken down into small, AI-friendly tasks.
 
 ### 7.1 — Plugin Settings
 
-- [x] Add a settings/configuration UI page in IDE settings for the plugin
+- [ ] Add a settings/configuration UI page in IDE settings for the plugin
 - [x] Add options such as:
   - [x] Custom base directory for saved XML files (default `.fmCuttingBoard`)
   - [x] Custom filename format for new XML files (default `fmclip-{timestamp}.xml` -- and update the routine to include the `fmclip-` prefix also)
-- [x] Persist settings using IDE’s settings mechanism
-- [x] Add tests (if supported) for settings persistence
+- [ ] Persist settings using IDE’s settings mechanism
+- [ ] Add tests (if supported) for settings persistence
 
 ### 7.2 — Advanced Behaviors (Optional)
 
