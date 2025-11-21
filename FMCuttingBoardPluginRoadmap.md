@@ -172,7 +172,7 @@ Each phase is broken down into small, AI-friendly tasks.
 
 - [x] Standardize all user-facing messages and notifications
 - [x] Introduce helper utilities for showing notifications with consistent style
-- [ ] Add detailed error messages for common failure scenarios
+- [x] Add detailed error messages for common failure scenarios
 - [ ] Optionally add a “Show Details” link for advanced error info (e.g., logs)
 
 ### 6.2 — Logging & Diagnostics
