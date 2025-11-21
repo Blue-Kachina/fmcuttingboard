@@ -37,4 +37,10 @@ class ClipboardToXmlConverterTest {
         String payload = "<root><child/></root>";
         assertThrows(ConversionException.class, () -> converter.convert(payload));
     }
+
+    @Test
+    void failsWhenEmptyOrNull() {
+        assertThrows(ConversionException.class, () -> converter.convert(""));
+        assertThrows(ConversionException.class, () -> converter.convert(null));
+    }
 }
