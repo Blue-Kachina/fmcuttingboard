@@ -61,5 +61,6 @@ class WorkflowIntegrationTest {
         assertNotNull(payload);
         assertEquals(payload, capture.lastText);
         assertTrue(payload.contains("<fmxmlsnippet"));
+        assertTrue(payload.contains("</fmxmlsnippet>"));
     }
 }
