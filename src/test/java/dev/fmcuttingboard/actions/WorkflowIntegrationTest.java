@@ -1,7 +1,5 @@
-package dev.fmcuttingboard.integration;
+package dev.fmcuttingboard.actions;
 
-import dev.fmcuttingboard.actions.PushClipboardIntoFileMakerAction;
-import dev.fmcuttingboard.actions.ReadClipboardIntoNewXmlFileAction;
 import dev.fmcuttingboard.clipboard.ClipboardAccessException;
 import dev.fmcuttingboard.clipboard.ClipboardService;
 import dev.fmcuttingboard.fm.ClipboardToXmlConverter;
@@ -45,7 +43,7 @@ class WorkflowIntegrationTest {
         String xml = toXml.convertToXml(clipboardPayload);
         assertTrue(xml.startsWith("<fmxmlsnippet"));
 
-        // Save to timestamped file under .fmCuttingBoard
+        // Save to timestamped file under .fmCuttingBoard using action's helper
         ReadClipboardIntoNewXmlFileAction saveAction = new ReadClipboardIntoNewXmlFileAction(
                 new CapturingClipboard(), new ClipboardToXmlConverter(), NOOP);
         Path writtenFile = saveAction.processIntoNewXmlFile(null, tmpDir, xml);

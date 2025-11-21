@@ -210,8 +210,8 @@ Each phase is broken down into small, AI-friendly tasks.
 ### 8.1 — Extended Testing
 
 - [x] Expand unit test coverage for all critical components
-- [ ] Add integration tests simulating full workflows:
-  - [ ] Convert → Save XML → Push to Clipboard
+- [x] Add integration tests simulating full workflows:
+  - [x] Convert → Save XML → Push to Clipboard
 - [ ] Perform manual testing across supported IDE versions
 - [ ] Test behavior with large snippets and edge cases
 
