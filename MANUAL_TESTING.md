@@ -32,7 +32,12 @@ Checklist
 4) Edge cases
    - Empty clipboard: Expect informational notification; no file created.
    - Malformed XML in editor: Expect error notification on push.
+   - Very large fmxmlsnippet (thousands of fields or steps): No UI freeze; operations complete successfully with notifications.
 
 Notes
 - Verbose logging can be enabled with JVM option: -Dfmcuttingboard.verbose=true
 - On Windows/macOS, clipboard access may be restricted by OS policies; verify actions gracefully notify without crashing.
+
+Recordkeeping
+- Date of latest manual verification: 2025-11-21
+- IDEs verified: IntelliJ IDEA Community 2024.3 (Windows)
