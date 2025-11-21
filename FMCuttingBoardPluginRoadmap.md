@@ -141,7 +141,7 @@ Each phase is broken down into small, AI-friendly tasks.
 
 ### 5.2 — Conversion to FileMaker Clipboard Format
 
-- [ ] Research required format for FileMaker clipboard payloads (data + metadata, if any)
+- [x] Research required format for FileMaker clipboard payloads (data + metadata, if any)
 - [ ] Design converter from XML-based representation to FileMaker-compatible clipboard content
 - [ ] Implement conversion logic for:
   - [ ] Database fields snippets
