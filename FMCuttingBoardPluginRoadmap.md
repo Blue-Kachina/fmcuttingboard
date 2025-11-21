@@ -145,7 +145,7 @@ Each phase is broken down into small, AI-friendly tasks.
 - [x] Design converter from XML-based representation to FileMaker-compatible clipboard content
 - [ ] Implement conversion logic for:
   - [x] Database fields snippets
-  - [ ] Script steps snippets
+  - [x] Script steps snippets
   - [ ] Other supported snippet types as needed
 - [ ] Add graceful error handling for unsupported snippet types or malformed XML
 - [ ] Add unit tests for each supported snippet type conversion
