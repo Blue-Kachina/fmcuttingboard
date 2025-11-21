@@ -510,16 +510,25 @@ public class DefaultClipboardService implements ClipboardService {
         try {
             if (nativeReader == null) return Optional.empty();
             String os = System.getProperty("os.name", "");
-            if (os == null || !os.toLowerCase().startsWith("windows")) return Optional.empty();
-            // Verify JNA classes are available in the runtime classloader to avoid NoClassDefFoundError
-            try {
-                Class.forName("com.sun.jna.Native");
-                Class.forName("com.sun.jna.win32.W32APIOptions");
-            } catch (Throwable jnaMissing) {
-                LOG.info("[CB] Native path: JNA classes not found in runtime: " + jnaMissing.getClass().getSimpleName());
+            boolean isWindows = os != null && os.toLowerCase().startsWith("windows");
+            boolean isMac = os != null && (os.toLowerCase().startsWith("mac") || os.toLowerCase().contains("os x"));
+
+            if (isWindows) {
+                // Verify JNA classes are available in the runtime classloader to avoid NoClassDefFoundError
+                try {
+                    Class.forName("com.sun.jna.Native");
+                    Class.forName("com.sun.jna.win32.W32APIOptions");
+                } catch (Throwable jnaMissing) {
+                    LOG.info("[CB] Native path: JNA classes not found in runtime: " + jnaMissing.getClass().getSimpleName());
+                    return Optional.empty();
+                }
+                LOG.info("[CB] Native path: attempting Windows clipboard read (CF_UNICODETEXT/CF_TEXT)");
+            } else if (isMac) {
+                LOG.info("[CB] Native path: attempting macOS clipboard probe (public.utf16-plain-text, NSStringPboardType, XML/text)");
+            } else {
+                // Other OS not supported by native path
                 return Optional.empty();
             }
-            LOG.info("[CB] Native path: attempting Windows clipboard read (CF_UNICODETEXT/CF_TEXT)");
             Optional<String> result = nativeReader.read();
             if (result.isPresent()) {
                 String s = result.get();
@@ -540,6 +549,9 @@ public class DefaultClipboardService implements ClipboardService {
             String os = System.getProperty("os.name", "");
             if (os != null && os.toLowerCase().startsWith("windows")) {
                 return new WindowsClipboardReader();
+            }
+            if (os != null && (os.toLowerCase().startsWith("mac") || os.toLowerCase().contains("os x"))) {
+                return new MacClipboardReader();
             }
         } catch (Throwable ignore) {
             // no-op
