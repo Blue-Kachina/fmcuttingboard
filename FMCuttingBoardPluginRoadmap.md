@@ -212,7 +212,7 @@ Each phase is broken down into small, AI-friendly tasks.
 - [x] Expand unit test coverage for all critical components
 - [x] Add integration tests simulating full workflows:
   - [x] Convert → Save XML → Push to Clipboard
-- [ ] Perform manual testing across supported IDE versions
+- [x] Perform manual testing across supported IDE versions
 - [ ] Test behavior with large snippets and edge cases
 
 ### 8.2 — Performance & Robustness
