@@ -44,6 +44,9 @@
                     text="Convert FileMaker Clipboard To XML"
                     description="Convert FileMaker clipboard contents to XML and place on clipboard">
                 <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt C" second-keystroke="X"/>
+                <!-- Phase 7.2: Quick access in context menus -->
+                <add-to-group group-id="EditorPopupMenu" anchor="last"/>
+                <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
             </action>
 
             <action id="dev.fmcuttingboard.actions.ReadClipboardIntoNewXmlFile"
@@ -51,6 +54,9 @@
                     text="Read Clipboard Into New XML File"
                     description="Create a new XML file from the current clipboard contents">
                 <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt C" second-keystroke="F"/>
+                <!-- Phase 7.2: Quick access in context menus -->
+                <add-to-group group-id="EditorPopupMenu" anchor="last"/>
+                <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
             </action>
 
             <action id="dev.fmcuttingboard.actions.PushClipboardIntoFileMaker"
@@ -58,6 +64,9 @@
                     text="Push Clipboard Into FileMaker"
                     description="Push XML or supported content on clipboard into FileMaker">
                 <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt C" second-keystroke="P"/>
+                <!-- Phase 7.2: Quick access in context menus -->
+                <add-to-group group-id="EditorPopupMenu" anchor="last"/>
+                <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
             </action>
 
         </group>
