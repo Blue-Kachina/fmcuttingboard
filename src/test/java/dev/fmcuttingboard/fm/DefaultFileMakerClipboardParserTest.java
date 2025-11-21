@@ -45,4 +45,14 @@ class DefaultFileMakerClipboardParserTest {
         assertFalse(parser.isLikelyFileMakerContent(otherXml));
         assertTrue(parser.normalizeToXmlText(otherXml).isEmpty());
     }
+
+    @Test
+    void handlesWhitespaceOnlyOrNullGracefully() {
+        assertFalse(parser.isLikelyFileMakerContent("   \n\t   "));
+        assertTrue(parser.normalizeToXmlText("   \n\t   ").isEmpty());
+
+        // Null should be treated as not present
+        assertFalse(parser.isLikelyFileMakerContent(null));
+        assertTrue(parser.normalizeToXmlText(null).isEmpty());
+    }
 }
