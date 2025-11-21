@@ -182,8 +182,8 @@ Each phase is broken down into small, AI-friendly tasks.
   - [x] Clipboard reads/writes — completed
   - [x] Conversion success/fail — completed
   - [x] File I/O operations — completed (file writes, VFS refresh)
- - [x] Add a simple diagnostic mode (e.g., verbose logging flag) if needed — completed (Diagnostics helper)
- - [x] Document where logs can be found for troubleshooting — completed (see README: Logging and Diagnostics section)
+ - [x] Add a simple diagnostic mode (e.g., verbose logging flag) if needed — completed (Diagnostics helper).
+ - [x] Document where logs can be found for troubleshooting — completed (see README: Logging and Diagnostics section).
 
 ---
 
