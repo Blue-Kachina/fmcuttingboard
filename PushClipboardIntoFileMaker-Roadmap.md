@@ -4,7 +4,7 @@
 
 The `PushClipboardIntoFileMakerAction` currently writes fmxmlsnippet XML to the clipboard, but FileMaker does not recognize it as pasteable structured data in all scenarios. FileMaker requires specific clipboard formats (custom named formats on Windows like `Mac-XMSS` and `Mac-XMFD`, plus proper encoding/newline conventions) to identify content as objects rather than plain text.
 
-**Goal**: Ensure all supported fmxmlsnippet types (Scripts, Fields, Tables) paste into FileMaker as structured objects, matching FileMaker's native copy behavior.
+**Goal**: Ensure all supported fmxmlsnippet types paste into FileMaker as structured objects, matching FileMaker's native copy behavior. Currently supported on Windows: Scripts, Script Steps, Fields, Tables, Custom Functions, Value Lists, and Layout Objects.
 
 ---
 
@@ -17,11 +17,10 @@ The `PushClipboardIntoFileMakerAction` currently writes fmxmlsnippet XML to the 
 - ✅ Windows JNA-based native clipboard writer with custom formats
 
 ### What's Missing
-- ❌ FileMaker doesn't recognize our clipboard content as objects consistently
-- ❌ Limited testing across FileMaker versions and contexts
-- ❌ No macOS custom format support (`Mac-XMSS`, `Mac-XMFD`)
-- ❌ Incomplete handling of all fmxmlsnippet types (Layouts, Tables, etc.)
-- ❌ No automated validation that output matches FileMaker's native clipboard
+- ❌ macOS custom pasteboard support (equivalent to Windows Mac-* formats)
+- ❌ Manual end-to-end testing across FileMaker versions (19/20/21) and documenting results
+- ❌ Relationships/Graph and other less-common snippet types (TBD)
+- ❌ Automated validation that output matches FileMaker's native clipboard (planned in Phase 4)
 
 ### Key Technical Issues
 1. **Format detection logic incomplete**: `DefaultClipboardService.tryWindowsNativeWrite()` detects Scripts vs Fields but uses heuristics that may miss edge cases
@@ -86,10 +85,13 @@ The `PushClipboardIntoFileMakerAction` currently writes fmxmlsnippet XML to the 
 **Tasks**:
 - [x] Review `tryWindowsNativeWrite()` heuristics at DefaultClipboardService.java:379-385
 - [x] Enhance detection to handle:
-  - Script Steps: Look for `<Step` (current)
-  - Fields: Look for `<Field` or `<FieldDefinition>` (current)
-  - Tables: Add detection for `<BaseTable` and use `Mac-XMTB`
-  - Layouts: Identify layout snippets (to be supported later) and handle gracefully
+  - Script (full): Look for `<Script` and map to `Mac-XMSC`
+  - Script Steps: Look for `<Step` and map to `Mac-XMSS`
+  - Tables: Look for `<BaseTable` and map to `Mac-XMTB` (checked before Field)
+  - Fields: Look for `<Field` or `<FieldDefinition>` and map to `Mac-XMFD`
+  - Layout Objects: Look for `<Layout`, `<LayoutObject`, `<ObjectList`, `<Object `, `<Part` and map to `Mac-XML2` (checked before Field)
+  - Custom Functions: Look for `<CustomFunction` and map to `Mac-XMFN`
+  - Value Lists: Look for `<ValueList` and map to `Mac-XMVL`
 - [x] Add unit tests for each snippet type detection
 - [x] Log detected type clearly in diagnostics
 
@@ -104,6 +106,8 @@ The `PushClipboardIntoFileMakerAction` currently writes fmxmlsnippet XML to the 
 - [x] Create test XML files for: Script Steps, Fields, Tables
   - Added under resources/test-snippets: ScriptSteps.xml, Fields.xml, Tables.xml (2025-11-22)
   - See MANUAL_TESTING.md (Phase 1.5 section) for usage instructions and docs/Windows-EndToEnd-Test-Report.md for recording results
+- [x] Create test XML files for: Custom Functions, Value Lists, Layout Objects
+  - Added under resources/test-snippets: CustomFunctions.xml, ValueLists.xml, LayoutObjects.xml (2025-11-22)
 - [ ] For each test file:
   - [ ] Open in plugin → Run PushClipboardIntoFileMakerAction
   - [ ] Open FileMaker Pro
@@ -145,8 +149,12 @@ The `PushClipboardIntoFileMakerAction` currently writes fmxmlsnippet XML to the 
   - `setData:forType:` for custom types
 - [ ] Write custom types based on snippet type:
   - Script Steps: Write to `Mac-XMSS` or appropriate UTI
+  - Full Scripts: Write to `Mac-XMSC` or appropriate UTI
   - Fields: Write to `Mac-XMFD` or appropriate UTI
   - Tables: Write to `Mac-XMTB` or appropriate UTI
+  - Custom Functions: Write to `Mac-XMFN` or appropriate UTI
+  - Value Lists: Write to `Mac-XMVL` or appropriate UTI
+  - Layout Objects: Write to `Mac-XML2` (and optionally legacy alias `Mac-XML`) or appropriate UTI
 - [ ] Write standard text types as fallback: `public.utf8-plain-text`, `NSStringPboardType`
 - [ ] Ensure UTF-8 encoding with BOM (if required by FileMaker on macOS)
 - [ ] Normalize newlines to `\r` (classic Mac) to match Windows behavior
@@ -197,7 +205,7 @@ The `PushClipboardIntoFileMakerAction` currently writes fmxmlsnippet XML to the 
   - Script Steps (`<Step`)
   - Fields (`<Field`, `<FieldDefinition`)
   - Base Tables (`<BaseTable`)
-  - Layouts (`<Layout`)
+  - Layouts/Objects (`<Layout`, `<LayoutObjectList`, `<LayoutObject`, `<ObjectList`, `<Object`)
   - Custom Functions (`<CustomFunction`)
   - Value Lists (`<ValueList`)
   - Relationships/Graph (`<Relationship`)
@@ -214,21 +222,26 @@ The `PushClipboardIntoFileMakerAction` currently writes fmxmlsnippet XML to the 
 **Estimated Effort**: 3 hours
 
 **Tasks**:
-- [ ] Enhance `tryWindowsNativeWrite()` detection logic to identify:
-  - Layouts: `<Layout`
+- [x] Enhance `tryWindowsNativeWrite()` detection logic to identify:
+  - Layout Objects: `<Layout`, `<LayoutObject`, `<ObjectList`, `<Object`, `<Part` (checked before Fields)
   - Custom Functions: `<CustomFunction`
   - Value Lists: `<ValueList`
-  - Relationships: `<Relationship`
-  - Base Tables: `<BaseTable` (already partial support)
-- [ ] Map each type to the appropriate Windows custom format:
-  - Scripts → `Mac-XMSS`
+  - Base Tables: `<BaseTable` (checked before Field)
+  - Full Scripts: `<Script` (checked before Steps)
+  - Script Steps: `<Step`
+  - Relationships: `<Relationship` (TBD)
+- [x] Map each type to the appropriate Windows custom format:
+  - Script (full) → `Mac-XMSC`
+  - Script Steps → `Mac-XMSS`
   - Fields → `Mac-XMFD`
   - Tables → `Mac-XMTB`
-  - Layouts → `Mac-XML2` (per captures; write support TBD)
+  - Layout Objects → `Mac-XML2` (plus alias `Mac-XML`)
+  - Custom Functions → `Mac-XMFN`
+  - Value Lists → `Mac-XMVL`
   - Others → TBD based on research
-- [ ] Add unit tests for each detection case
+- [x] Add unit tests for each detection case (see SnippetDetectionTest)
 
-**Output**: Updated detection logic + comprehensive unit tests
+**Output**: Updated detection logic + comprehensive unit tests (Windows path complete for listed types)
 
 ---
 
@@ -236,16 +249,16 @@ The `PushClipboardIntoFileMakerAction` currently writes fmxmlsnippet XML to the 
 **Estimated Effort**: 4-6 hours
 
 **Tasks**:
-- [ ] For Layouts, Custom Functions, Value Lists, etc.:
-  - [ ] Copy from FileMaker and capture custom clipboard format names via diagnostics
-  - [ ] Analyze byte structure (BOM, newlines, encoding)
-  - [ ] Implement write logic in `tryWindowsNativeWrite()` (Windows) and `MacClipboardWriter` (macOS)
-- [ ] Test each type end-to-end:
-  - [ ] Write to clipboard via plugin
-  - [ ] Paste into FileMaker in correct context
+- [x] For Layout Objects, Custom Functions, Value Lists (Windows):
+  - [x] Capture/confirm custom clipboard format names via diagnostics
+  - [x] Align byte structure (LE length prefix + UTF-8, no BOM, no trailing NUL; LF newlines)
+  - [x] Implement write logic in `tryWindowsNativeWrite()`
+- [ ] macOS implementation remains pending (`MacClipboardWriter` TBD in Phase 2)
+- [ ] Test each type end-to-end manually:
+  - [ ] Write to clipboard via plugin and paste into FileMaker in correct context
   - [ ] Verify object paste (not text)
 
-**Output**: Enhanced `DefaultClipboardService` and `MacClipboardWriter` supporting all types
+**Output**: Enhanced `DefaultClipboardService` (Windows complete for listed types); macOS pending
 
 ---
 
@@ -253,9 +266,9 @@ The `PushClipboardIntoFileMakerAction` currently writes fmxmlsnippet XML to the 
 **Estimated Effort**: 1 hour
 
 **Tasks**:
-- [ ] Remove artificial restrictions in `DefaultXmlToClipboardConverter.java:26-36`
-- [ ] Currently rejects Layouts and unknown types; remove these blocks once clipboard formats are implemented
-- [ ] Validate XML structure but allow all element types to proceed to clipboard write
+- [x] Remove artificial restrictions in `DefaultXmlToClipboardConverter.java`
+- [x] Previously rejected Layout-only snippets; now allowed (supports Layout Objects)
+- [x] Validate XML structure and allow supported element types to proceed to clipboard write
 
 **Output**: Updated DefaultXmlToClipboardConverter.java:22-40
 
@@ -412,9 +425,9 @@ The `PushClipboardIntoFileMakerAction` currently writes fmxmlsnippet XML to the 
 
 | Phase                  | Deliverables                                                      | Estimated Total Effort  |
 |------------------------|-------------------------------------------------------------------|-------------------------|
-| **Phase 1: Windows**   | Updated `DefaultClipboardService`, test report, analysis docs     | 14-18 hours             |
+| **Phase 1: Windows**   | Updated `DefaultClipboardService`, test report, analysis docs; Windows support for Scripts, Script Steps, Fields, Tables, Custom Functions, Value Lists, Layout Objects | 14-18 hours |
 | **Phase 2: macOS**     | `MacClipboardWriter`, integrated write path, macOS test report    | 11-15 hours             |
-| **Phase 3: All Types** | Support for Layouts/Custom Functions/etc., updated converter      | 10-14 hours             |
+| **Phase 3: All Types** | Support for Layout Objects, Custom Functions, Value Lists (Windows), updated converter | 10-14 hours |
 | **Phase 4: Testing**   | Automated tests, cross-platform matrix, edge cases, docs          | 15-20 hours             |
 | **Phase 5: Polish**    | Refactored code, performance baseline, security review, release   | 9-11 hours              |
 | **Total**              | Fully functional PushClipboardIntoFileMakerAction for all flavors | **59-78 hours**         |
