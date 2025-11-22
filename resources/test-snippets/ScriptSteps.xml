@@ -1,5 +1,5 @@
 <fmxmlsnippet type="FMObjectList">
   <Step enable="True" id="1" name="Show Custom Dialog">
-    <Text>Example step from test snippet</Text>
+    <Text>Example step from test snippet.  Modified without saving</Text>
   </Step>
 </fmxmlsnippet>

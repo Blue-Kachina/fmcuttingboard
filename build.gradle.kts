@@ -63,7 +63,15 @@ tasks.patchPluginXml {
 
 tasks.runIde {
     // Provide reasonable default heap for early development
-    jvmArgs = listOf("-Xmx1g")
+    jvmArgs = listOf(
+        "-Xmx1g",
+        // Workaround: disable the bundled Gradle plugin in the runIde sandbox to avoid
+        // a startup crash observed in 2024.3 where GradleJvmSupportMatrix fails parsing
+        // JavaVersion "25" (see resources/startup_runIde.log). This does NOT affect our
+        // plugin’s functionality and only applies to the runIde task.
+        // Remove this flag once the upstream issue is fixed to re-enable Gradle features.
+        "-Didea.plugins.disabled=com.intellij.gradle"
+    )
 }
 
 // Ensure targetCompatibility that the IntelliJ Gradle plugin verifies is set to 21

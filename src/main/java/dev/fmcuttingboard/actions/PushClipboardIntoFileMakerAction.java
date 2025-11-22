@@ -5,6 +5,9 @@ import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.editor.Document;
+import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VfsUtilCore;
@@ -72,11 +75,26 @@ public class PushClipboardIntoFileMakerAction extends AnAction {
         Project project = e.getProject();
         LOG.info("Invoke: PushClipboardIntoFileMakerAction");
 
-        VirtualFile vf = e.getData(CommonDataKeys.VIRTUAL_FILE);
-        if (vf == null && project != null) {
-            VirtualFile[] selected = FileEditorManager.getInstance(project).getSelectedFiles();
-            if (selected.length > 0) {
-                vf = selected[0];
+        // Prefer in-memory document from the active editor (unsaved changes included)
+        Editor editor = e.getData(CommonDataKeys.EDITOR);
+        VirtualFile vf = null;
+        Document document = null;
+        if (editor != null) {
+            document = editor.getDocument();
+            try {
+                vf = FileDocumentManager.getInstance().getFile(document);
+            } catch (Throwable ignored) {
+                // Fallbacks below will handle if we can't resolve a VirtualFile from the document
+            }
+        }
+        // Fallback: resolve VirtualFile from context/selection
+        if (vf == null) {
+            vf = e.getData(CommonDataKeys.VIRTUAL_FILE);
+            if (vf == null && project != null) {
+                VirtualFile[] selected = FileEditorManager.getInstance(project).getSelectedFiles();
+                if (selected.length > 0) {
+                    vf = selected[0];
+                }
             }
         }
 
@@ -87,15 +105,19 @@ public class PushClipboardIntoFileMakerAction extends AnAction {
             return;
         }
 
-        // 1) Read file content as XML
+        // 1) Read content as XML (prefer in-memory editor document when available)
         final String xml;
-        try {
-            xml = VfsUtilCore.loadText(vf);
-        } catch (Throwable t) {
-            LOG.warn("Failed to read active XML file: " + safeName(vf), t);
-            Notifier.notifyWithDetails(project, NotificationType.ERROR, "Push Clipboard Into FileMaker",
-                    "Failed to read the active XML file: " + safeMessage(t), t);
-            return;
+        if (document != null) {
+            xml = document.getText();
+        } else {
+            try {
+                xml = VfsUtilCore.loadText(vf);
+            } catch (Throwable t) {
+                LOG.warn("Failed to read active XML file: " + safeName(vf), t);
+                Notifier.notifyWithDetails(project, NotificationType.ERROR, "Push Clipboard Into FileMaker",
+                        "Failed to read the active XML file: " + safeMessage(t), t);
+                return;
+            }
         }
 
         if (xml.isBlank()) {
