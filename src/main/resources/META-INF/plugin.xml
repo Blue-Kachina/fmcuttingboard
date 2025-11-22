@@ -5,7 +5,6 @@
 
     <id>dev.bluekachina.fmcuttingboard</id>
     <name>FMCuttingBoard</name>
-    <version>1.0.0</version>
     <vendor url="https://github.com/Blue-Kachina/fmcuttingboard">Blue Kachina</vendor>
 
     <!-- Compatibility configured via Gradle's patchPluginXml -->
@@ -38,7 +37,8 @@
         <group id="dev.fmcuttingboard.toolsGroup"
                text="FMCuttingBoard"
                description="FMCuttingBoard tools"
-               popup="true">
+               popup="true"
+               icon="/icons/pluginIcon16.svg">
             <add-to-group group-id="ToolsMenu" anchor="last"/>
             <!-- Phase 1.2: Register submenu actions -->
             <action id="dev.fmcuttingboard.actions.ConvertClipboardToXml"

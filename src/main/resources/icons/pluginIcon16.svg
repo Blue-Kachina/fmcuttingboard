@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 16x16 downsized variant of the plugin branding icon (cutting board with FM). -->
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+  <!-- Board base -->
+  <g fill="none" stroke="none">
+    <!-- Outer white trim to mimic the original outline -->
+    <rect x="2.1" y="2.2" width="11.8" height="11.2" rx="2" ry="2" fill="#ffffff"/>
+    <!-- Wood board body -->
+    <rect x="2.6" y="2.7" width="10.8" height="10.2" rx="1.7" ry="1.7" fill="#d29b62"/>
+    <!-- Handle notch suggestion at the top (rounded bump) -->
+    <path d="M6.2 2.7h3.6c.6 0 1 .4 1 .9v.2c0 .5-.4.9-1 .9H6.2c-.6 0-1-.4-1-.9v-.2c0-.5.4-.9 1-.9z" fill="#d29b62"/>
+    <!-- Handle hole -->
+    <circle cx="8" cy="3.6" r="0.6" fill="#3f2618"/>
+
+    <!-- Subtle wood grain (very light so it stays clean at 16px) -->
+    <path d="M5.1 3.2c-.7 1.7-.6 4.3.3 6.2.2.5.3 1.1.1 1.7" stroke="#c3874d" stroke-width="0.4" opacity=".5"/>
+    <path d="M10.9 3.3c.6 1.4.5 3.6-.2 5.1-.2.4-.2.9 0 1.4" stroke="#c3874d" stroke-width="0.4" opacity=".5"/>
+
+    <!-- FM letters (dark imprint) -->
+    <g fill="#6e4325">
+      <!-- F -->
+      <path d="M4.7 8.2h1.2v3.2H4.7zM4.7 8.2h2.1v.9H4.7zM4.7 9.6h1.8v.9H4.7z"/>
+      <!-- M -->
+      <path d="M8.2 8.2h1.1l.7 1.6.7-1.6h1.1v3.2h-1V9.9l-.8 1.6-.8-1.6v1.5h-1V8.2z"/>
+    </g>
+
+    <!-- Small leaf mark below -->
+    <path d="M7.5 11.8c.7-.5 1.5-.5 2.3-.6-.2.7-.7 1.3-1.4 1.5-.4.1-.7 0-.9-.3-.1-.2 0-.4 0-.6z" fill="#6e4325"/>
+  </g>
+</svg>
