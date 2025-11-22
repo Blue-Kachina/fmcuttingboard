@@ -97,4 +97,27 @@ tasks.register<Task>("releasePlugin") {
     dependsOn("buildPlugin")
 }
 
-// Lexer generation tasks will be added in a subsequent step of Phase 2.2
+// ===== Phase 2.2: Lexer Generation & Integration =====
+val generatedDir = layout.buildDirectory.dir("generated-src/grammarkit")
+
+tasks.register<org.jetbrains.grammarkit.tasks.GenerateLexerTask>("generateFileMakerCalculationLexer") {
+    description = "Generates the FileMaker Calculation JFlex lexer"
+    sourceFile.set(file("src/main/java/dev/fmcuttingboard/language/filemaker-calculation.flex"))
+    // GrammarKit 2022.3.2 expects targetDir (as String) + targetClass to derive targetFile
+    targetDir.set("build/generated-src/grammarkit/dev/fmcuttingboard/language")
+    targetClass.set("_FileMakerCalculationLexer")
+    purgeOldFiles.set(true)
+}
+
+sourceSets {
+    main {
+        java {
+            srcDir(generatedDir)
+        }
+    }
+}
+
+// Ensure lexer is generated before compilation
+tasks.withType<JavaCompile>().configureEach {
+    dependsOn("generateFileMakerCalculationLexer")
+}

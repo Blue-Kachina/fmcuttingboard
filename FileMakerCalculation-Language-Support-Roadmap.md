@@ -52,54 +52,54 @@ This roadmap outlines the implementation of FileMaker Calculation language suppo
 - Color reference: `fgColor="0000FF"`, `fontStyle="1"` (bold)
 
 #### Keywords Group 2 - Logical Operators (Dark Blue/Bold)
-- [ ] Define tokens: `and`, `or`, `not`
+- [x] Define tokens: `and`, `or`, `not`
 - Color reference: `fgColor="006699"`, `fontStyle="1"` (bold)
 
 #### Keywords Group 3 - Type Keywords (Orange/Bold)
-- [ ] Define tokens: `boolean`, `byte`, `char`, `class`, `double`, `float`, `int`, `interface`, `long`, `short`, `void`
+- [x] Define tokens: `boolean`, `byte`, `char`, `class`, `double`, `float`, `int`, `interface`, `long`, `short`, `void`
 - Color reference: `fgColor="FF8000"`, `fontStyle="1"` (bold)
 
 #### Keywords Group 4 - Functions (Purple/Bold)
-- [ ] Define mathematical functions: `Abs`, `Acos`, `Asin`, `Atan`, `Ceiling`, `Cos`, `Degrees`, `Div`, `Exp`, `Floor`, `Int`, `Lg`, `Ln`, `Log`, `Max`, `Min`, `Mod`, `Pi`, `Radians`, `Round`, `Sign`, `Sin`, `Sqrt`, `Tan`, `Truncate`
-- [ ] Define statistical functions: `Average`, `Count`, `StDev`, `StDevP`, `Sum`, `Variance`, `VarianceP`
-- [ ] Define text functions: `Char`, `Code`, `Exact`, `Filter`, `FilterValues`, `Left`, `LeftValues`, `LeftWords`, `Length`, `Lower`, `Middle`, `MiddleValues`, `MiddleWords`, `Position`, `Proper`, `Quote`, `Replace`, `Right`, `RightValues`, `RightWords`, `Substitute`, `TextColor`, `TextColorRemove`, `TextFont`, `TextFontRemove`, `TextFormatRemove`, `TextSize`, `TextSizeRemove`, `TextStyleAdd`, `TextStyleRemove`, `Trim`, `TrimAll`, `Upper`, `WordCount`
-- [ ] Define date/time functions: `Date`, `Day`, `DayName`, `DayNameJ`, `DayOfWeek`, `DayOfYear`, `Hour`, `Minute`, `Month`, `MonthName`, `MonthNameJ`, `Seconds`, `Time`, `Timestamp`, `WeekOfYear`, `WeekOfYearFiscal`, `Year`, `YearName`
+- [x] Define mathematical functions: `Abs`, `Acos`, `Asin`, `Atan`, `Ceiling`, `Cos`, `Degrees`, `Div`, `Exp`, `Floor`, `Int`, `Lg`, `Ln`, `Log`, `Max`, `Min`, `Mod`, `Pi`, `Radians`, `Round`, `Sign`, `Sin`, `Sqrt`, `Tan`, `Truncate`
+- [x] Define statistical functions: `Average`, `Count`, `StDev`, `StDevP`, `Sum`, `Variance`, `VarianceP`
+- [x] Define text functions: `Char`, `Code`, `Exact`, `Filter`, `FilterValues`, `Left`, `LeftValues`, `LeftWords`, `Length`, `Lower`, `Middle`, `MiddleValues`, `MiddleWords`, `Position`, `Proper`, `Quote`, `Replace`, `Right`, `RightValues`, `RightWords`, `Substitute`, `TextColor`, `TextColorRemove`, `TextFont`, `TextFontRemove`, `TextFormatRemove`, `TextSize`, `TextSizeRemove`, `TextStyleAdd`, `TextStyleRemove`, `Trim`, `TrimAll`, `Upper`, `WordCount`
+- [x] Define date/time functions: `Date`, `Day`, `DayName`, `DayNameJ`, `DayOfWeek`, `DayOfYear`, `Hour`, `Minute`, `Month`, `MonthName`, `MonthNameJ`, `Seconds`, `Time`, `Timestamp`, `WeekOfYear`, `WeekOfYearFiscal`, `Year`, `YearName`
 - [ ] Define Get functions (100+ functions): All `Get()` functions from XML line 17
-- [ ] Define conversion functions: `GetAsBoolean`, `GetAsCSS`, `GetAsDate`, `GetAsNumber`, `GetAsSVG`, `GetAsText`, `GetAsTime`, `GetAsTimestamp`, `GetAsURLEncoded`
-- [ ] Define field/database functions: `DatabaseNames`, `FieldBounds`, `FieldComment`, `FieldIDs`, `FieldNames`, `FieldRepetitions`, `FieldStyle`, `FieldType`, `GetField`, `GetFieldName`, `GetNthRecord`, `GetRepetition`, `GetSummary`, `GetValue`, `Lookup`, `LookupNext`
-- [ ] Define Japanese text functions: `Hiragana`, `KanaHankaku`, `KanaZenkaku`, `KanjiNumeral`, `Katakana`, `NumToJText`, `RomanHankaku`, `RomanZenkaku`
-- [ ] Define layout/window functions: `GetLayoutObjectAttribute`, `LayoutIDs`, `LayoutNames`, `LayoutObjectNames`, `WindowNames`
-- [ ] Define list functions: `List`, `ValueCount`, `ValueListIDs`, `ValueListItems`, `ValueListNames`
-- [ ] Define script/relation functions: `RelationInfo`, `ScriptIDs`, `ScriptNames`
-- [ ] Define table functions: `TableIDs`, `TableNames`
-- [ ] Define financial functions: `FV`, `NPV`, `PMT`, `PV`
-- [ ] Define logical functions: `Case`, `Choose`, `Evaluate`, `EvaluationError`, `If`, `IsEmpty`, `IsValid`, `IsValidExpression`
-- [ ] Define special functions: `Combination`, `Extend`, `External`, `Factorial`, `GetNextSerialValue`, `Last`, `Let`, `PatternCount`, `Random`, `RGB`, `Self`, `SerialIncrement`, `SetPrecision`
+ - [x] Define conversion functions: `GetAsBoolean`, `GetAsCSS`, `GetAsDate`, `GetAsNumber`, `GetAsSVG`, `GetAsText`, `GetAsTime`, `GetAsTimestamp`, `GetAsURLEncoded`
+ - [x] Define field/database functions: `DatabaseNames`, `FieldBounds`, `FieldComment`, `FieldIDs`, `FieldNames`, `FieldRepetitions`, `FieldStyle`, `FieldType`, `GetField`, `GetFieldName`, `GetNthRecord`, `GetRepetition`, `GetSummary`, `GetValue`, `Lookup`, `LookupNext`
+ - [x] Define Japanese text functions: `Hiragana`, `KanaHankaku`, `KanaZenkaku`, `KanjiNumeral`, `Katakana`, `NumToJText`, `RomanHankaku`, `RomanZenkaku`
+ - [x] Define layout/window functions: `GetLayoutObjectAttribute`, `LayoutIDs`, `LayoutNames`, `LayoutObjectNames`, `WindowNames`
+ - [x] Define list functions: `List`, `ValueCount`, `ValueListIDs`, `ValueListItems`, `ValueListNames`
+ - [x] Define script/relation functions: `RelationInfo`, `ScriptIDs`, `ScriptNames`
+ - [x] Define table functions: `TableIDs`, `TableNames`
+ - [x] Define financial functions: `FV`, `NPV`, `PMT`, `PV`
+ - [x] Define logical functions: `Case`, `Choose`, `Evaluate`, `EvaluationError`, `If`, `IsEmpty`, `IsValid`, `IsValidExpression`
+ - [x] Define special functions: `Combination`, `Extend`, `External`, `Factorial`, `GetNextSerialValue`, `Last`, `Let`, `PatternCount`, `Random`, `RGB`, `Self`, `SerialIncrement`, `SetPrecision`
 - Color reference: `fgColor="8000FF"`, `fontStyle="1"` (bold)
 
 #### Comments (Green)
-- [ ] Define block comment tokens: `/*` and `*/`
-- [ ] Define line comment token: `//`
+- [x] Define block comment tokens: `/*` and `*/`
+- [x] Define line comment token: `//`
 - Color reference: `fgColor="008000"` (both styles)
 
 #### String Delimiters (Pink)
-- [ ] Define string tokens: double quote `"` and single quote `'`
+- [x] Define string tokens: double quote `"` and single quote `'`
 - Color reference: `fgColor="DB599D"`
 
 #### Numbers (Red)
-- [ ] Define number pattern: integers and decimals
+- [x] Define number pattern: integers and decimals
 - Color reference: `fgColor="FF0000"`
 
 #### Operators (Brown/Bold)
-- [ ] Define operator tokens: `+`, `-`, `*`, `/`, `^`, `=`, `≠`, `<`, `>`, `≤`, `≥`, `&`, `(`, `)`, `[`, `]`, `{`, `}`, `;`, `,`
+- [x] Define operator tokens: `+`, `-`, `*`, `/`, `^`, `=`, `≠`, `<`, `>`, `≤`, `≥`, `&`, `(`, `)`, `[`, `]`, `{`, `}`, `;`, `,`
 - Color reference: `fgColor="804000"`, `fontStyle="1"` (bold)
 
 ### 2.2 Lexer Generation & Integration
-- [ ] Configure JFlex plugin in `build.gradle` to generate lexer from `.flex` file
+- [x] Configure JFlex plugin in `build.gradle` to generate lexer from `.flex` file
 - [x] Create `FileMakerCalculationTokenType` class for token type definitions
 - [x] Create `FileMakerCalculationElementType` class for element types
-- [ ] Generate lexer adapter class from flex definition
-- [ ] Test lexer with sample FileMaker calculation code
+- [x] Generate lexer adapter class from flex definition
+- [x] Test lexer with sample FileMaker calculation code
 
 ---
 

@@ -15,40 +15,27 @@ import com.intellij.psi.tree.IElementType;
 %function advance
 %type IElementType
 %final
-%eof{ return; %eof}
+%eof{
+  return;
+%eof}
 %state COMMENT
-
-WHITESPACE = [\ \t\f\r\n\v]+
-ID_START = [A-Za-z_]
-ID_PART = [A-Za-z0-9_]
-DIGIT = [0-9]
-INT = {DIGIT}+
-DEC = {DIGIT}+\.({DIGIT}+)?|\.{DIGIT}+
-EXP = ([eE][+-]?{DIGIT}+)
-NUMBER = ({DEC}{EXP}?|{INT}{EXP}?)
-
-LINE_COMMENT = "//"[^\n\r]*
-BLOCK_COMMENT_START = "/\*"
-BLOCK_COMMENT_END = "\*/"
-
-DQ_STRING = \"([^\\\n\r\"]|\\.)*\"
-SQ_STRING = '([^\\\n\r']|\\.)*'
 
 %%
 
 <YYINITIAL>{
-  {WHITESPACE}                { return FileMakerCalculationTokenType.WHITE_SPACE; }
+  [ \t\f\r\n]+            { return FileMakerCalculationTokenType.WHITE_SPACE; }
 
   // Comments
-  {LINE_COMMENT}              { return FileMakerCalculationTokenType.LINE_COMMENT; }
-  {BLOCK_COMMENT_START}       { yybegin(COMMENT); return FileMakerCalculationTokenType.BLOCK_COMMENT; }
+  "//"[^\n\r]*              { return FileMakerCalculationTokenType.LINE_COMMENT; }
+  "/\*"                      { yybegin(COMMENT); return FileMakerCalculationTokenType.BLOCK_COMMENT; }
 
   // Strings
-  {DQ_STRING}                 { return FileMakerCalculationTokenType.STRING; }
-  {SQ_STRING}                 { return FileMakerCalculationTokenType.STRING; }
+  [\"]([^\\\r\n\"]|\\.)*[\"] { return FileMakerCalculationTokenType.STRING; }
+  [']([^\\\r\n\']|\\.)*[']     { return FileMakerCalculationTokenType.STRING; }
 
-  // Numbers
-  {NUMBER}                    { return FileMakerCalculationTokenType.NUMBER; }
+  // Numbers (integers, decimals with optional exponent)
+  ([0-9]+(\.[0-9]+)?([eE][+-]?[0-9]+)?|\.[0-9]+([eE][+-]?[0-9]+)?)
+                               { return FileMakerCalculationTokenType.NUMBER; }
 
   // Keywords Group 1 - Control Flow
   "if"                        { return FileMakerCalculationTokenType.KEYWORD_CONTROL; }
@@ -59,17 +46,73 @@ SQ_STRING = '([^\\\n\r']|\\.)*'
   "or"                        { return FileMakerCalculationTokenType.KEYWORD_LOGICAL; }
   "not"                       { return FileMakerCalculationTokenType.KEYWORD_LOGICAL; }
 
+  // Keywords Group 3 - Type Keywords
+  "boolean"                   { return FileMakerCalculationTokenType.KEYWORD_TYPE; }
+  "byte"                      { return FileMakerCalculationTokenType.KEYWORD_TYPE; }
+  "char"                      { return FileMakerCalculationTokenType.KEYWORD_TYPE; }
+  "class"                     { return FileMakerCalculationTokenType.KEYWORD_TYPE; }
+  "double"                    { return FileMakerCalculationTokenType.KEYWORD_TYPE; }
+  "float"                     { return FileMakerCalculationTokenType.KEYWORD_TYPE; }
+  "int"                       { return FileMakerCalculationTokenType.KEYWORD_TYPE; }
+  "interface"                 { return FileMakerCalculationTokenType.KEYWORD_TYPE; }
+  "long"                      { return FileMakerCalculationTokenType.KEYWORD_TYPE; }
+  "short"                     { return FileMakerCalculationTokenType.KEYWORD_TYPE; }
+  "void"                      { return FileMakerCalculationTokenType.KEYWORD_TYPE; }
+
+  // Keywords Group 4 - Functions (partial groups as per roadmap)
+  // Mathematical functions
+  "Abs"|"Acos"|"Asin"|"Atan"|"Ceiling"|"Cos"|"Degrees"|"Div"|"Exp"|"Floor"|"Int"|"Lg"|"Ln"|"Log"|"Max"|"Min"|"Mod"|"Pi"|"Radians"|"Round"|"Sign"|"Sin"|"Sqrt"|"Tan"|"Truncate"
+                               { return FileMakerCalculationTokenType.KEYWORD_FUNCTION; }
+  // Statistical functions
+  "Average"|"Count"|"StDev"|"StDevP"|"Sum"|"Variance"|"VarianceP"
+                               { return FileMakerCalculationTokenType.KEYWORD_FUNCTION; }
+  // Text functions
+  "Char"|"Code"|"Exact"|"Filter"|"FilterValues"|"Left"|"LeftValues"|"LeftWords"|"Length"|"Lower"|"Middle"|"MiddleValues"|"MiddleWords"|"Position"|"Proper"|"Quote"|"Replace"|"Right"|"RightValues"|"RightWords"|"Substitute"|"TextColor"|"TextColorRemove"|"TextFont"|"TextFontRemove"|"TextFormatRemove"|"TextSize"|"TextSizeRemove"|"TextStyleAdd"|"TextStyleRemove"|"Trim"|"TrimAll"|"Upper"|"WordCount"
+                               { return FileMakerCalculationTokenType.KEYWORD_FUNCTION; }
+  // Date/time functions
+  "Date"|"Day"|"DayName"|"DayNameJ"|"DayOfWeek"|"DayOfYear"|"Hour"|"Minute"|"Month"|"MonthName"|"MonthNameJ"|"Seconds"|"Time"|"Timestamp"|"WeekOfYear"|"WeekOfYearFiscal"|"Year"|"YearName"
+                               { return FileMakerCalculationTokenType.KEYWORD_FUNCTION; }
+  // Conversion functions
+  "GetAsBoolean"|"GetAsCSS"|"GetAsDate"|"GetAsNumber"|"GetAsSVG"|"GetAsText"|"GetAsTime"|"GetAsTimestamp"|"GetAsURLEncoded"
+                               { return FileMakerCalculationTokenType.KEYWORD_FUNCTION; }
+  // Generic Get() family — highlight core function name
+  "Get"                        { return FileMakerCalculationTokenType.KEYWORD_FUNCTION; }
+  // Field/database functions
+  "DatabaseNames"|"FieldBounds"|"FieldComment"|"FieldIDs"|"FieldNames"|"FieldRepetitions"|"FieldStyle"|"FieldType"|"GetField"|"GetFieldName"|"GetNthRecord"|"GetRepetition"|"GetSummary"|"GetValue"|"Lookup"|"LookupNext"
+                               { return FileMakerCalculationTokenType.KEYWORD_FUNCTION; }
+  // Japanese text functions
+  "Hiragana"|"KanaHankaku"|"KanaZenkaku"|"KanjiNumeral"|"Katakana"|"NumToJText"|"RomanHankaku"|"RomanZenkaku"
+                               { return FileMakerCalculationTokenType.KEYWORD_FUNCTION; }
+  // Layout/window functions
+  "GetLayoutObjectAttribute"|"LayoutIDs"|"LayoutNames"|"LayoutObjectNames"|"WindowNames"
+                               { return FileMakerCalculationTokenType.KEYWORD_FUNCTION; }
+  // List functions
+  "List"|"ValueCount"|"ValueListIDs"|"ValueListItems"|"ValueListNames"
+                               { return FileMakerCalculationTokenType.KEYWORD_FUNCTION; }
+  // Script/relation functions
+  "RelationInfo"|"ScriptIDs"|"ScriptNames"
+                               { return FileMakerCalculationTokenType.KEYWORD_FUNCTION; }
+  // Table functions
+  "TableIDs"|"TableNames"
+                               { return FileMakerCalculationTokenType.KEYWORD_FUNCTION; }
+  // Financial functions
+  "FV"|"NPV"|"PMT"|"PV"
+                               { return FileMakerCalculationTokenType.KEYWORD_FUNCTION; }
+  // Logical/special functions
+  "Case"|"Choose"|"Evaluate"|"EvaluationError"|"If"|"IsEmpty"|"IsValid"|"IsValidExpression"|"Combination"|"Extend"|"External"|"Factorial"|"GetNextSerialValue"|"Last"|"Let"|"PatternCount"|"Random"|"RGB"|"Self"|"SerialIncrement"|"SetPrecision"
+                               { return FileMakerCalculationTokenType.KEYWORD_FUNCTION; }
+
   // Operators and punctuation
   [\+\-\*\/=\^<>&;,()\[\]{}] { return FileMakerCalculationTokenType.OPERATOR; }
   "≠"|"≤"|"≥"                 { return FileMakerCalculationTokenType.OPERATOR; }
 
   // Identifier
-  {ID_START}{ID_PART}*        { return FileMakerCalculationTokenType.IDENTIFIER; }
+  [A-Za-z_][A-Za-z0-9_]*      { return FileMakerCalculationTokenType.IDENTIFIER; }
 
   .                            { return TokenType.BAD_CHARACTER; }
 }
 
 <COMMENT>{
-  {BLOCK_COMMENT_END}         { yybegin(YYINITIAL); return FileMakerCalculationTokenType.BLOCK_COMMENT; }
+  "\*/"                      { yybegin(YYINITIAL); return FileMakerCalculationTokenType.BLOCK_COMMENT; }
   [^]                         { return FileMakerCalculationTokenType.BLOCK_COMMENT; }
 }
