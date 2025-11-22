@@ -14,6 +14,19 @@ class SnippetDetectionTest {
     }
 
     @Test
+    void detectsFullScriptOverSteps() {
+        String xml = """
+                <fmxmlsnippet>
+                  <Script name="DoWork">
+                    <Step id="1"/>
+                  </Script>
+                </fmxmlsnippet>
+                """;
+        assertEquals(DefaultClipboardService.SnippetType.SCRIPT,
+                DefaultClipboardService.detectSnippetType(xml));
+    }
+
+    @Test
     void detectsFieldDefinition() {
         String xml = "<fmxmlsnippet type=\"FMObjectList\"><FieldDefinition name=\"X\"/></fmxmlsnippet>";
         assertEquals(DefaultClipboardService.SnippetType.FIELD_DEFINITION,

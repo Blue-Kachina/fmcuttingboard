@@ -484,6 +484,9 @@ public class DefaultClipboardService implements ClipboardService {
             int targetFormatId = 0;
             String targetFormatName = null;
             switch (type) {
+                case SCRIPT:
+                    targetFormatName = "Mac-XMSC"; // Full Scripts
+                    break;
                 case SCRIPT_STEPS:
                     targetFormatName = "Mac-XMSS"; // Script Steps
                     break;
@@ -603,6 +606,7 @@ public class DefaultClipboardService implements ClipboardService {
 
     // Snippet type classification to select FileMaker custom clipboard format
     static enum SnippetType {
+        SCRIPT,
         SCRIPT_STEPS,
         FIELD_DEFINITION,
         TABLE_DEFINITION,
@@ -615,6 +619,8 @@ public class DefaultClipboardService implements ClipboardService {
         if (text == null || text.isEmpty()) return SnippetType.UNKNOWN;
         // Simple heuristics per roadmap 1.4
         // Order matters; check the most specific/common first
+        // Important: detect full Script before bare Step selection, since scripts contain steps
+        if (text.contains("<Script")) return SnippetType.SCRIPT;
         if (text.contains("<Step")) return SnippetType.SCRIPT_STEPS;
         // Important: check for BaseTable before Field/FieldDefinition because table snippets often contain <Field>
         // and must be classified as TABLE_DEFINITION to target Mac-XMTB (not Mac-XMFD).
