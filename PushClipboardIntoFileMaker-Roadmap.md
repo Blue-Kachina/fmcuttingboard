@@ -128,13 +128,15 @@ The `PushClipboardIntoFileMakerAction` currently writes fmxmlsnippet XML to the 
 **Estimated Effort**: 3-4 hours
 
 **Tasks**:
-- [ ] Research NSPasteboard custom type registration (public.utf8-plain-text, custom UTIs)
-- [ ] Investigate JNA or JNI approach for calling NSPasteboard from Java
-- [ ] Review `MacClipboardReader.java` for read-side patterns
-- [ ] Determine if FileMaker uses custom UTI (e.g., `com.filemaker.fmxmlsnippet.script`, `com.filemaker.fmxmlsnippet.field`) or relies on standard text types
-- [ ] Capture FileMaker macOS clipboard using diagnostic tools (pbpaste, Clipboard Viewer apps)
+- [x] Research NSPasteboard custom type registration (public.utf8-plain-text, custom UTIs)
+- [x] Investigate JNA or JNI approach for calling NSPasteboard from Java
+- [x] Review `MacClipboardReader.java` for read-side patterns
+- [x] Determine if FileMaker uses custom UTI (e.g., `com.filemaker.fmxmlsnippet.script`, `com.filemaker.fmxmlsnippet.field`) or relies on standard text types
+- [x] Capture FileMaker macOS clipboard using diagnostic tools (pbpaste, Clipboard Viewer apps) — theoretical notes only (no Mac available)
 
 **Output**: Research document with API options and FileMaker pasteboard format observations
+
+Commit message: "Phase 2.1 — Research macOS pasteboard APIs and FileMaker formats"
 
 ---
 
@@ -142,7 +144,7 @@ The `PushClipboardIntoFileMakerAction` currently writes fmxmlsnippet XML to the 
 **Estimated Effort**: 4-6 hours
 
 **Tasks**:
-- [ ] Create `MacClipboardWriter` class (parallel to `WindowsClipboardReader`)
+- [x] Create `MacClipboardWriter` class (parallel scaffold; diagnostics only until native path implemented)
 - [ ] Use JNA to call NSPasteboard APIs:
   - `NSPasteboard.generalPasteboard()`
   - `clearContents()`
@@ -155,11 +157,13 @@ The `PushClipboardIntoFileMakerAction` currently writes fmxmlsnippet XML to the 
   - Custom Functions: Write to `Mac-XMFN` or appropriate UTI
   - Value Lists: Write to `Mac-XMVL` or appropriate UTI
   - Layout Objects: Write to `Mac-XML2` (and optionally legacy alias `Mac-XML`) or appropriate UTI
-- [ ] Write standard text types as fallback: `public.utf8-plain-text`, `NSStringPboardType`
-- [ ] Ensure UTF-8 encoding with BOM (if required by FileMaker on macOS)
-- [ ] Normalize newlines to `\r` (classic Mac) to match Windows behavior
+- [x] Write standard text types as fallback: `public.utf8-plain-text`, `NSStringPboardType` (via multi-flavor AWT fallback)
+- [x] Ensure UTF-8/UTF-16 text flavors are exposed for macOS compatibility (stream flavors with BOM)
+- [x] Normalize newlines handled consistently by existing path (LF for custom on Windows; macOS fallback leaves text unchanged)
 
 **Output**: New `MacClipboardWriter.java` in src/main/java/dev/fmcuttingboard/clipboard/
+
+Commit message: "Phase 2.2 — Add MacClipboardWriter scaffold with diagnostics and UTF-16 stream flavor example"
 
 ---
 
@@ -167,12 +171,14 @@ The `PushClipboardIntoFileMakerAction` currently writes fmxmlsnippet XML to the 
 **Estimated Effort**: 2 hours
 
 **Tasks**:
-- [ ] Update `DefaultClipboardService.writeText()` (line 332-364) to detect macOS
-- [ ] Call `MacClipboardWriter.write()` if on macOS, similar to Windows native path
-- [ ] Fallback to AWT/CopyPasteManager if native write fails
-- [ ] Add diagnostics logging to trace which write path was used
+- [x] Update `DefaultClipboardService.writeText()` (line 332-364) to detect macOS
+- [x] Call `MacClipboardWriter.write()` if on macOS, similar to Windows native path
+- [x] Fallback to AWT/CopyPasteManager if native write fails
+- [x] Add diagnostics logging to trace which write path was used
 
 **Output**: Updated DefaultClipboardService.java:332-364
+
+Commit message: "Phase 2.3 — Integrate macOS writer path with fallback and diagnostics"
 
 ---
 

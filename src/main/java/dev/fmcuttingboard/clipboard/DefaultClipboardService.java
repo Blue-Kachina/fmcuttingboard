@@ -341,6 +341,12 @@ public class DefaultClipboardService implements ClipboardService {
                 maybeDumpClipboardFormats("post-write");
                 return;
             }
+            // Try macOS-specific path (Phase 2.3 integration). If not active/available, this returns false
+            // and we fall back to the broader AWT/CopyPasteManager multi-flavor writer below.
+            if (!toWrite.isEmpty() && tryMacNativeWrite(toWrite)) {
+                maybeDumpClipboardFormats("post-write");
+                return;
+            }
             // Publish multiple text flavors to improve compatibility with apps like FileMaker on macOS
             // that may probe XML, UTF-16, or generic text representations. This mirrors the breadth
             // of formats we read and increases the chance that FileMaker recognizes fmxmlsnippet
@@ -360,6 +366,16 @@ public class DefaultClipboardService implements ClipboardService {
             throw new ClipboardAccessException("Clipboard is currently unavailable (locked).", e);
         } catch (Throwable t) {
             throw new ClipboardAccessException("Unexpected clipboard error while writing.", t);
+        }
+    }
+
+    // Phase 2.3 — Integrate MacClipboardWriter into DefaultClipboardService
+    private boolean tryMacNativeWrite(String text) {
+        try {
+            return MacClipboardWriter.write(text);
+        } catch (Throwable t) {
+            LOG.info("[CB-mac] native write path failed: " + t.getClass().getSimpleName());
+            return false;
         }
     }
 
