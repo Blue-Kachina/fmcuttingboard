@@ -93,6 +93,19 @@ class FmXmlParserTest {
     }
 
     @Test
+    void parsesLayoutWithGenericObjectTagsAsLayouts() throws Exception {
+        String xml = """
+                <fmxmlsnippet type="LayoutObjectList">
+                  <Layout name="L">
+                    <Object type="Text" key="1"/>
+                  </Layout>
+                </fmxmlsnippet>
+                """;
+        ParsedSnippet sn = parser.parse(xml);
+        assertTrue(sn.getElementTypes().contains(ElementType.LAYOUTS));
+    }
+
+    @Test
     void rejectsNonSnippetRoot() {
         String xml = "<root><child/></root>";
         assertThrows(ConversionException.class, () -> parser.parse(xml));

@@ -93,6 +93,7 @@ public class FmXmlParser {
                     || lower.equals("layoutobjectlist")
                     || lower.equals("objectlist")
                     || lower.equals("layoutobject")
+                    || lower.equals("object")
                     || lower.equals("part")) {
                 String name = el.getAttribute("name");
                 if (name != null && !name.isBlank()) model.addLayoutName(name);

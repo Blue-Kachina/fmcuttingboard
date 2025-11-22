@@ -68,6 +68,13 @@ class SnippetDetectionTest {
     }
 
     @Test
+    void detectsLayoutObjectsWhenOnlyGenericObjectPresent() {
+        String xml = "<fmxmlsnippet type=\"LayoutObjectList\"><Layout><Object type=\"Text\"/></Layout></fmxmlsnippet>";
+        assertEquals(DefaultClipboardService.SnippetType.LAYOUT_OBJECTS,
+                DefaultClipboardService.detectSnippetType(xml));
+    }
+
+    @Test
     void unknownWhenNoHeuristicsMatch() {
         String xml = "<fmxmlsnippet type=\"FMObjectList\"><UnknownTag/></fmxmlsnippet>";
         assertEquals(DefaultClipboardService.SnippetType.UNKNOWN,
