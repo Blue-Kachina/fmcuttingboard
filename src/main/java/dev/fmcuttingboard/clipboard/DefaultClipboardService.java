@@ -616,8 +616,10 @@ public class DefaultClipboardService implements ClipboardService {
         // Simple heuristics per roadmap 1.4
         // Order matters; check the most specific/common first
         if (text.contains("<Step")) return SnippetType.SCRIPT_STEPS;
-        if (text.contains("<FieldDefinition") || text.contains("<Field ")) return SnippetType.FIELD_DEFINITION;
+        // Important: check for BaseTable before Field/FieldDefinition because table snippets often contain <Field>
+        // and must be classified as TABLE_DEFINITION to target Mac-XMTB (not Mac-XMFD).
         if (text.contains("<BaseTable")) return SnippetType.TABLE_DEFINITION;
+        if (text.contains("<FieldDefinition") || text.contains("<Field ")) return SnippetType.FIELD_DEFINITION;
         // Layout-related tags (not yet supported for custom format setting)
         if (text.contains("<Layout") || text.contains("<ObjectList") || text.contains("<LayoutObject") || text.contains("<Object ") || text.contains("<Part")) {
             return SnippetType.LAYOUT_OBJECTS;

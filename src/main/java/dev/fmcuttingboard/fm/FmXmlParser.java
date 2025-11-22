@@ -86,6 +86,9 @@ public class FmXmlParser {
                 if (name != null && !name.isBlank()) model.addFieldName(name);
                 // Even if name is missing, presence of a Field/FieldDefinition indicates a Fields snippet
                 model.addElementType(ElementType.FIELDS);
+            } else if (lower.equals("basetable")) {
+                // Table definitions — mark TABLES and capture name if present later when model expands
+                model.addElementType(ElementType.TABLES);
             } else if (lower.equals("layout")) {
                 String name = el.getAttribute("name");
                 if (name != null && !name.isBlank()) model.addLayoutName(name);

@@ -7,6 +7,7 @@ package dev.fmcuttingboard.fm;
 public enum ElementType {
     FIELDS,
     SCRIPTS,
+    TABLES,
     LAYOUTS,
     UNKNOWN
 }

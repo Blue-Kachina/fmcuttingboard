@@ -35,6 +35,19 @@ class SnippetDetectionTest {
     }
 
     @Test
+    void detectsTableDefinitionEvenWhenFieldsPresent() {
+        String xml = """
+                <fmxmlsnippet type="FMObjectList">
+                  <BaseTable name="T">
+                    <Field name="F"><DataType>Text</DataType></Field>
+                  </BaseTable>
+                </fmxmlsnippet>
+                """;
+        assertEquals(DefaultClipboardService.SnippetType.TABLE_DEFINITION,
+                DefaultClipboardService.detectSnippetType(xml));
+    }
+
+    @Test
     void detectsLayoutObjects() {
         String xml = "<fmxmlsnippet type=\"FMObjectList\"><Layout name=\"L\"/><ObjectList/></fmxmlsnippet>";
         assertEquals(DefaultClipboardService.SnippetType.LAYOUT_OBJECTS,

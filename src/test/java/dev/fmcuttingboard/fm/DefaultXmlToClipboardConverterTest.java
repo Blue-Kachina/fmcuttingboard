@@ -62,6 +62,23 @@ class DefaultXmlToClipboardConverterTest {
     }
 
     @Test
+    void convertsTablesSnippetToClipboardPayload() throws Exception {
+        String xml = """
+                <fmxmlsnippet type="FMObjectList">
+                  <BaseTable name="TestTable">
+                    <Field name="Id">
+                      <DataType>Number</DataType>
+                    </Field>
+                  </BaseTable>
+                </fmxmlsnippet>
+                """;
+
+        String payload = converter.convertToClipboardPayload(xml);
+        assertNotNull(payload);
+        assertTrue(payload.contains("<BaseTable"));
+    }
+
+    @Test
     void throwsForUnsupportedLayoutSnippets() {
         String xml = """
                 <fmxmlsnippet>

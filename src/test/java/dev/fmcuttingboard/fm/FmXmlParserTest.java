@@ -37,6 +37,19 @@ class FmXmlParserTest {
     }
 
     @Test
+    void parsesTablesSnippet() throws Exception {
+        String xml = """
+                <fmxmlsnippet type="FMObjectList">
+                  <BaseTable name="Customers">
+                    <Field name="Name"><DataType>Text</DataType></Field>
+                  </BaseTable>
+                </fmxmlsnippet>
+                """;
+        ParsedSnippet sn = parser.parse(xml);
+        assertTrue(sn.getElementTypes().contains(ElementType.TABLES));
+    }
+
+    @Test
     void rejectsNonSnippetRoot() {
         String xml = "<root><child/></root>";
         assertThrows(ConversionException.class, () -> parser.parse(xml));
