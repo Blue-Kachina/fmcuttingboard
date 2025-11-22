@@ -51,8 +51,14 @@ dependencies {
 }
 
 tasks.patchPluginXml {
-    // 243 = IntelliJ Platform 2024.3 baseline
-    sinceBuild.set("243")
+    // Set the minimum compatible IDE build.
+    // 242 = IntelliJ Platform 2024.2 baseline, which is the first version running on Java 21.
+    // Our plugin targets Java 21 bytecode, so 2024.2 is the earliest compatible IDE.
+    sinceBuild.set("242")
+
+    // Do NOT cap the upper build. Leaving untilBuild empty removes the upper bound,
+    // allowing the plugin to load on newer IDEs (e.g., 25x) unless there are API breaks.
+    untilBuild.set("")
 }
 
 tasks.runIde {
@@ -74,8 +80,9 @@ tasks.test {
 }
 
 // Convenience task to build distributable plugin artifact
-tasks.register("releasePlugin") {
+// Explicit Task type to satisfy Kotlin DSL type inference in some environments
+tasks.register<Task>("releasePlugin") {
     group = "build"
-    description = "Builds the plugin distribution zip for release"
+    description = "Builds the plugin distribution zip for release (outputs to build/distributions)"
     dependsOn("buildPlugin")
 }

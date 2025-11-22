@@ -1,4 +1,4 @@
-# JetBrains Marketplace Listing — Draft
+# JetBrains Marketplace Listing
 
 Name: FMCuttingBoard
 
