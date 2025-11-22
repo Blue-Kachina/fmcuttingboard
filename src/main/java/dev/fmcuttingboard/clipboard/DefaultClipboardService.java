@@ -409,12 +409,15 @@ public class DefaultClipboardService implements ClipboardService {
         // FileMaker's custom Mac-* formats: 4-byte LE length prefix + UTF-8 (no BOM), no trailing NUL.
         final byte[] fmCustom = utf8LengthPrefixedNoBom(customPayload);
 
-        // Diagnostics for Phase 1.1: verify BOMs and terminators at runtime when verbose logging is enabled.
+        // Diagnostics: verify BOMs, terminators, newline normalization and length prefix expectations at runtime.
         if (Diagnostics.isVerbose()) {
             // CF_UNICODETEXT: should NOT include BOM by spec; should end with two NUL bytes.
             boolean utf16HasBom = utf16.length >= 2 && (utf16[0] == (byte)0xFF && utf16[1] == (byte)0xFE);
             boolean utf16HasNullTerm = utf16.length >= 2 && (utf16[utf16.length - 1] == 0x00) && (utf16[utf16.length - 2] == 0x00);
             LOG.info("[CB-DIAG] CF_UNICODETEXT: hasBOM=" + utf16HasBom + " (expected=false), hasNullTerm=" + utf16HasNullTerm + " (expected=true), size=" + utf16.length);
+            if (utf16HasBom || !utf16HasNullTerm) {
+                LOG.warn("[CB-DIAG] CF_UNICODETEXT validation failed: expected no BOM and a trailing UTF-16 NUL terminator");
+            }
 
             // Custom format: first 4 bytes are LE length; payload should NOT start with UTF-8 BOM and should have no trailing NUL
             int leLen = (fmCustom.length >= 4)
@@ -423,13 +426,17 @@ public class DefaultClipboardService implements ClipboardService {
             boolean customHasBom = fmCustom.length >= 7 // 4 bytes len + 3 bytes BOM
                     && ((fmCustom[4] & 0xFF) == 0xEF) && ((fmCustom[5] & 0xFF) == 0xBB) && ((fmCustom[6] & 0xFF) == 0xBF);
             boolean customHasNullTerm = fmCustom.length > 4 && (fmCustom[fmCustom.length - 1] == 0x00);
+            boolean lengthMatches = (leLen >= 0) && (leLen == (fmCustom.length - 4));
             // Also sample first/last few bytes to aid hex inspection
             StringBuilder head = new StringBuilder();
             for (int i = 0; i < Math.min(12, fmCustom.length); i++) head.append(String.format("%02X ", fmCustom[i] & 0xFF));
             StringBuilder tail = new StringBuilder();
             for (int i = Math.max(0, fmCustom.length - 4); i < fmCustom.length; i++) tail.append(String.format("%02X ", fmCustom[i] & 0xFF));
             LOG.info("[CB-DIAG] FM-CUSTOM: leLen=" + leLen + ", hasBOM=" + customHasBom + " (expected=false), hasNullTerm=" + customHasNullTerm +
-                    " (expected=false), size=" + fmCustom.length + ", head=" + head + ", tail=" + tail);
+                    " (expected=false), lenMatches=" + lengthMatches + ", size=" + fmCustom.length + ", head=" + head + ", tail=" + tail);
+            if (customHasBom || customHasNullTerm || !lengthMatches) {
+                LOG.warn("[CB-DIAG] FM-CUSTOM validation failed: expected no BOM, no trailing NUL, and length prefix to equal payload length");
+            }
 
             // Newline diagnostics (post-normalization to LF for custom payload)
             int lfCount = 0, crCount = 0;
@@ -439,6 +446,12 @@ public class DefaultClipboardService implements ClipboardService {
                 if (b == (byte) '\r') crCount++;
             }
             LOG.info("[CB-DIAG] FM-CUSTOM newlines: LF=" + lfCount + ", CR=" + crCount + " (expected LF>0 for multi-line snippets, CR=0)");
+
+            // Input vs normalized newline summary
+            int inCrLf = countOccurrences(text, "\r\n");
+            int inCr = countOccurrences(text.replace("\r\n", ""), "\r");
+            int inLf = countOccurrences(text.replace("\r\n", ""), "\n");
+            LOG.info("[CB-DIAG] Input newlines: CRLF=" + inCrLf + ", CR=" + inCr + ", LF=" + inLf + "; normalized to LF for custom format");
         }
         final long MAX = 10L * 1024 * 1024; // 10 MB cap per format
         if (utf16.length > MAX || fmCustom.length > MAX) {
@@ -574,6 +587,17 @@ public class DefaultClipboardService implements ClipboardService {
         String tmp = s.replace("\r\n", "\n");
         tmp = tmp.replace("\r", "\n");
         return tmp;
+    }
+
+    // Utility: simple non-overlapping substring count for diagnostics
+    private static int countOccurrences(String text, String sub) {
+        if (text == null || text.isEmpty() || sub == null || sub.isEmpty()) return 0;
+        int count = 0, idx = 0;
+        while ((idx = text.indexOf(sub, idx)) != -1) {
+            count++;
+            idx += sub.length();
+        }
+        return count;
     }
 
     // Small holder to track HGLOBAL while deciding whether we need to free
