@@ -1,0 +1,6 @@
+<fmxmlsnippet type="FMObjectList">
+  <CustomFunction name="CF_SayHello">
+    <Parameters>name</Parameters>
+    <Definition>"Hello, " &amp; name</Definition>
+  </CustomFunction>
+</fmxmlsnippet>

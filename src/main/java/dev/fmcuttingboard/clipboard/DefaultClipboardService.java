@@ -496,6 +496,12 @@ public class DefaultClipboardService implements ClipboardService {
                 case TABLE_DEFINITION:
                     targetFormatName = "Mac-XMTB"; // Tables per analysis (was previously mapped to XMFD)
                     break;
+                case CUSTOM_FUNCTION:
+                    targetFormatName = "Mac-XMFN"; // Custom Functions
+                    break;
+                case VALUE_LIST:
+                    targetFormatName = "Mac-XMVL"; // Value Lists
+                    break;
                 case LAYOUT_OBJECTS:
                     // Layouts not yet supported — gracefully avoid setting custom format
                     targetFormatName = null;
@@ -610,6 +616,8 @@ public class DefaultClipboardService implements ClipboardService {
         SCRIPT_STEPS,
         FIELD_DEFINITION,
         TABLE_DEFINITION,
+        CUSTOM_FUNCTION,
+        VALUE_LIST,
         LAYOUT_OBJECTS,
         UNKNOWN
     }
@@ -626,6 +634,9 @@ public class DefaultClipboardService implements ClipboardService {
         // and must be classified as TABLE_DEFINITION to target Mac-XMTB (not Mac-XMFD).
         if (text.contains("<BaseTable")) return SnippetType.TABLE_DEFINITION;
         if (text.contains("<FieldDefinition") || text.contains("<Field ")) return SnippetType.FIELD_DEFINITION;
+        // Custom Functions and Value Lists
+        if (text.contains("<CustomFunction")) return SnippetType.CUSTOM_FUNCTION;
+        if (text.contains("<ValueList")) return SnippetType.VALUE_LIST;
         // Layout-related tags (not yet supported for custom format setting)
         if (text.contains("<Layout") || text.contains("<ObjectList") || text.contains("<LayoutObject") || text.contains("<Object ") || text.contains("<Part")) {
             return SnippetType.LAYOUT_OBJECTS;

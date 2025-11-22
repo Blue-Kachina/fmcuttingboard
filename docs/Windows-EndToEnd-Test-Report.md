@@ -21,6 +21,8 @@ Files under test (from resources/test-snippets)
 - ScriptSteps.xml
 - Fields.xml
 - Tables.xml
+- CustomFunctions.xml
+- ValueLists.xml
 
 Environment
 - OS: Windows 10/11 (record exact build)
@@ -40,6 +42,12 @@ FileMaker Pro 19
 - Tables:
   - Result: 
   - Notes:
+ - Custom Functions:
+  - Result:
+  - Notes:
+ - Value Lists:
+  - Result:
+  - Notes:
 
 FileMaker Pro 20
 - Script Steps: 
@@ -51,6 +59,12 @@ FileMaker Pro 20
 - Tables:
   - Result: 
   - Notes:
+ - Custom Functions:
+  - Result:
+  - Notes:
+ - Value Lists:
+  - Result:
+  - Notes:
 
 FileMaker Pro 21
 - Script Steps: 
@@ -61,6 +75,12 @@ FileMaker Pro 21
   - Notes:
 - Tables:
   - Result: 
+  - Notes:
+ - Custom Functions:
+  - Result:
+  - Notes:
+ - Value Lists:
+  - Result:
   - Notes:
 
 Version-specific observations

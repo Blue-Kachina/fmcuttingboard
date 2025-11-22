@@ -1,0 +1,8 @@
+<fmxmlsnippet type="FMObjectList">
+  <ValueList name="VL_Status">
+    <CustomValues>
+      <CustomValue>Open</CustomValue>
+      <CustomValue>Closed</CustomValue>
+    </CustomValues>
+  </ValueList>
+</fmxmlsnippet>

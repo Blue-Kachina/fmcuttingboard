@@ -20,9 +20,11 @@ Checklist
 
 2) Push Clipboard Into FileMaker (from active XML file)
    - Open a valid fmxmlsnippet XML file in the editor. Sample files are provided under resources/test-snippets:
-     - ScriptSteps.xml (Script Workspace paste)
-     - Fields.xml (Manage Database > Fields paste)
-     - Tables.xml (Manage Database > Tables paste)
+     - ScriptSteps.xml (Script Workspace — paste as steps or into a script)
+     - Fields.xml (Manage Database > Fields — paste)
+     - Tables.xml (Manage Database > Tables — paste)
+     - CustomFunctions.xml (Manage Custom Functions — paste)
+     - ValueLists.xml (Manage Value Lists — paste)
    - Invoke the action “FM: Push Clipboard Into FileMaker”.
    - Expected: System clipboard receives the normalized fmxmlsnippet payload.
    - For unsupported types (e.g., pure Layouts), expect a warning/error notification.

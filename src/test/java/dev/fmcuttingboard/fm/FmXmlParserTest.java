@@ -50,6 +50,36 @@ class FmXmlParserTest {
     }
 
     @Test
+    void parsesCustomFunctionSnippet() throws Exception {
+        String xml = """
+                <fmxmlsnippet type="FMObjectList">
+                  <CustomFunction name="CF_SayHello">
+                    <Parameters>name</Parameters>
+                    <Definition>\"Hello, \" &amp; name</Definition>
+                  </CustomFunction>
+                </fmxmlsnippet>
+                """;
+        ParsedSnippet sn = parser.parse(xml);
+        assertTrue(sn.getElementTypes().contains(ElementType.CUSTOM_FUNCTIONS));
+    }
+
+    @Test
+    void parsesValueListSnippet() throws Exception {
+        String xml = """
+                <fmxmlsnippet type="FMObjectList">
+                  <ValueList name="VL_Status">
+                    <CustomValues>
+                      <CustomValue>Open</CustomValue>
+                      <CustomValue>Closed</CustomValue>
+                    </CustomValues>
+                  </ValueList>
+                </fmxmlsnippet>
+                """;
+        ParsedSnippet sn = parser.parse(xml);
+        assertTrue(sn.getElementTypes().contains(ElementType.VALUE_LISTS));
+    }
+
+    @Test
     void rejectsNonSnippetRoot() {
         String xml = "<root><child/></root>";
         assertThrows(ConversionException.class, () -> parser.parse(xml));

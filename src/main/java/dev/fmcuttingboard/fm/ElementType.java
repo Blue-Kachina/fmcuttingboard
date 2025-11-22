@@ -9,5 +9,7 @@ public enum ElementType {
     SCRIPTS,
     TABLES,
     LAYOUTS,
+    CUSTOM_FUNCTIONS,
+    VALUE_LISTS,
     UNKNOWN
 }

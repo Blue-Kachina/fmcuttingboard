@@ -95,4 +95,38 @@ class DefaultXmlToClipboardConverterTest {
         String xml = "<fmxmlsnippet><Script></fmxmlsnippet>"; // unclosed <Script>
         assertThrows(ConversionException.class, () -> converter.convertToClipboardPayload(xml));
     }
+
+    @Test
+    void convertsCustomFunctionSnippetToClipboardPayload() throws Exception {
+        String xml = """
+                <fmxmlsnippet type="FMObjectList">
+                  <CustomFunction name="CF_SayHello">
+                    <Parameters>name</Parameters>
+                    <Definition>\\"Hello, \\" &amp; name</Definition>
+                  </CustomFunction>
+                </fmxmlsnippet>
+                """;
+
+        String payload = converter.convertToClipboardPayload(xml);
+        assertNotNull(payload);
+        assertTrue(payload.contains("<CustomFunction"));
+    }
+
+    @Test
+    void convertsValueListSnippetToClipboardPayload() throws Exception {
+        String xml = """
+                <fmxmlsnippet type="FMObjectList">
+                  <ValueList name="VL_Status">
+                    <CustomValues>
+                      <CustomValue>Open</CustomValue>
+                      <CustomValue>Closed</CustomValue>
+                    </CustomValues>
+                  </ValueList>
+                </fmxmlsnippet>
+                """;
+
+        String payload = converter.convertToClipboardPayload(xml);
+        assertNotNull(payload);
+        assertTrue(payload.contains("<ValueList"));
+    }
 }

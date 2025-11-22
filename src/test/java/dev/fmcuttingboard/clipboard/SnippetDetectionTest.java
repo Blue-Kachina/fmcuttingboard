@@ -73,4 +73,18 @@ class SnippetDetectionTest {
         assertEquals(DefaultClipboardService.SnippetType.UNKNOWN,
                 DefaultClipboardService.detectSnippetType(xml));
     }
+
+    @Test
+    void detectsCustomFunction() {
+        String xml = "<fmxmlsnippet type=\"FMObjectList\"><CustomFunction name=\"CF\"/></fmxmlsnippet>";
+        assertEquals(DefaultClipboardService.SnippetType.CUSTOM_FUNCTION,
+                DefaultClipboardService.detectSnippetType(xml));
+    }
+
+    @Test
+    void detectsValueList() {
+        String xml = "<fmxmlsnippet type=\"FMObjectList\"><ValueList name=\"VL\"/></fmxmlsnippet>";
+        assertEquals(DefaultClipboardService.SnippetType.VALUE_LIST,
+                DefaultClipboardService.detectSnippetType(xml));
+    }
 }

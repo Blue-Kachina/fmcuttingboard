@@ -23,17 +23,19 @@ public class DefaultXmlToClipboardConverter implements XmlToClipboardConverter {
         ParsedSnippet model = parser.parse(fmxmlsnippetXml);
         EnumSet<ElementType> types = model.getElementTypes();
 
-        // Phase 1.5 update: support FIELDS, SCRIPTS, and TABLES; Layout-only remains unsupported for now
+        // Phase 3.3 update: support FIELDS, SCRIPTS, TABLES, CUSTOM FUNCTIONS, and VALUE LISTS; Layout-only remains unsupported for now
         boolean isFields = types.contains(ElementType.FIELDS);
         boolean isScripts = types.contains(ElementType.SCRIPTS);
         boolean isTables = types.contains(ElementType.TABLES);
         boolean isLayouts = types.contains(ElementType.LAYOUTS);
+        boolean isCustomFunctions = types.contains(ElementType.CUSTOM_FUNCTIONS);
+        boolean isValueLists = types.contains(ElementType.VALUE_LISTS);
 
-        if (isLayouts && !isFields && !isScripts && !isTables) {
+        if (isLayouts && !isFields && !isScripts && !isTables && !isCustomFunctions && !isValueLists) {
             throw new ConversionException("Layout snippets are not supported yet.");
         }
-        if (!isFields && !isScripts && !isTables) {
-            throw new ConversionException("Unsupported or unknown fmxmlsnippet type. Supported: Script Steps, Fields, Tables.");
+        if (!isFields && !isScripts && !isTables && !isCustomFunctions && !isValueLists) {
+            throw new ConversionException("Unsupported or unknown fmxmlsnippet type. Supported: Script/Steps, Fields, Tables, Custom Functions, Value Lists.");
         }
 
         // For supported types, returning the validated XML is sufficient for FileMaker paste

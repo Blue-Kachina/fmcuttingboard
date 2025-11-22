@@ -101,6 +101,12 @@ public class FmXmlParser {
                 // Standalone Script Steps snippets may not include a <Script> wrapper. Treat <Step> as script content
                 // so that converters recognize it as a supported Script Steps fmxmlsnippet.
                 model.addElementType(ElementType.SCRIPTS);
+            } else if (lower.equals("customfunction")) {
+                // Custom Functions live under <CustomFunction>
+                model.addElementType(ElementType.CUSTOM_FUNCTIONS);
+            } else if (lower.equals("valuelist")) {
+                // Value Lists live under <ValueList>
+                model.addElementType(ElementType.VALUE_LISTS);
             }
         }
 
