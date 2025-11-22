@@ -45,6 +45,23 @@ class DefaultXmlToClipboardConverterTest {
     }
 
     @Test
+    void convertsStandaloneScriptStepsSnippetToClipboardPayload() throws Exception {
+        // Some fmxmlsnippets contain Script Steps without a wrapping <Script> element
+        String xml = """
+                <fmxmlsnippet type="FMObjectList">
+                  <Step enable=\"True\" id=\"1\" name=\"Show Custom Dialog\">
+                    <Text>Example</Text>
+                  </Step>
+                </fmxmlsnippet>
+                """;
+
+        String payload = converter.convertToClipboardPayload(xml);
+        assertNotNull(payload);
+        assertTrue(payload.contains("<fmxmlsnippet"));
+        assertTrue(payload.contains("<Step"));
+    }
+
+    @Test
     void throwsForUnsupportedLayoutSnippets() {
         String xml = """
                 <fmxmlsnippet>

@@ -84,12 +84,20 @@ public class FmXmlParser {
             if (lower.equals("field") || lower.equals("fielddefinition")) {
                 String name = el.getAttribute("name");
                 if (name != null && !name.isBlank()) model.addFieldName(name);
+                // Even if name is missing, presence of a Field/FieldDefinition indicates a Fields snippet
+                model.addElementType(ElementType.FIELDS);
             } else if (lower.equals("layout")) {
                 String name = el.getAttribute("name");
                 if (name != null && !name.isBlank()) model.addLayoutName(name);
+                model.addElementType(ElementType.LAYOUTS);
             } else if (lower.equals("script")) {
                 String name = el.getAttribute("name");
                 if (name != null && !name.isBlank()) model.addScriptName(name);
+                model.addElementType(ElementType.SCRIPTS);
+            } else if (lower.equals("step")) {
+                // Standalone Script Steps snippets may not include a <Script> wrapper. Treat <Step> as script content
+                // so that converters recognize it as a supported Script Steps fmxmlsnippet.
+                model.addElementType(ElementType.SCRIPTS);
             }
         }
 

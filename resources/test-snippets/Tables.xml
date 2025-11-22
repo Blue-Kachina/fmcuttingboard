@@ -1,8 +1,18 @@
 <fmxmlsnippet type="FMObjectList">
-  <BaseTable name="TestTable">
-    <Field name="Id">
-      <DataType>Number</DataType>
-      <FieldClass>Normal</FieldClass>
-    </Field>
-  </BaseTable>
+    <BaseTable name="TestTable">
+        <Field id="6" dataType="Text" fieldType="Normal" name="TestField">
+            <Comment></Comment>
+            <AutoEnter allowEditing="True" constant="False" furigana="False" lookup="False" calculation="False">
+                <ConstantData></ConstantData>
+            </AutoEnter>
+            <Validation messageCalc="False" message="False" maxLength="False" valuelist="False" calculation="False"
+                        alwaysValidateCalculation="False" type="OnlyDuringDataEntry">
+                <NotEmpty value="False"></NotEmpty>
+                <Unique value="False"></Unique>
+                <Existing value="False"></Existing>
+                <StrictValidation value="False"></StrictValidation>
+            </Validation>
+            <Storage autoIndex="True" index="None" indexLanguage="English" global="False" maxRepetition="1"></Storage>
+        </Field>
+    </BaseTable>
 </fmxmlsnippet>
