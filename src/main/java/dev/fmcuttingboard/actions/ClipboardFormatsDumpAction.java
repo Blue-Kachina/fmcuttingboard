@@ -67,18 +67,16 @@ public class ClipboardFormatsDumpAction extends AnAction {
                 count++;
                 if (count >= 64) break; // avoid excessive logs
 
-                // If this format looks like a FileMaker custom type, extract/analyze bytes
-                if (name != null && isInteresting(name)) {
-                    try {
-                        byte[] bytes = readAllBytes(id);
-                        if (bytes != null) {
-                            String section = analyzeBytesSection(id, name, bytes);
-                            LOG.info(section.replace("\n", " ")); // compact info into log line
-                            analysis.append(section).append("\n\n");
-                        }
-                    } catch (Throwable t) {
-                        LOG.info("[CB-ANALYZE] Failed reading/analyzing id=" + id + ", name='" + name + "': " + t.getClass().getSimpleName());
+                // Analyze ALL clipboard formats for now (lifting previous restriction to FM-specific names)
+                try {
+                    byte[] bytes = readAllBytes(id);
+                    if (bytes != null && bytes.length > 0) {
+                        String section = analyzeBytesSection(id, name, bytes);
+                        LOG.info(section.replace("\n", " ")); // compact info into log line
+                        analysis.append(section).append("\n\n");
                     }
+                } catch (Throwable t) {
+                    LOG.info("[CB-ANALYZE] Failed reading/analyzing id=" + id + (name == null ? "" : ", name='" + name + "'") + ": " + t.getClass().getSimpleName());
                 }
             }
             if (count == 0) {

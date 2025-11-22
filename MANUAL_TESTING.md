@@ -48,7 +48,7 @@ Phase 1.2 — Clipboard Capture (Windows)
 - Steps:
   1) In FileMaker, copy a Script (or a selection of steps) so it’s on the system clipboard.
   2) In the IDE, run Tools > FMCuttingBoard > Diagnostics: Dump Clipboard Formats.
-  3) Expected: IDE log shows lines prefixed with [CB-DUMP] for all formats, and [CB-ANALYZE] for FileMaker-specific formats (Mac-XMSS/Mac-XMFD).
+  3) Expected: IDE log shows lines prefixed with [CB-DUMP] for all formats, and [CB-ANALYZE] entries for every enumerated format (we now analyze ALL formats, not just FileMaker-specific ones).
   4) A report file is written to docs/FileMaker-Native-Clipboard-Analysis.md in your project (or to your home folder if no project is open).
   5) Repeat for Fields and Tables (copy from FileMaker’s Manage Database) and run the diagnostics action again.
   6) Validate the report contains BOM info, newline counts (CR/LF/CRLF), null terminator note, and a small fmxmlsnippet preview.
@@ -56,6 +56,15 @@ Phase 1.2 — Clipboard Capture (Windows)
 Notes
 - If JNA is not available or you’re not on Windows, the diagnostics action will log a notice and skip native enumeration.
 - The report appends new captures; delete the file to start fresh.
+
+Suggested FileMaker items to copy and analyze
+- Script(s) and selections of Script Steps (Script Workspace)
+- Field Definitions and Table Definitions (Manage Database)
+- Custom Functions (Manage Custom Functions)
+- Layout Objects (e.g., single field, button, group) and full Layouts if possible
+- Value Lists (Manage Value Lists)
+- Custom Menus and Menu Sets (Manage Custom Menus)
+- Privilege Sets (Manage Security) — if copy is supported
 
 Fresh environment validation
 - Start the IDE with a fresh config directory (or use the Gradle `runIde` sandbox) to simulate a new user profile.
