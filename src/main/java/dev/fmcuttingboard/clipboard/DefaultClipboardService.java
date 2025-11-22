@@ -390,16 +390,14 @@ public class DefaultClipboardService implements ClipboardService {
         if (!jnaAvailable) return false;
 
         // Detect fmxmlsnippet content type for selecting correct FileMaker clipboard flavor
-        final boolean isScript = text != null && text.contains("<Step");
-        final boolean isField = text != null && (text.contains("<Field") || text.contains("<FieldDefinition"));
-        if (!isScript && !isField) {
+        SnippetType type = detectSnippetType(text);
+        if (type == SnippetType.UNKNOWN) {
             // Unknown content — fall back to generic multi-flavor AWT writer
             Diagnostics.vInfo(LOG, "Native write skipped: unknown fmxmlsnippet type");
             return false;
         }
         if (Diagnostics.isVerbose()) {
-            String detected = isScript ? "ScriptSteps" : (isField ? "FieldOrTable" : "Unknown");
-            Diagnostics.vInfo(LOG, "[CB-DIAG] Detected snippet type=" + detected);
+            Diagnostics.vInfo(LOG, "[CB-DIAG] Detected snippet type=" + type.name());
         }
 
         // Guard extremely large payloads to avoid excessive allocations
@@ -480,10 +478,24 @@ public class DefaultClipboardService implements ClipboardService {
             // Register only the specific FileMaker format matching the content type
             int targetFormatId = 0;
             String targetFormatName = null;
-            if (isScript) {
-                targetFormatName = "Mac-XMSS"; // Script Steps
-            } else if (isField) {
-                targetFormatName = "Mac-XMFD"; // Fields/Tables
+            switch (type) {
+                case SCRIPT_STEPS:
+                    targetFormatName = "Mac-XMSS"; // Script Steps
+                    break;
+                case FIELD_DEFINITION:
+                case TABLE_DEFINITION:
+                    targetFormatName = "Mac-XMFD"; // Fields & Tables
+                    break;
+                case LAYOUT_OBJECTS:
+                    // Layouts not yet supported — gracefully avoid setting custom format
+                    targetFormatName = null;
+                    Diagnostics.vInfo(LOG, "[CB-DIAG] Layout snippets not supported yet; only CF_UNICODETEXT will be set");
+                    break;
+                default:
+                    break;
+            }
+            if (Diagnostics.isVerbose()) {
+                Diagnostics.vInfo(LOG, "[CB-DIAG] targetFormat=" + (targetFormatName == null ? "none" : targetFormatName));
             }
             if (targetFormatName != null) {
                 targetFormatId = User32.INSTANCE.RegisterClipboardFormat(targetFormatName);
@@ -537,6 +549,7 @@ public class DefaultClipboardService implements ClipboardService {
                 crc = c.getValue();
             } catch (Throwable ignore) {}
             Diagnostics.vInfo(LOG, "Native write: CF_UNICODETEXT=" + (unicodeOk ? "ok" : "fail")
+                    + ", detectedType=" + type.name()
                     + ", target=" + (targetFormatName == null ? "n/a" : targetFormatName) + "=" + (customOk ? "ok" : (targetFormatId == 0 ? "n/a" : "fail"))
                     + ", sizes: utf16=" + utf16.length + ", custom=" + fmCustom.length + ", custom.lenPrefixed=true, custom.hasBom=false, custom.crc32=0x" + Long.toHexString(crc));
         
@@ -579,6 +592,30 @@ public class DefaultClipboardService implements ClipboardService {
         out[3] = (byte) ((len >>> 24) & 0xFF);
         System.arraycopy(payload, 0, out, 4, len);
         return out;
+    }
+
+    // Snippet type classification to select FileMaker custom clipboard format
+    static enum SnippetType {
+        SCRIPT_STEPS,
+        FIELD_DEFINITION,
+        TABLE_DEFINITION,
+        LAYOUT_OBJECTS,
+        UNKNOWN
+    }
+
+    // Package-private for unit testing
+    static SnippetType detectSnippetType(String text) {
+        if (text == null || text.isEmpty()) return SnippetType.UNKNOWN;
+        // Simple heuristics per roadmap 1.4
+        // Order matters; check the most specific/common first
+        if (text.contains("<Step")) return SnippetType.SCRIPT_STEPS;
+        if (text.contains("<FieldDefinition") || text.contains("<Field ")) return SnippetType.FIELD_DEFINITION;
+        if (text.contains("<BaseTable")) return SnippetType.TABLE_DEFINITION;
+        // Layout-related tags (not yet supported for custom format setting)
+        if (text.contains("<Layout") || text.contains("<ObjectList") || text.contains("<LayoutObject") || text.contains("<Object ") || text.contains("<Part")) {
+            return SnippetType.LAYOUT_OBJECTS;
+        }
+        return SnippetType.UNKNOWN;
     }
 
     // Normalize any mix of CRLF/CR/LF to LF newlines for custom Mac-* formats based on analysis.
