@@ -2,6 +2,7 @@ package dev.fmcuttingboard.clipboard;
 
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.ide.CopyPasteManager;
+import dev.fmcuttingboard.util.Diagnostics;
 
 import java.awt.*;
 import java.awt.datatransfer.*;
@@ -37,6 +38,7 @@ public class DefaultClipboardService implements ClipboardService {
     @Override
     public Optional<String> readText() throws ClipboardAccessException {
         try {
+            maybeDumpClipboardFormats("pre-read");
             // Environment diagnostics (once per call; lightweight)
             try {
                 String os = System.getProperty("os.name", "");
@@ -314,7 +316,12 @@ public class DefaultClipboardService implements ClipboardService {
             Optional<String> nativeResult = tryNativeClipboard();
             if (nativeResult.isPresent()) return nativeResult;
 
-            return Optional.empty();
+            Optional<String> res = Optional.empty();
+            try {
+                return res;
+            } finally {
+                maybeDumpClipboardFormats("post-read");
+            }
         } catch (IllegalStateException e) { // clipboard busy/locked
             throw new ClipboardAccessException("Clipboard is currently unavailable (locked).", e);
         } catch (Throwable t) {
@@ -325,11 +332,20 @@ public class DefaultClipboardService implements ClipboardService {
     @Override
     public void writeText(String text) throws ClipboardAccessException {
         try {
+            maybeDumpClipboardFormats("pre-write");
+            String toWrite = text == null ? "" : text;
+            // Try Windows-native write if available to mirror FileMaker's custom formats.
+            // For empty payloads, prefer the AWT/CPM path to preserve historical behavior and
+            // avoid platform quirks observed in some environments.
+            if (!toWrite.isEmpty() && tryWindowsNativeWrite(toWrite)) {
+                maybeDumpClipboardFormats("post-write");
+                return;
+            }
             // Publish multiple text flavors to improve compatibility with apps like FileMaker on macOS
             // that may probe XML, UTF-16, or generic text representations. This mirrors the breadth
             // of formats we read and increases the chance that FileMaker recognizes fmxmlsnippet
             // as an object paste, not plain text.
-            Transferable multi = new MultiFlavorTextTransferable(text == null ? "" : text);
+            Transferable multi = new MultiFlavorTextTransferable(toWrite);
             if (manager != null) {
                 manager.setContents(multi);
             } else {
@@ -339,11 +355,331 @@ public class DefaultClipboardService implements ClipboardService {
                 }
                 sysClipboard.setContents(multi, null);
             }
+            maybeDumpClipboardFormats("post-write");
         } catch (IllegalStateException e) { // clipboard busy/locked
             throw new ClipboardAccessException("Clipboard is currently unavailable (locked).", e);
         } catch (Throwable t) {
             throw new ClipboardAccessException("Unexpected clipboard error while writing.", t);
         }
+    }
+
+    /**
+     * Windows-native clipboard writer that sets CF_UNICODETEXT and FileMaker custom formats
+     * ('Mac-XMSS' and 'Mac-XMFD') in a single OpenClipboard/EmptyClipboard session via JNA,
+     * to better match FileMaker. Returns true if the native path succeeded; false to allow
+     * fallback to AWT/CopyPasteManager.
+     */
+    private boolean tryWindowsNativeWrite(String text) {
+        // PHASE 1.1 REVIEW NOTE (2025-11-22):
+        // This method intentionally mirrors how FileMaker exposes clipboard data on Windows:
+        // 1) Always publish CF_UNICODETEXT (format id 13) containing a UTF-16LE, NUL-terminated string.
+        //    - No BOM is included for CF_UNICODETEXT (Windows convention for this format).
+        //    - The terminator is a 16-bit 0x0000 (i.e., two trailing zero bytes).
+        // 2) Additionally publish exactly one FileMaker custom format, depending on fmxmlsnippet type:
+        //    - "Mac-XMSS" for Script Steps
+        //    - "Mac-XMFD" for Field/Table definitions
+        //    Payload details for custom formats:
+        //    - Encoding: UTF-8 WITH BOM (EF BB BF)
+        //    - Newlines: classic Mac CR (\r), so we normalize any LF/CRLF to CR
+        //    - Terminator: a single trailing NUL byte (0x00)
+        // The two formats are set within a single OpenClipboard/EmptyClipboard session.
+        String os = System.getProperty("os.name", "");
+        if (os == null || !os.toLowerCase().startsWith("windows")) return false;
+        ensureJna();
+        if (!jnaAvailable) return false;
+
+        // Detect fmxmlsnippet content type for selecting correct FileMaker clipboard flavor
+        final boolean isScript = text != null && text.contains("<Step");
+        final boolean isField = text != null && (text.contains("<Field") || text.contains("<FieldDefinition"));
+        if (!isScript && !isField) {
+            // Unknown content — fall back to generic multi-flavor AWT writer
+            Diagnostics.vInfo(LOG, "Native write skipped: unknown fmxmlsnippet type");
+            return false;
+        }
+
+        // Guard extremely large payloads to avoid excessive allocations
+        final byte[] utf16 = utf16leNullTerminated(text);
+        // For FileMaker's custom Mac-* formats, normalize newlines to classic Mac CR ("\r").
+        final String customPayload = normalizeToClassicMacNewlines(text);
+        // FileMaker's custom Mac-* formats require UTF-8 with BOM and a trailing NUL terminator.
+        final byte[] fmCustom = utf8BomNullTerminated(customPayload);
+
+        // Diagnostics for Phase 1.1: verify BOMs and terminators at runtime when verbose logging is enabled.
+        if (Diagnostics.isVerbose()) {
+            // CF_UNICODETEXT: should NOT include BOM by spec; should end with two NUL bytes.
+            boolean utf16HasBom = utf16.length >= 2 && (utf16[0] == (byte)0xFF && utf16[1] == (byte)0xFE);
+            boolean utf16HasNullTerm = utf16.length >= 2 && (utf16[utf16.length - 1] == 0x00) && (utf16[utf16.length - 2] == 0x00);
+            LOG.info("[CB-DIAG] CF_UNICODETEXT: hasBOM=" + utf16HasBom + " (expected=false), hasNullTerm=" + utf16HasNullTerm + ", size=" + utf16.length);
+
+            // Custom UTF-8: must start with EF BB BF and end with single NUL.
+            boolean customHasBom = fmCustom.length >= 3 && ((fmCustom[0] & 0xFF) == 0xEF) && ((fmCustom[1] & 0xFF) == 0xBB) && ((fmCustom[2] & 0xFF) == 0xBF);
+            boolean customHasNullTerm = fmCustom.length >= 1 && (fmCustom[fmCustom.length - 1] == 0x00);
+            // Also sample first/last few bytes to aid hex inspection
+            StringBuilder head = new StringBuilder();
+            for (int i = 0; i < Math.min(8, fmCustom.length); i++) head.append(String.format("%02X ", fmCustom[i] & 0xFF));
+            StringBuilder tail = new StringBuilder();
+            for (int i = Math.max(0, fmCustom.length - 4); i < fmCustom.length; i++) tail.append(String.format("%02X ", fmCustom[i] & 0xFF));
+            LOG.info("[CB-DIAG] FM-CUSTOM: hasBOM=" + customHasBom + " (expected=true), hasNullTerm=" + customHasNullTerm + ", size=" + fmCustom.length + ", head=" + head + ", tail=" + tail);
+        }
+        final long MAX = 10L * 1024 * 1024; // 10 MB cap per format
+        if (utf16.length > MAX || fmCustom.length > MAX) {
+            LOG.info("[CB] Native path: payload too large for native write; falling back");
+            return false;
+        }
+
+        boolean opened = false;
+        try {
+            for (int i = 0; i < 8; i++) {
+                opened = User32.INSTANCE.OpenClipboard(null);
+                if (opened) break;
+                try { Thread.sleep(10); } catch (InterruptedException ie) { Thread.currentThread().interrupt(); }
+            }
+            if (!opened) {
+                LOG.info("[CB] Native path: OpenClipboard failed/busy (write)");
+                return false;
+            }
+
+            // Take ownership and clear existing content first
+            if (!User32.INSTANCE.EmptyClipboard()) {
+                LOG.info("[CB] Native path: EmptyClipboard failed");
+                return false;
+            }
+
+            // Register only the specific FileMaker format matching the content type
+            int targetFormatId = 0;
+            String targetFormatName = null;
+            if (isScript) {
+                targetFormatName = "Mac-XMSS"; // Script Steps
+            } else if (isField) {
+                targetFormatName = "Mac-XMFD"; // Fields/Tables
+            }
+            if (targetFormatName != null) {
+                targetFormatId = User32.INSTANCE.RegisterClipboardFormat(targetFormatName);
+            }
+            if (targetFormatId == 0) {
+                LOG.info("[CB] Native path: RegisterClipboardFormat failed for target FileMaker format (" + targetFormatName + ")");
+                // We'll still proceed with CF_UNICODETEXT so paste as text works, but fail overall to allow fallback
+            }
+
+            boolean unicodeOk = false;
+            boolean customOk = false;
+
+            // Set CF_UNICODETEXT (13) — null-terminated UTF-16LE
+            WinHandle hUtf16 = globalAllocAndWrite(utf16);
+            if (hUtf16 == null) {
+                LOG.info("[CB] Native path: GlobalAlloc failed for CF_UNICODETEXT");
+                unicodeOk = false;
+            } else {
+                com.sun.jna.platform.win32.WinNT.HANDLE out = User32.INSTANCE.SetClipboardData(13, hUtf16.handle);
+                if (out == null) {
+                    // On failure, we still own the HGLOBAL and must free it
+                    Kernel32.INSTANCE.GlobalFree(hUtf16.handle);
+                    LOG.info("[CB] Native path: SetClipboardData(CF_UNICODETEXT) failed");
+                    unicodeOk = false;
+                } else {
+                    unicodeOk = true;
+                }
+            }
+
+            // Set the single target custom format if registered
+            if (targetFormatId != 0) {
+                WinHandle hCustom = globalAllocAndWrite(fmCustom);
+                if (hCustom == null) {
+                    LOG.info("[CB] Native path: GlobalAlloc failed for " + targetFormatName);
+                } else {
+                    com.sun.jna.platform.win32.WinNT.HANDLE out = User32.INSTANCE.SetClipboardData(targetFormatId, hCustom.handle);
+                    if (out == null) {
+                        Kernel32.INSTANCE.GlobalFree(hCustom.handle);
+                        LOG.info("[CB] Native path: SetClipboardData(" + targetFormatName + ") failed");
+                    } else {
+                        customOk = true;
+                    }
+                }
+            }
+
+            long crc = 0L;
+            try {
+                java.util.zip.CRC32 c = new java.util.zip.CRC32();
+                c.update(fmCustom);
+                crc = c.getValue();
+            } catch (Throwable ignore) {}
+            Diagnostics.vInfo(LOG, "Native write: CF_UNICODETEXT=" + (unicodeOk ? "ok" : "fail")
+                    + ", target=" + (targetFormatName == null ? "n/a" : targetFormatName) + "=" + (customOk ? "ok" : (targetFormatId == 0 ? "n/a" : "fail"))
+                    + ", sizes: utf16=" + utf16.length + ", custom=" + fmCustom.length + ", custom.hasBom=true, custom.crc32=0x" + Long.toHexString(crc));
+
+            // Consider it a success only if CF_UNICODETEXT and the target custom format were set
+            return unicodeOk && customOk;
+        } catch (Throwable t) {
+            LOG.info("[CB] Native path: write failed: " + t.getClass().getSimpleName());
+            return false;
+        } finally {
+            if (opened) {
+                try { User32.INSTANCE.CloseClipboard(); } catch (Throwable ignore) {}
+            }
+        }
+    }
+
+    private static byte[] utf16leNullTerminated(String s) {
+        byte[] data = (s == null ? "" : s).getBytes(StandardCharsets.UTF_16LE);
+        byte[] out = new byte[data.length + 2];
+        System.arraycopy(data, 0, out, 0, data.length);
+        // last two bytes already zero
+        return out;
+    }
+
+    private static byte[] utf8NullTerminated(String s) {
+        byte[] data = (s == null ? "" : s).getBytes(StandardCharsets.UTF_8);
+        byte[] out = new byte[data.length + 1];
+        System.arraycopy(data, 0, out, 0, data.length);
+        // last byte zero
+        return out;
+    }
+
+    // UTF-8 with BOM (EF BB BF) and a trailing NUL terminator
+    private static byte[] utf8BomNullTerminated(String s) {
+        byte[] data = (s == null ? "" : s).getBytes(StandardCharsets.UTF_8);
+        byte[] out = new byte[data.length + 1 /*NUL*/ + 3 /*BOM*/];
+        // BOM
+        out[0] = (byte)0xEF;
+        out[1] = (byte)0xBB;
+        out[2] = (byte)0xBF;
+        // payload
+        System.arraycopy(data, 0, out, 3, data.length);
+        // trailing NUL is already 0 at out[out.length-1]
+        return out;
+    }
+
+    // Normalize any mix of CRLF/CR/LF to classic Mac CR newlines for custom Mac-* formats.
+    private static String normalizeToClassicMacNewlines(String s) {
+        if (s == null || s.isEmpty()) return "";
+        String tmp = s.replace("\r\n", "\n");
+        tmp = tmp.replace("\r", "\n");
+        return tmp.replace("\n", "\r");
+    }
+
+    // Small holder to track HGLOBAL while deciding whether we need to free
+    private static final class WinHandle {
+        final com.sun.jna.platform.win32.WinNT.HANDLE handle;
+        WinHandle(com.sun.jna.platform.win32.WinNT.HANDLE h) { this.handle = h; }
+    }
+
+    private WinHandle globalAllocAndWrite(byte[] bytes) {
+        // GMEM_MOVEABLE = 0x0002
+        int GMEM_MOVEABLE = 0x0002;
+        com.sun.jna.platform.win32.WinNT.HANDLE h = Kernel32.INSTANCE.GlobalAlloc(GMEM_MOVEABLE, new com.sun.jna.platform.win32.BaseTSD.SIZE_T(bytes.length));
+        if (h == null) return null;
+        com.sun.jna.Pointer p = Kernel32.INSTANCE.GlobalLock(h);
+        if (p == null) {
+            try { Kernel32.INSTANCE.GlobalFree(h); } catch (Throwable ignore) {}
+            return null;
+        }
+        try {
+            p.write(0, bytes, 0, bytes.length);
+        } finally {
+            try { Kernel32.INSTANCE.GlobalUnlock(h); } catch (Throwable ignore) {}
+        }
+        return new WinHandle(h);
+    }
+
+    // --- Diagnostics helpers: Windows clipboard formats dump (when verbose enabled) ---
+    private static volatile boolean jnaChecked = false;
+    private static volatile boolean jnaAvailable = false;
+
+    private void maybeDumpClipboardFormats(String phase) {
+        if (!Diagnostics.isVerbose()) return;
+        String os = System.getProperty("os.name", "");
+        if (os == null || !os.toLowerCase().startsWith("windows")) return;
+        ensureJna();
+        if (!jnaAvailable) {
+            LOG.info("[CB-DIAG] (" + phase + ") JNA not available; skip formats dump");
+            return;
+        }
+        boolean opened = false;
+        try {
+            for (int i = 0; i < 5; i++) {
+                opened = User32.INSTANCE.OpenClipboard(null);
+                if (opened) break;
+                try { Thread.sleep(10); } catch (InterruptedException ie) { Thread.currentThread().interrupt(); }
+            }
+            if (!opened) {
+                LOG.info("[CB-DIAG] (" + phase + ") OpenClipboard failed/busy");
+                return;
+            }
+            int id = 0;
+            int count = 0;
+            StringBuilder sb = new StringBuilder();
+            sb.append("[CB-DIAG] (").append(phase).append(") formats: ");
+            while (true) {
+                id = User32.INSTANCE.EnumClipboardFormats(id);
+                if (id == 0) break;
+                String name = getFormatName(id);
+                Long size = null;
+                try {
+                    com.sun.jna.platform.win32.WinNT.HANDLE h = User32.INSTANCE.GetClipboardData(id);
+                    if (h != null) {
+                        size = Kernel32.INSTANCE.GlobalSize(h).longValue();
+                    }
+                } catch (Throwable ignore) {}
+                if (count > 0) sb.append(" | ");
+                sb.append(id);
+                if (name != null) sb.append(":").append(name);
+                if (size != null) sb.append(" (size=").append(size).append(")");
+                count++;
+                if (count >= 64) { sb.append(" ..."); break; }
+            }
+            if (count == 0) sb.append("<none>");
+            LOG.info(sb.toString());
+        } catch (Throwable t) {
+            LOG.info("[CB-DIAG] (" + phase + ") dump failed: " + t.getClass().getSimpleName());
+        } finally {
+            if (opened) {
+                try { User32.INSTANCE.CloseClipboard(); } catch (Throwable ignore) {}
+            }
+        }
+    }
+
+    private void ensureJna() {
+        if (jnaChecked) return;
+        synchronized (DefaultClipboardService.class) {
+            if (jnaChecked) return;
+            try {
+                Class.forName("com.sun.jna.Native");
+                jnaAvailable = true;
+            } catch (Throwable t) {
+                jnaAvailable = false;
+            }
+            jnaChecked = true;
+        }
+    }
+
+    private static String getFormatName(int id) {
+        try {
+            char[] buf = new char[128];
+            int n = User32.INSTANCE.GetClipboardFormatName(id, buf, buf.length);
+            if (n > 0) return new String(buf, 0, n);
+        } catch (Throwable ignore) {}
+        return null;
+    }
+
+    // Minimal JNA interfaces (duplicated locally to avoid public deps)
+    private interface User32 extends com.sun.jna.win32.StdCallLibrary {
+        User32 INSTANCE = com.sun.jna.Native.load("user32", User32.class, com.sun.jna.win32.W32APIOptions.DEFAULT_OPTIONS);
+        boolean OpenClipboard(com.sun.jna.platform.win32.WinDef.HWND hWndNewOwner);
+        boolean CloseClipboard();
+        boolean EmptyClipboard();
+        int EnumClipboardFormats(int formatId);
+        int GetClipboardFormatName(int formatId, char[] buffer, int cchMax);
+        int RegisterClipboardFormat(String lpString);
+        com.sun.jna.platform.win32.WinNT.HANDLE SetClipboardData(int uFormat, com.sun.jna.platform.win32.WinNT.HANDLE hMem);
+        com.sun.jna.platform.win32.WinNT.HANDLE GetClipboardData(int uFormat);
+    }
+    private interface Kernel32 extends com.sun.jna.win32.StdCallLibrary {
+        Kernel32 INSTANCE = com.sun.jna.Native.load("kernel32", Kernel32.class, com.sun.jna.win32.W32APIOptions.DEFAULT_OPTIONS);
+        com.sun.jna.Pointer GlobalLock(com.sun.jna.platform.win32.WinNT.HANDLE hMem);
+        boolean GlobalUnlock(com.sun.jna.platform.win32.WinNT.HANDLE hMem);
+        com.sun.jna.platform.win32.WinNT.HANDLE GlobalAlloc(int uFlags, com.sun.jna.platform.win32.BaseTSD.SIZE_T dwBytes);
+        com.sun.jna.platform.win32.WinNT.HANDLE GlobalFree(com.sun.jna.platform.win32.WinNT.HANDLE hMem);
+        com.sun.jna.platform.win32.BaseTSD.SIZE_T GlobalSize(com.sun.jna.platform.win32.WinNT.HANDLE hMem);
     }
 
     /**
