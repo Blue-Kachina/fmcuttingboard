@@ -390,20 +390,25 @@ public class DefaultClipboardService implements ClipboardService {
         //    - No trailing NUL terminator
         // The formats above are set within the same OpenClipboard/EmptyClipboard session as CF_UNICODETEXT.
         String os = System.getProperty("os.name", "");
-        if (os == null || !os.toLowerCase().startsWith("windows")) return false;
+        if (os == null || !os.toLowerCase().startsWith("windows")) {
+            LOG.info("[CB-DIAG] Native Windows path unavailable: os=" + os);
+            return false;
+        }
         ensureJna();
-        if (!jnaAvailable) return false;
+        if (!jnaAvailable) {
+            LOG.info("[CB-DIAG] Native Windows path disabled: JNA not available — will fall back to text flavors only");
+            return false;
+        }
 
         // Detect fmxmlsnippet content type for selecting correct FileMaker clipboard flavor
         SnippetType type = detectSnippetType(text);
         if (type == SnippetType.UNKNOWN) {
             // Unknown content — fall back to generic multi-flavor AWT writer
-            Diagnostics.vInfo(LOG, "Native write skipped: unknown fmxmlsnippet type");
+            LOG.info("[CB-DIAG] Native write skipped: unknown fmxmlsnippet type (falling back to text-only flavors)");
             return false;
         }
-        if (Diagnostics.isVerbose()) {
-            Diagnostics.vInfo(LOG, "[CB-DIAG] Detected snippet type=" + type.name());
-        }
+        // Always emit CB-DIAG for detected type
+        LOG.info("[CB-DIAG] Detected snippet type=" + type.name());
 
         // Guard extremely large payloads to avoid excessive allocations
         final byte[] utf16 = utf16leNullTerminated(text);
@@ -483,6 +488,9 @@ public class DefaultClipboardService implements ClipboardService {
             // Register only the specific FileMaker format matching the content type
             int targetFormatId = 0;
             String targetFormatName = null;
+            // For certain types (e.g., Layout Objects), some environments might use an
+            // alternate custom format name. We optionally try additional aliases.
+            java.util.List<String> extraAliases = java.util.Collections.emptyList();
             switch (type) {
                 case SCRIPT:
                     targetFormatName = "Mac-XMSC"; // Full Scripts
@@ -505,16 +513,17 @@ public class DefaultClipboardService implements ClipboardService {
                 case LAYOUT_OBJECTS:
                     // Layout Objects (selection on a layout) use Mac-XML2 per captures
                     targetFormatName = "Mac-XML2";
+                    // Some installations may advertise legacy name "Mac-XML"; attempt both
+                    extraAliases = java.util.Arrays.asList("Mac-XML");
                     break;
                 default:
                     break;
             }
-            if (Diagnostics.isVerbose()) {
-                Diagnostics.vInfo(LOG, "[CB-DIAG] targetFormat=" + (targetFormatName == null ? "none" : targetFormatName));
-            }
+            // Always emit CB-DIAG for target format
+            LOG.info("[CB-DIAG] targetFormat=" + (targetFormatName == null ? "none" : targetFormatName));
             if (targetFormatName != null) {
                 targetFormatId = User32.INSTANCE.RegisterClipboardFormat(targetFormatName);
-                Diagnostics.vInfo(LOG, "[CB-DIAG] Register target FileMaker format: " + targetFormatName + ", id=" + targetFormatId);
+                LOG.info("[CB-DIAG] Register target FileMaker format: " + targetFormatName + ", id=" + targetFormatId);
             }
             if (targetFormatId == 0) {
                 LOG.info("[CB] Native path: RegisterClipboardFormat failed for target FileMaker format (" + targetFormatName + ")");
@@ -557,13 +566,39 @@ public class DefaultClipboardService implements ClipboardService {
                 }
             }
 
+            // Attempt to also publish any alias formats (e.g., "Mac-XML") for broader compatibility
+            if (!extraAliases.isEmpty()) {
+                for (String alias : extraAliases) {
+                    try {
+                        int aliasId = User32.INSTANCE.RegisterClipboardFormat(alias);
+                        LOG.info("[CB-DIAG] Register alias FileMaker format: " + alias + ", id=" + aliasId);
+                        if (aliasId != 0) {
+                            WinHandle hAlias = globalAllocAndWrite(fmCustom);
+                            if (hAlias == null) {
+                                LOG.info("[CB] Native path: GlobalAlloc failed for alias " + alias);
+                            } else {
+                                com.sun.jna.platform.win32.WinNT.HANDLE out2 = User32.INSTANCE.SetClipboardData(aliasId, hAlias.handle);
+                                if (out2 == null) {
+                                    Kernel32.INSTANCE.GlobalFree(hAlias.handle);
+                                    LOG.info("[CB] Native path: SetClipboardData(" + alias + ") failed");
+                                } else {
+                                    LOG.info("[CB-DIAG] Alias format write ok: " + alias);
+                                }
+                            }
+                        }
+                    } catch (Throwable t) {
+                        LOG.info("[CB] Native path: alias format registration/write failed: " + alias, t);
+                    }
+                }
+            }
+
             long crc = 0L;
             try {
                 java.util.zip.CRC32 c = new java.util.zip.CRC32();
                 c.update(fmCustom);
                 crc = c.getValue();
             } catch (Throwable ignore) {}
-            Diagnostics.vInfo(LOG, "Native write: CF_UNICODETEXT=" + (unicodeOk ? "ok" : "fail")
+            LOG.info("[CB-DIAG] Native write: CF_UNICODETEXT=" + (unicodeOk ? "ok" : "fail")
                     + ", detectedType=" + type.name()
                     + ", target=" + (targetFormatName == null ? "n/a" : targetFormatName) + "=" + (customOk ? "ok" : (targetFormatId == 0 ? "n/a" : "fail"))
                     + ", sizes: utf16=" + utf16.length + ", custom=" + fmCustom.length + ", custom.lenPrefixed=true, custom.hasBom=false, custom.crc32=0x" + Long.toHexString(crc));
@@ -632,14 +667,15 @@ public class DefaultClipboardService implements ClipboardService {
         // Important: check for BaseTable before Field/FieldDefinition because table snippets often contain <Field>
         // and must be classified as TABLE_DEFINITION to target Mac-XMTB (not Mac-XMFD).
         if (text.contains("<BaseTable")) return SnippetType.TABLE_DEFINITION;
+        // Layout-related tags should be detected BEFORE fields because layout object XML may include
+        // <Field> references inside DDRInfo or nested elements; we must still treat the snippet as layout objects.
+        if (text.contains("<Layout") || text.contains("<ObjectList") || text.contains("<LayoutObject") || text.contains("<Object ") || text.contains("<Part")) {
+            return SnippetType.LAYOUT_OBJECTS;
+        }
         if (text.contains("<FieldDefinition") || text.contains("<Field ")) return SnippetType.FIELD_DEFINITION;
         // Custom Functions and Value Lists
         if (text.contains("<CustomFunction")) return SnippetType.CUSTOM_FUNCTION;
         if (text.contains("<ValueList")) return SnippetType.VALUE_LIST;
-        // Layout-related tags (not yet supported for custom format setting)
-        if (text.contains("<Layout") || text.contains("<ObjectList") || text.contains("<LayoutObject") || text.contains("<Object ") || text.contains("<Part")) {
-            return SnippetType.LAYOUT_OBJECTS;
-        }
         return SnippetType.UNKNOWN;
     }
 
