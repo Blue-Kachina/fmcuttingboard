@@ -84,14 +84,14 @@ The `PushClipboardIntoFileMakerAction` currently writes fmxmlsnippet XML to the 
 **Estimated Effort**: 2 hours
 
 **Tasks**:
-- [ ] Review `tryWindowsNativeWrite()` heuristics at DefaultClipboardService.java:379-385
-- [ ] Enhance detection to handle:
+- [x] Review `tryWindowsNativeWrite()` heuristics at DefaultClipboardService.java:379-385
+- [x] Enhance detection to handle:
   - Script Steps: Look for `<Step` (current)
   - Fields: Look for `<Field` or `<FieldDefinition>` (current)
   - Tables: Add detection for `<BaseTable` and use `Mac-XMFD`
   - Layouts: Identify layout snippets (to be supported later) and handle gracefully
-- [ ] Add unit tests for each snippet type detection
-- [ ] Log detected type clearly in diagnostics
+- [x] Add unit tests for each snippet type detection
+- [x] Log detected type clearly in diagnostics
 
 **Output**: Enhanced detection logic + unit tests in test/java/dev/fmcuttingboard/clipboard/
 
