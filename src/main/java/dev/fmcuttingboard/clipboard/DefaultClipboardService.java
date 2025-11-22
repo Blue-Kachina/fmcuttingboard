@@ -397,6 +397,10 @@ public class DefaultClipboardService implements ClipboardService {
             Diagnostics.vInfo(LOG, "Native write skipped: unknown fmxmlsnippet type");
             return false;
         }
+        if (Diagnostics.isVerbose()) {
+            String detected = isScript ? "ScriptSteps" : (isField ? "FieldOrTable" : "Unknown");
+            Diagnostics.vInfo(LOG, "[CB-DIAG] Detected snippet type=" + detected);
+        }
 
         // Guard extremely large payloads to avoid excessive allocations
         final byte[] utf16 = utf16leNullTerminated(text);
@@ -410,7 +414,7 @@ public class DefaultClipboardService implements ClipboardService {
             // CF_UNICODETEXT: should NOT include BOM by spec; should end with two NUL bytes.
             boolean utf16HasBom = utf16.length >= 2 && (utf16[0] == (byte)0xFF && utf16[1] == (byte)0xFE);
             boolean utf16HasNullTerm = utf16.length >= 2 && (utf16[utf16.length - 1] == 0x00) && (utf16[utf16.length - 2] == 0x00);
-            LOG.info("[CB-DIAG] CF_UNICODETEXT: hasBOM=" + utf16HasBom + " (expected=false), hasNullTerm=" + utf16HasNullTerm + ", size=" + utf16.length);
+            LOG.info("[CB-DIAG] CF_UNICODETEXT: hasBOM=" + utf16HasBom + " (expected=false), hasNullTerm=" + utf16HasNullTerm + " (expected=true), size=" + utf16.length);
 
             // Custom format: first 4 bytes are LE length; payload should NOT start with UTF-8 BOM and should have no trailing NUL
             int leLen = (fmCustom.length >= 4)
@@ -426,6 +430,15 @@ public class DefaultClipboardService implements ClipboardService {
             for (int i = Math.max(0, fmCustom.length - 4); i < fmCustom.length; i++) tail.append(String.format("%02X ", fmCustom[i] & 0xFF));
             LOG.info("[CB-DIAG] FM-CUSTOM: leLen=" + leLen + ", hasBOM=" + customHasBom + " (expected=false), hasNullTerm=" + customHasNullTerm +
                     " (expected=false), size=" + fmCustom.length + ", head=" + head + ", tail=" + tail);
+
+            // Newline diagnostics (post-normalization to LF for custom payload)
+            int lfCount = 0, crCount = 0;
+            for (int i = 4; i < fmCustom.length; i++) { // skip length prefix
+                byte b = fmCustom[i];
+                if (b == (byte) '\n') lfCount++;
+                if (b == (byte) '\r') crCount++;
+            }
+            LOG.info("[CB-DIAG] FM-CUSTOM newlines: LF=" + lfCount + ", CR=" + crCount + " (expected LF>0 for multi-line snippets, CR=0)");
         }
         final long MAX = 10L * 1024 * 1024; // 10 MB cap per format
         if (utf16.length > MAX || fmCustom.length > MAX) {
@@ -461,6 +474,7 @@ public class DefaultClipboardService implements ClipboardService {
             }
             if (targetFormatName != null) {
                 targetFormatId = User32.INSTANCE.RegisterClipboardFormat(targetFormatName);
+                Diagnostics.vInfo(LOG, "[CB-DIAG] Register target FileMaker format: " + targetFormatName + ", id=" + targetFormatId);
             }
             if (targetFormatId == 0) {
                 LOG.info("[CB] Native path: RegisterClipboardFormat failed for target FileMaker format (" + targetFormatName + ")");
