@@ -113,8 +113,11 @@ class WindowsClipboardReader implements NativeClipboardReader {
                 return Optional.empty();
             }
 
-            // First pass: find known FileMaker-specific formats by name (e.g., Mac-XMSS) and try them immediately
-            final String[] interestingNames = new String[] { "Mac-XMSS" };
+            // First pass: find known FileMaker-specific formats by name and try them immediately
+            // Known variants observed in the wild include:
+            //  - Mac-XMSS (common)
+            //  - Mac-XMFD (seen in user logs)
+            final String[] interestingNames = new String[] { "Mac-XMSS", "Mac-XMFD" };
             int id = 0;
             boolean any = false;
             while (true) {

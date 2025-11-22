@@ -69,6 +69,15 @@
                 <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
             </action>
 
+            <!-- Diagnostics: dump clipboard formats to IDE log (Windows only) -->
+            <action id="dev.fmcuttingboard.actions.ClipboardFormatsDumpAction"
+                    class="dev.fmcuttingboard.actions.ClipboardFormatsDumpAction"
+                    text="Diagnostics: Dump Clipboard Formats"
+                    description="Log current Windows clipboard formats and light size info">
+                <add-to-group group-id="EditorPopupMenu" anchor="last"/>
+                <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
+            </action>
+
         </group>
     </actions>
 </idea-plugin>

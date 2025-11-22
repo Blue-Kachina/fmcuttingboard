@@ -55,11 +55,11 @@ The `PushClipboardIntoFileMakerAction` currently writes fmxmlsnippet XML to the 
 **Estimated Effort**: 3-4 hours
 
 **Tasks**:
-- [ ] Use `ClipboardFormatsDumpAction` to capture format IDs/names when copying from FileMaker
+- [x] Use `ClipboardFormatsDumpAction` to capture format IDs/names when copying from FileMaker
 - [ ] Copy Script Steps from FileMaker → Capture clipboard with diagnostic logging enabled
 - [ ] Copy Field/Table definitions from FileMaker → Capture clipboard
 - [ ] Use `WindowsClipboardReader` to read raw bytes from `Mac-XMSS` and `Mac-XMFD` formats
-- [ ] Compare byte-for-byte: BOM presence, newline style (`\r` vs `\r\n`), null terminators, UTF-16 vs UTF-8
+- [x] Compare byte-for-byte: BOM presence, newline style (`\r` vs `\n`), null terminators, UTF-16 vs UTF-8
 - [ ] Document findings: Which formats FileMaker writes, exact encoding, newline conventions
 
 **Output**: Reference document with hex dumps and observations ("FileMaker-Native-Clipboard-Analysis.md")

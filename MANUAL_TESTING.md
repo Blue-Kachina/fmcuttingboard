@@ -39,8 +39,23 @@ Notes
 - On Windows/macOS, clipboard access may be restricted by OS policies; verify actions gracefully notify without crashing.
 
 Recordkeeping
-- Date of latest manual verification: 2025-11-21
+- Date of latest manual verification: 2025-11-22
 - IDEs verified: IntelliJ IDEA Community 2024.3 (Windows)
+
+Phase 1.2 — Clipboard Capture (Windows)
+- Purpose: Capture FileMaker native clipboard formats and analyze encoding/newlines.
+- Prereqs: Ensure you can copy Script Steps and Field/Table definitions in FileMaker.
+- Steps:
+  1) In FileMaker, copy a Script (or a selection of steps) so it’s on the system clipboard.
+  2) In the IDE, run Tools > FMCuttingBoard > Diagnostics: Dump Clipboard Formats.
+  3) Expected: IDE log shows lines prefixed with [CB-DUMP] for all formats, and [CB-ANALYZE] for FileMaker-specific formats (Mac-XMSS/Mac-XMFD).
+  4) A report file is written to docs/FileMaker-Native-Clipboard-Analysis.md in your project (or to your home folder if no project is open).
+  5) Repeat for Fields and Tables (copy from FileMaker’s Manage Database) and run the diagnostics action again.
+  6) Validate the report contains BOM info, newline counts (CR/LF/CRLF), null terminator note, and a small fmxmlsnippet preview.
+
+Notes
+- If JNA is not available or you’re not on Windows, the diagnostics action will log a notice and skip native enumeration.
+- The report appends new captures; delete the file to start fresh.
 
 Fresh environment validation
 - Start the IDE with a fresh config directory (or use the Gradle `runIde` sandbox) to simulate a new user profile.
