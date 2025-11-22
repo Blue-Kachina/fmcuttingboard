@@ -44,8 +44,8 @@ The `PushClipboardIntoFileMakerAction` currently writes fmxmlsnippet XML to the 
 **Tasks**:
 - [x] Review `DefaultClipboardService.tryWindowsNativeWrite()` line-by-line (src/main/java/dev/fmcuttingboard/clipboard/DefaultClipboardService.java:372-489)
 - [x] Document exactly what's written: CF_UNICODETEXT (format 13), custom format ID, byte layouts
-- [ ] Verify BOM presence (UTF-8: `EF BB BF`, UTF-16LE: `FF FE`) in all written formats
-- [ ] Confirm null terminator placement for CF_UNICODETEXT and custom formats
+- [x] Verify BOM presence (UTF-8: `EF BB BF`, UTF-16LE: `FF FE`) in all written formats
+- [x] Confirm null terminator placement for CF_UNICODETEXT and custom formats
 
 **Output**: Document or inline comments describing current byte-level clipboard format
 
