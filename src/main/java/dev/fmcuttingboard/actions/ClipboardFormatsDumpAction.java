@@ -233,7 +233,8 @@ public class ClipboardFormatsDumpAction extends AnAction {
             int idx = s.toLowerCase().indexOf("<fmxmlsnippet");
             if (idx >= 0) {
                 int end = Math.min(s.length(), idx + 120);
-                String sub = s.substring(idx, end).replaceAll("[\r\n]+", "\\n");
+                // Use a literal \n in preview (replaceAll replacement needs escaped backslash)
+                String sub = s.substring(idx, end).replaceAll("[\r\n]+", "\\\\n");
                 return sub;
             }
             return null;

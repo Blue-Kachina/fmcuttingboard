@@ -370,8 +370,8 @@ public class DefaultClipboardService implements ClipboardService {
      * fallback to AWT/CopyPasteManager.
      */
     private boolean tryWindowsNativeWrite(String text) {
-        // PHASE 1.1 REVIEW NOTE (2025-11-22):
-        // This method intentionally mirrors how FileMaker exposes clipboard data on Windows:
+        // PHASE 1.3 Alignment (2025-11-22):
+        // This method mirrors how FileMaker exposes clipboard data on Windows (per docs/FileMaker-Native-Clipboard-Analysis.md):
         // 1) Always publish CF_UNICODETEXT (format id 13) containing a UTF-16LE, NUL-terminated string.
         //    - No BOM is included for CF_UNICODETEXT (Windows convention for this format).
         //    - The terminator is a 16-bit 0x0000 (i.e., two trailing zero bytes).
@@ -379,9 +379,10 @@ public class DefaultClipboardService implements ClipboardService {
         //    - "Mac-XMSS" for Script Steps
         //    - "Mac-XMFD" for Field/Table definitions
         //    Payload details for custom formats:
-        //    - Encoding: UTF-8 WITH BOM (EF BB BF)
-        //    - Newlines: classic Mac CR (\r), so we normalize any LF/CRLF to CR
-        //    - Terminator: a single trailing NUL byte (0x00)
+        //    - 4-byte little-endian length prefix of the following XML bytes
+        //    - Encoding: UTF-8 without BOM
+        //    - Newlines: LF (\n) — normalize CRLF/CR to LF
+        //    - No trailing NUL terminator
         // The two formats are set within a single OpenClipboard/EmptyClipboard session.
         String os = System.getProperty("os.name", "");
         if (os == null || !os.toLowerCase().startsWith("windows")) return false;
@@ -399,10 +400,10 @@ public class DefaultClipboardService implements ClipboardService {
 
         // Guard extremely large payloads to avoid excessive allocations
         final byte[] utf16 = utf16leNullTerminated(text);
-        // For FileMaker's custom Mac-* formats, normalize newlines to classic Mac CR ("\r").
-        final String customPayload = normalizeToClassicMacNewlines(text);
-        // FileMaker's custom Mac-* formats require UTF-8 with BOM and a trailing NUL terminator.
-        final byte[] fmCustom = utf8BomNullTerminated(customPayload);
+        // For FileMaker's custom Mac-* formats, normalize newlines to LF ("\n").
+        final String customPayload = normalizeToLfNewlines(text);
+        // FileMaker's custom Mac-* formats: 4-byte LE length prefix + UTF-8 (no BOM), no trailing NUL.
+        final byte[] fmCustom = utf8LengthPrefixedNoBom(customPayload);
 
         // Diagnostics for Phase 1.1: verify BOMs and terminators at runtime when verbose logging is enabled.
         if (Diagnostics.isVerbose()) {
@@ -411,15 +412,20 @@ public class DefaultClipboardService implements ClipboardService {
             boolean utf16HasNullTerm = utf16.length >= 2 && (utf16[utf16.length - 1] == 0x00) && (utf16[utf16.length - 2] == 0x00);
             LOG.info("[CB-DIAG] CF_UNICODETEXT: hasBOM=" + utf16HasBom + " (expected=false), hasNullTerm=" + utf16HasNullTerm + ", size=" + utf16.length);
 
-            // Custom UTF-8: must start with EF BB BF and end with single NUL.
-            boolean customHasBom = fmCustom.length >= 3 && ((fmCustom[0] & 0xFF) == 0xEF) && ((fmCustom[1] & 0xFF) == 0xBB) && ((fmCustom[2] & 0xFF) == 0xBF);
-            boolean customHasNullTerm = fmCustom.length >= 1 && (fmCustom[fmCustom.length - 1] == 0x00);
+            // Custom format: first 4 bytes are LE length; payload should NOT start with UTF-8 BOM and should have no trailing NUL
+            int leLen = (fmCustom.length >= 4)
+                    ? ((fmCustom[0] & 0xFF) | ((fmCustom[1] & 0xFF) << 8) | ((fmCustom[2] & 0xFF) << 16) | ((fmCustom[3] & 0xFF) << 24))
+                    : -1;
+            boolean customHasBom = fmCustom.length >= 7 // 4 bytes len + 3 bytes BOM
+                    && ((fmCustom[4] & 0xFF) == 0xEF) && ((fmCustom[5] & 0xFF) == 0xBB) && ((fmCustom[6] & 0xFF) == 0xBF);
+            boolean customHasNullTerm = fmCustom.length > 4 && (fmCustom[fmCustom.length - 1] == 0x00);
             // Also sample first/last few bytes to aid hex inspection
             StringBuilder head = new StringBuilder();
-            for (int i = 0; i < Math.min(8, fmCustom.length); i++) head.append(String.format("%02X ", fmCustom[i] & 0xFF));
+            for (int i = 0; i < Math.min(12, fmCustom.length); i++) head.append(String.format("%02X ", fmCustom[i] & 0xFF));
             StringBuilder tail = new StringBuilder();
             for (int i = Math.max(0, fmCustom.length - 4); i < fmCustom.length; i++) tail.append(String.format("%02X ", fmCustom[i] & 0xFF));
-            LOG.info("[CB-DIAG] FM-CUSTOM: hasBOM=" + customHasBom + " (expected=true), hasNullTerm=" + customHasNullTerm + ", size=" + fmCustom.length + ", head=" + head + ", tail=" + tail);
+            LOG.info("[CB-DIAG] FM-CUSTOM: leLen=" + leLen + ", hasBOM=" + customHasBom + " (expected=false), hasNullTerm=" + customHasNullTerm +
+                    " (expected=false), size=" + fmCustom.length + ", head=" + head + ", tail=" + tail);
         }
         final long MAX = 10L * 1024 * 1024; // 10 MB cap per format
         if (utf16.length > MAX || fmCustom.length > MAX) {
@@ -505,8 +511,8 @@ public class DefaultClipboardService implements ClipboardService {
             } catch (Throwable ignore) {}
             Diagnostics.vInfo(LOG, "Native write: CF_UNICODETEXT=" + (unicodeOk ? "ok" : "fail")
                     + ", target=" + (targetFormatName == null ? "n/a" : targetFormatName) + "=" + (customOk ? "ok" : (targetFormatId == 0 ? "n/a" : "fail"))
-                    + ", sizes: utf16=" + utf16.length + ", custom=" + fmCustom.length + ", custom.hasBom=true, custom.crc32=0x" + Long.toHexString(crc));
-
+                    + ", sizes: utf16=" + utf16.length + ", custom=" + fmCustom.length + ", custom.lenPrefixed=true, custom.hasBom=false, custom.crc32=0x" + Long.toHexString(crc));
+        
             // Consider it a success only if CF_UNICODETEXT and the target custom format were set
             return unicodeOk && customOk;
         } catch (Throwable t) {
@@ -535,26 +541,25 @@ public class DefaultClipboardService implements ClipboardService {
         return out;
     }
 
-    // UTF-8 with BOM (EF BB BF) and a trailing NUL terminator
-    private static byte[] utf8BomNullTerminated(String s) {
-        byte[] data = (s == null ? "" : s).getBytes(StandardCharsets.UTF_8);
-        byte[] out = new byte[data.length + 1 /*NUL*/ + 3 /*BOM*/];
-        // BOM
-        out[0] = (byte)0xEF;
-        out[1] = (byte)0xBB;
-        out[2] = (byte)0xBF;
-        // payload
-        System.arraycopy(data, 0, out, 3, data.length);
-        // trailing NUL is already 0 at out[out.length-1]
+    // Build: [4-byte little-endian payload length] + [UTF-8 payload without BOM], no trailing NUL
+    private static byte[] utf8LengthPrefixedNoBom(String s) {
+        byte[] payload = (s == null ? "" : s).getBytes(StandardCharsets.UTF_8);
+        int len = payload.length;
+        byte[] out = new byte[4 + len];
+        out[0] = (byte) (len & 0xFF);
+        out[1] = (byte) ((len >>> 8) & 0xFF);
+        out[2] = (byte) ((len >>> 16) & 0xFF);
+        out[3] = (byte) ((len >>> 24) & 0xFF);
+        System.arraycopy(payload, 0, out, 4, len);
         return out;
     }
 
-    // Normalize any mix of CRLF/CR/LF to classic Mac CR newlines for custom Mac-* formats.
-    private static String normalizeToClassicMacNewlines(String s) {
+    // Normalize any mix of CRLF/CR/LF to LF newlines for custom Mac-* formats based on analysis.
+    private static String normalizeToLfNewlines(String s) {
         if (s == null || s.isEmpty()) return "";
         String tmp = s.replace("\r\n", "\n");
         tmp = tmp.replace("\r", "\n");
-        return tmp.replace("\n", "\r");
+        return tmp;
     }
 
     // Small holder to track HGLOBAL while deciding whether we need to free

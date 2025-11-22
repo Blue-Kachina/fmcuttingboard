@@ -115,9 +115,16 @@ class WindowsClipboardReader implements NativeClipboardReader {
 
             // First pass: find known FileMaker-specific formats by name and try them immediately
             // Known variants observed in the wild include:
-            //  - Mac-XMSS (common)
-            //  - Mac-XMFD (seen in user logs)
-            final String[] interestingNames = new String[] { "Mac-XMSS", "Mac-XMFD" };
+            //  - Mac-XMSS (Script Steps)
+            //  - Mac-XMSC (Scripts)
+            //  - Mac-XMFD (Fields)
+            //  - Mac-XMTB (Tables)
+            //  - Mac-XMFN (Custom Functions)
+            //  - Mac-XMVL (Value Lists)
+            //  - Mac-XML2 (Layout Objects/Layouts)
+            final String[] interestingNames = new String[] {
+                    "Mac-XMSS", "Mac-XMSC", "Mac-XMFD", "Mac-XMTB", "Mac-XMFN", "Mac-XMVL", "Mac-XML2"
+            };
             int id = 0;
             boolean any = false;
             while (true) {

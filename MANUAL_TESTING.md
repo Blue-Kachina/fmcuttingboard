@@ -56,6 +56,7 @@ Phase 1.2 — Clipboard Capture (Windows)
 Notes
 - If JNA is not available or you’re not on Windows, the diagnostics action will log a notice and skip native enumeration.
 - The report appends new captures; delete the file to start fresh.
+- Layouts and Layout Objects: Expect multiple flavors beyond the XML one. FileMaker emits Mac-XML2 (XML payload) and also large bitmap flavors like CF_DIB/CF_DIBV5 for previews. Only Mac-XML2 will decode to fmxmlsnippet; binary formats are expected and will not produce text previews.
 
 Suggested FileMaker items to copy and analyze
 - Script(s) and selections of Script Steps (Script Workspace)

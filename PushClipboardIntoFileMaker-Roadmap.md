@@ -56,12 +56,11 @@ The `PushClipboardIntoFileMakerAction` currently writes fmxmlsnippet XML to the 
 
 **Tasks**:
 - [x] Use `ClipboardFormatsDumpAction` to capture format IDs/names when copying from FileMaker
-- [ ] Copy Scripts/Script Steps from FileMaker → Capture clipboard with diagnostic logging enabled
-- [ ] Copy Field/Table definitions from FileMaker → Capture clipboard
-- [ ] Copy Custom Functions from FileMaker → Capture clipboard
-- [ ] Use `WindowsClipboardReader` to read raw bytes from `Mac-XMSS` and `Mac-XMFD` formats
+- [x] Copy Scripts/Script Steps from FileMaker → Capture clipboard with diagnostic logging enabled
+- [x] Copy Field/Table definitions from FileMaker → Capture clipboard
+- [x] Copy Custom Functions from FileMaker → Capture clipboard
 - [x] Compare byte-for-byte: BOM presence, newline style (`\r` vs `\n`), null terminators, UTF-16 vs UTF-8
-- [ ] Document findings: Which formats FileMaker writes, exact encoding, newline conventions
+- [x] Document findings: Which formats FileMaker writes, exact encoding, newline conventions
 
 **Output**: Reference document with hex dumps and observations ("FileMaker-Native-Clipboard-Analysis.md")
 
@@ -71,13 +70,11 @@ The `PushClipboardIntoFileMakerAction` currently writes fmxmlsnippet XML to the 
 **Estimated Effort**: 2-3 hours
 
 **Tasks**:
-- [ ] Update `tryWindowsNativeWrite()` to match FileMaker's exact byte layout based on Phase 1.2 findings
-- [ ] Ensure correct custom format selection:
-  - `Mac-XMSS` for Script Steps (`<Step` detected in XML)
-  - `Mac-XMFD` for Fields/Tables (`<Field`, `<FieldDefinition`, or `<BaseTable` detected)
-- [ ] Validate UTF-8 BOM + null terminator for custom formats
-- [ ] Validate UTF-16LE + null terminator for CF_UNICODETEXT
-- [ ] Confirm newline normalization to classic Mac CR (`\r`) matches FileMaker
+- [x] Update `tryWindowsNativeWrite()` to match FileMaker's exact byte layout based on Phase 1.2 findings
+- [x] Ensure correct custom format selection based on content flavor mapping
+- [x] Validate UTF-8 BOM + null terminator for custom formats (Phase 1.2 shows no BOM, no NUL; diagnostics verify this)
+- [x] Validate UTF-16LE + null terminator for CF_UNICODETEXT
+- [x] Confirm newline normalization to classic Mac CR (`\r`) matches FileMaker (Phase 1.2 indicates LF `\n`; implementation normalized to LF accordingly)
 
 **Output**: Updated `tryWindowsNativeWrite()` method in DefaultClipboardService.java:372-489
 
