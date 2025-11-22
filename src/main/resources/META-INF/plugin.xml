@@ -30,6 +30,12 @@
                              instance="dev.fmcuttingboard.settings.FmCuttingBoardConfigurable"/>
         <!-- Show a toolbar/banner when editing fmxmlsnippet XML files -->
         <editorNotificationProvider implementation="dev.fmcuttingboard.ui.FmXmlSnippetNotificationProvider"/>
+
+        <!-- Phase 1.2: Register FileMaker Calculation file type -->
+        <fileType name="FileMaker Calculation"
+                  language="FileMakerCalculation"
+                  implementationClass="dev.fmcuttingboard.language.FileMakerCalculationFileType"
+                  extensions="fmcalc"/>
     </extensions>
 
     <!-- Phase 1.1: Register base actions group under Tools menu -->
