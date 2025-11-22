@@ -1,0 +1,6 @@
+<fmxmlsnippet type="FMObjectList">
+  <FieldDefinition name="TestField" autoEnterSerial="False" caseSensitive="False">
+    <DataType>Text</DataType>
+    <FieldClass>Normal</FieldClass>
+  </FieldDefinition>
+</fmxmlsnippet>

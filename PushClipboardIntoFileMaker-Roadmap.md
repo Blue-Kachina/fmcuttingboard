@@ -101,7 +101,9 @@ The `PushClipboardIntoFileMakerAction` currently writes fmxmlsnippet XML to the 
 **Estimated Effort**: 2-3 hours
 
 **Tasks**:
-- [ ] Create test XML files for: Script Steps, Fields, Tables
+- [x] Create test XML files for: Script Steps, Fields, Tables
+  - Added under resources/test-snippets: ScriptSteps.xml, Fields.xml, Tables.xml (2025-11-22)
+  - See MANUAL_TESTING.md (Phase 1.5 section) for usage instructions and docs/Windows-EndToEnd-Test-Report.md for recording results
 - [ ] For each test file:
   - [ ] Open in plugin → Run PushClipboardIntoFileMakerAction
   - [ ] Open FileMaker Pro

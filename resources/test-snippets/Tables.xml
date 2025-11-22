@@ -1,0 +1,8 @@
+<fmxmlsnippet type="FMObjectList">
+  <BaseTable name="TestTable">
+    <Field name="Id">
+      <DataType>Number</DataType>
+      <FieldClass>Normal</FieldClass>
+    </Field>
+  </BaseTable>
+</fmxmlsnippet>

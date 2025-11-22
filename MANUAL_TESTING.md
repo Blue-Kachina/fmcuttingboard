@@ -19,7 +19,10 @@ Checklist
    - Expected: Notification indicates success and filepath.
 
 2) Push Clipboard Into FileMaker (from active XML file)
-   - Open a valid fmxmlsnippet XML file in the editor.
+   - Open a valid fmxmlsnippet XML file in the editor. Sample files are provided under resources/test-snippets:
+     - ScriptSteps.xml (Script Workspace paste)
+     - Fields.xml (Manage Database > Fields paste)
+     - Tables.xml (Manage Database > Tables paste)
    - Invoke the action “FM: Push Clipboard Into FileMaker”.
    - Expected: System clipboard receives the normalized fmxmlsnippet payload.
    - For unsupported types (e.g., pure Layouts), expect a warning/error notification.
@@ -41,6 +44,18 @@ Notes
 Recordkeeping
 - Date of latest manual verification: 2025-11-22
 - IDEs verified: IntelliJ IDEA Community 2024.3 (Windows)
+
+Phase 1.5 — Windows End-to-End Clipboard Output
+- Purpose: Validate that FileMaker recognizes our clipboard payload as an object paste (not plain text) for Script Steps, Fields, and Tables.
+- Test Inputs: Use the sample XML files under resources/test-snippets.
+- Procedure:
+  1) Open one of the sample XML files.
+  2) Run Tools > FMCuttingBoard > FM: Push Clipboard Into FileMaker.
+  3) Switch to FileMaker and paste in the appropriate context.
+  4) Observe behavior and document results in docs/Windows-EndToEnd-Test-Report.md.
+- Notes:
+  - Run the IDE with -Dfmcuttingboard.verbose=true to capture [CB-DIAG] logs of clipboard formats for correlation.
+  - Repeat across FileMaker Pro 19/20/21 if available and record any version-specific differences.
 
 Phase 1.2 — Clipboard Capture (Windows)
 - Purpose: Capture FileMaker native clipboard formats and analyze encoding/newlines.
