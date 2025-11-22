@@ -16,11 +16,11 @@ This roadmap outlines the implementation of FileMaker Calculation language suppo
 - `src/main/java/com/fmcuttingboard/language/FileMakerCalculationFileType.java`
 
 **Tasks:**
-- [ ] Create `FileMakerCalculationLanguage` class extending `Language`
+- [x] Create `FileMakerCalculationLanguage` class extending `Language`
   - Define language ID as "FileMakerCalculation"
   - Define display name as "FileMaker Calculation"
   - Set case-sensitive (matching Notepad++ XML: `caseIgnored="no"`)
-- [ ] Create `FileMakerCalculationFileType` class implementing `LanguageFileType`
+- [x] Create `FileMakerCalculationFileType` class implementing `LanguageFileType`
   - Associate with `.fmcalc` extension
   - Define file description: "FileMaker Calculation"
   - Reference `FileMakerCalculationLanguage` instance
@@ -31,9 +31,10 @@ This roadmap outlines the implementation of FileMaker Calculation language suppo
 - `src/main/resources/META-INF/plugin.xml`
 
 **Tasks:**
-- [ ] Register language in `plugin.xml`
+- [x] Register language in `plugin.xml`
   - Add `<language>` extension point for `FileMakerCalculationLanguage`
-- [ ] Register file type in `plugin.xml`
+  - Note: On modern IntelliJ Platform, explicit `<language/>` registration is not required; the `Language` is discovered via the file type binding. Kept as completed per intent. (No-op)
+- [x] Register file type in `plugin.xml`
   - Add `<fileType>` extension point for `FileMakerCalculationFileType`
 
 ---
