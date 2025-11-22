@@ -13,6 +13,8 @@ pluginManagement {
         id("org.jetbrains.intellij.platform") version "2.0.1"
         // Changelog plugin to manage release notes
         id("org.jetbrains.changelog") version "2.2.0"
+        // Grammar-Kit plugin for generating lexers/parsers
+        id("org.jetbrains.grammarkit") version "2022.3.2"
     }
 }
 

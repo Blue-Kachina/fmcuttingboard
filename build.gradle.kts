@@ -2,6 +2,8 @@ plugins {
     id("java")
     // Version is managed centrally in settings.gradle.kts -> pluginManagement.plugins
     id("org.jetbrains.intellij.platform")
+    // Grammar-Kit for generating the lexer from JFlex (Phase 2.2)
+    id("org.jetbrains.grammarkit")
 }
 
 group = "dev.fmcuttingboard"
@@ -94,3 +96,5 @@ tasks.register<Task>("releasePlugin") {
     description = "Builds the plugin distribution zip for release (outputs to build/distributions)"
     dependsOn("buildPlugin")
 }
+
+// Lexer generation tasks will be added in a subsequent step of Phase 2.2

@@ -48,7 +48,7 @@ This roadmap outlines the implementation of FileMaker Calculation language suppo
 **Token Categories (from Notepad++ XML):**
 
 #### Keywords Group 1 - Control Flow (Blue/Bold)
-- [ ] Define tokens: `if`, `case`
+- [x] Define tokens: `if`, `case`
 - Color reference: `fgColor="0000FF"`, `fontStyle="1"` (bold)
 
 #### Keywords Group 2 - Logical Operators (Dark Blue/Bold)
@@ -96,8 +96,8 @@ This roadmap outlines the implementation of FileMaker Calculation language suppo
 
 ### 2.2 Lexer Generation & Integration
 - [ ] Configure JFlex plugin in `build.gradle` to generate lexer from `.flex` file
-- [ ] Create `FileMakerCalculationTokenType` class for token type definitions
-- [ ] Create `FileMakerCalculationElementType` class for element types
+- [x] Create `FileMakerCalculationTokenType` class for token type definitions
+- [x] Create `FileMakerCalculationElementType` class for element types
 - [ ] Generate lexer adapter class from flex definition
 - [ ] Test lexer with sample FileMaker calculation code
 
