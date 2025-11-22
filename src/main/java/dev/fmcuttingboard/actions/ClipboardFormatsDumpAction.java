@@ -14,13 +14,22 @@ import com.sun.jna.win32.W32APIOptions;
 
 /**
  * Tools menu action that dumps Windows clipboard formats to the IDE log with [CB-DUMP] prefix.
- * Additionally, for FileMaker-related formats (Mac-XMSS/Mac-XMFD), this will extract raw bytes,
- * perform a quick encoding/newline/BOM analysis, and write a report to the project under
+ * Additionally, for FileMaker-related formats (e.g., Mac-XMSC, Mac-XMSS, Mac-XMFD, Mac-XMTB,
+ * Mac-XMFN, Mac-XMVL, Mac-XML2), this will extract raw bytes, perform a quick
+ * encoding/newline/BOM analysis, and write a report to the project under
  * docs/FileMaker-Native-Clipboard-Analysis.md when a project is available. This supports Phase 1.2.
  */
 public class ClipboardFormatsDumpAction extends AnAction {
     private static final Logger LOG = Logger.getInstance(ClipboardFormatsDumpAction.class);
-    private static final String[] INTERESTING_NAMES = new String[] {"Mac-XMSS", "Mac-XMFD"};
+    private static final String[] INTERESTING_NAMES = new String[] {
+            "Mac-XMSC", // Scripts
+            "Mac-XMSS", // Script Steps
+            "Mac-XMFD", // Fields
+            "Mac-XMTB", // Tables
+            "Mac-XMFN", // Custom Functions
+            "Mac-XMVL", // Value Lists
+            "Mac-XML2"  // Layout Objects
+    };
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {

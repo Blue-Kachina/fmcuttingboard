@@ -364,10 +364,10 @@ public class DefaultClipboardService implements ClipboardService {
     }
 
     /**
-     * Windows-native clipboard writer that sets CF_UNICODETEXT and FileMaker custom formats
-     * ('Mac-XMSS' and 'Mac-XMFD') in a single OpenClipboard/EmptyClipboard session via JNA,
-     * to better match FileMaker. Returns true if the native path succeeded; false to allow
-     * fallback to AWT/CopyPasteManager.
+     * Windows-native clipboard writer that sets CF_UNICODETEXT and (when applicable) one FileMaker
+     * custom format in a single OpenClipboard/EmptyClipboard session via JNA, to better match
+     * FileMaker. Returns true if the native path succeeded; false to allow fallback to
+     * AWT/CopyPasteManager.
      */
     private boolean tryWindowsNativeWrite(String text) {
         // PHASE 1.3 Alignment (2025-11-22):
@@ -375,15 +375,20 @@ public class DefaultClipboardService implements ClipboardService {
         // 1) Always publish CF_UNICODETEXT (format id 13) containing a UTF-16LE, NUL-terminated string.
         //    - No BOM is included for CF_UNICODETEXT (Windows convention for this format).
         //    - The terminator is a 16-bit 0x0000 (i.e., two trailing zero bytes).
-        // 2) Additionally publish exactly one FileMaker custom format, depending on fmxmlsnippet type:
-        //    - "Mac-XMSS" for Script Steps
-        //    - "Mac-XMFD" for Field/Table definitions
-        //    Payload details for custom formats:
+        // 2) Additionally publish exactly one FileMaker custom format, depending on fmxmlsnippet type. Known mappings:
+        //    - Script (entire script): "Mac-XMSC"
+        //    - Script Steps (selection): "Mac-XMSS"
+        //    - Fields: "Mac-XMFD"
+        //    - Tables: "Mac-XMTB"   <-- updated per latest captures
+        //    - Custom Functions: "Mac-XMFN"
+        //    - Value Lists: "Mac-XMVL"
+        //    - Layout Objects: "Mac-XML2" (very large; currently read/diagnostic only in this plugin)
+        //    Payload details for FileMaker custom formats:
         //    - 4-byte little-endian length prefix of the following XML bytes
         //    - Encoding: UTF-8 without BOM
         //    - Newlines: LF (\n) — normalize CRLF/CR to LF
         //    - No trailing NUL terminator
-        // The two formats are set within a single OpenClipboard/EmptyClipboard session.
+        // The formats above are set within the same OpenClipboard/EmptyClipboard session as CF_UNICODETEXT.
         String os = System.getProperty("os.name", "");
         if (os == null || !os.toLowerCase().startsWith("windows")) return false;
         ensureJna();
@@ -483,8 +488,10 @@ public class DefaultClipboardService implements ClipboardService {
                     targetFormatName = "Mac-XMSS"; // Script Steps
                     break;
                 case FIELD_DEFINITION:
-                case TABLE_DEFINITION:
                     targetFormatName = "Mac-XMFD"; // Fields & Tables
+                    break;
+                case TABLE_DEFINITION:
+                    targetFormatName = "Mac-XMTB"; // Tables per analysis (was previously mapped to XMFD)
                     break;
                 case LAYOUT_OBJECTS:
                     // Layouts not yet supported — gracefully avoid setting custom format

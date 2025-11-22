@@ -88,7 +88,7 @@ The `PushClipboardIntoFileMakerAction` currently writes fmxmlsnippet XML to the 
 - [x] Enhance detection to handle:
   - Script Steps: Look for `<Step` (current)
   - Fields: Look for `<Field` or `<FieldDefinition>` (current)
-  - Tables: Add detection for `<BaseTable` and use `Mac-XMFD`
+  - Tables: Add detection for `<BaseTable` and use `Mac-XMTB`
   - Layouts: Identify layout snippets (to be supported later) and handle gracefully
 - [x] Add unit tests for each snippet type detection
 - [x] Log detected type clearly in diagnostics
@@ -143,7 +143,8 @@ The `PushClipboardIntoFileMakerAction` currently writes fmxmlsnippet XML to the 
   - `setData:forType:` for custom types
 - [ ] Write custom types based on snippet type:
   - Script Steps: Write to `Mac-XMSS` or appropriate UTI
-  - Fields/Tables: Write to `Mac-XMFD` or appropriate UTI
+  - Fields: Write to `Mac-XMFD` or appropriate UTI
+  - Tables: Write to `Mac-XMTB` or appropriate UTI
 - [ ] Write standard text types as fallback: `public.utf8-plain-text`, `NSStringPboardType`
 - [ ] Ensure UTF-8 encoding with BOM (if required by FileMaker on macOS)
 - [ ] Normalize newlines to `\r` (classic Mac) to match Windows behavior
@@ -219,8 +220,9 @@ The `PushClipboardIntoFileMakerAction` currently writes fmxmlsnippet XML to the 
   - Base Tables: `<BaseTable` (already partial support)
 - [ ] Map each type to the appropriate Windows custom format:
   - Scripts → `Mac-XMSS`
-  - Fields/Tables → `Mac-XMFD`
-  - Layouts → `Mac-XMLO` (hypothesized, verify in Phase 3.3)
+  - Fields → `Mac-XMFD`
+  - Tables → `Mac-XMTB`
+  - Layouts → `Mac-XML2` (per captures; write support TBD)
   - Others → TBD based on research
 - [ ] Add unit tests for each detection case
 
@@ -337,7 +339,7 @@ The `PushClipboardIntoFileMakerAction` currently writes fmxmlsnippet XML to the 
 
 **Tasks**:
 - [ ] Extract clipboard format constants into dedicated class (e.g., `FileMakerClipboardFormats.java`)
-  - Custom format names: `Mac-XMSS`, `Mac-XMFD`, `Mac-XMLO`, etc.
+  - Custom format names: `Mac-XMSC`, `Mac-XMSS`, `Mac-XMFD`, `Mac-XMTB`, `Mac-XMFN`, `Mac-XMVL`, `Mac-XML2`, etc.
   - Standard format IDs: `CF_UNICODETEXT = 13`, `CF_TEXT = 1`
 - [ ] Reduce duplication between `WindowsClipboardReader`, `MacClipboardReader`, `DefaultClipboardService`
   - Extract shared encoding/decoding utilities into `ClipboardEncodingUtils.java`
