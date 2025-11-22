@@ -79,15 +79,18 @@ class DefaultXmlToClipboardConverterTest {
     }
 
     @Test
-    void throwsForUnsupportedLayoutSnippets() {
+    void convertsLayoutObjectListSnippetToClipboardPayload() throws Exception {
         String xml = """
-                <fmxmlsnippet>
-                  <Layout name="Main"/>
+                <fmxmlsnippet type="FMObjectList">
+                  <LayoutObjectList>
+                    <LayoutObject type="field" name="MyField"/>
+                  </LayoutObjectList>
                 </fmxmlsnippet>
                 """;
-        ConversionException ex = assertThrows(ConversionException.class,
-                () -> converter.convertToClipboardPayload(xml));
-        assertTrue(ex.getMessage().toLowerCase().contains("not supported"));
+
+        String payload = converter.convertToClipboardPayload(xml);
+        assertNotNull(payload);
+        assertTrue(payload.contains("<LayoutObjectList"));
     }
 
     @Test

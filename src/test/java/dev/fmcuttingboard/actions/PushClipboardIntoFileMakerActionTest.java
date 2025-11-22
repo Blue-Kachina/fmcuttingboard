@@ -41,10 +41,10 @@ class PushClipboardIntoFileMakerActionTest {
     }
 
     @Test
-    void processXmlToClipboard_throwsForUnsupportedLayoutSnippet() {
+    void processXmlToClipboard_throwsForUnsupportedUnknownSnippet() {
         String xml = """
                 <fmxmlsnippet>
-                  <Layout name=\"Main\"/>
+                  <UnknownTag/>
                 </fmxmlsnippet>
                 """;
         PushClipboardIntoFileMakerAction action = new PushClipboardIntoFileMakerAction(

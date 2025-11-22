@@ -1,0 +1,7 @@
+<fmxmlsnippet type="FMObjectList">
+  <LayoutObjectList>
+    <LayoutObject type="field" name="MyField">
+      <Bounds left="10" top="10" right="110" bottom="30"/>
+    </LayoutObject>
+  </LayoutObjectList>
+</fmxmlsnippet>

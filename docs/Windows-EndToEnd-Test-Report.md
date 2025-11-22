@@ -23,6 +23,7 @@ Files under test (from resources/test-snippets)
 - Tables.xml
 - CustomFunctions.xml
 - ValueLists.xml
+- LayoutObjects.xml
 
 Environment
 - OS: Windows 10/11 (record exact build)
@@ -48,6 +49,9 @@ FileMaker Pro 19
  - Value Lists:
   - Result:
   - Notes:
+ - Layout Objects:
+  - Result:
+  - Notes:
 
 FileMaker Pro 20
 - Script Steps: 
@@ -65,6 +69,9 @@ FileMaker Pro 20
  - Value Lists:
   - Result:
   - Notes:
+ - Layout Objects:
+  - Result:
+  - Notes:
 
 FileMaker Pro 21
 - Script Steps: 
@@ -80,6 +87,9 @@ FileMaker Pro 21
   - Result:
   - Notes:
  - Value Lists:
+  - Result:
+  - Notes:
+ - Layout Objects:
   - Result:
   - Notes:
 

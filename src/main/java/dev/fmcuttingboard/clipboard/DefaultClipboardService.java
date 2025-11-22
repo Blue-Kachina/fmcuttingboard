@@ -503,9 +503,8 @@ public class DefaultClipboardService implements ClipboardService {
                     targetFormatName = "Mac-XMVL"; // Value Lists
                     break;
                 case LAYOUT_OBJECTS:
-                    // Layouts not yet supported — gracefully avoid setting custom format
-                    targetFormatName = null;
-                    Diagnostics.vInfo(LOG, "[CB-DIAG] Layout snippets not supported yet; only CF_UNICODETEXT will be set");
+                    // Layout Objects (selection on a layout) use Mac-XML2 per captures
+                    targetFormatName = "Mac-XML2";
                     break;
                 default:
                     break;

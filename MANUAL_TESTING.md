@@ -25,9 +25,10 @@ Checklist
      - Tables.xml (Manage Database > Tables — paste)
      - CustomFunctions.xml (Manage Custom Functions — paste)
      - ValueLists.xml (Manage Value Lists — paste)
+     - LayoutObjects.xml (Layout mode — paste onto a layout)
    - Invoke the action “FM: Push Clipboard Into FileMaker”.
    - Expected: System clipboard receives the normalized fmxmlsnippet payload.
-   - For unsupported types (e.g., pure Layouts), expect a warning/error notification.
+   - For unsupported types, expect a warning/error notification.
 
 3) Settings
    - Open Settings > Tools > FMCuttingBoard.

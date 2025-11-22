@@ -89,7 +89,11 @@ public class FmXmlParser {
             } else if (lower.equals("basetable")) {
                 // Table definitions — mark TABLES and capture name if present later when model expands
                 model.addElementType(ElementType.TABLES);
-            } else if (lower.equals("layout")) {
+            } else if (lower.equals("layout")
+                    || lower.equals("layoutobjectlist")
+                    || lower.equals("objectlist")
+                    || lower.equals("layoutobject")
+                    || lower.equals("part")) {
                 String name = el.getAttribute("name");
                 if (name != null && !name.isBlank()) model.addLayoutName(name);
                 model.addElementType(ElementType.LAYOUTS);
