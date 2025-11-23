@@ -143,7 +143,7 @@ This roadmap outlines the implementation of FileMaker Calculation language suppo
 **Tasks:**
 - [x] Design 16x16 `.fmcalc` file type icon (SVG format recommended)
 - [x] Add icon to `src/main/resources/icons/filemaker-calculation.svg`
-- [ ] Update `FileMakerCalculationFileType.getIcon()` to reference new icon
+- [x] Update `FileMakerCalculationFileType.getIcon()` to reference new icon
 - [ ] Test icon appearance in Project view and editor tabs
 
 ---

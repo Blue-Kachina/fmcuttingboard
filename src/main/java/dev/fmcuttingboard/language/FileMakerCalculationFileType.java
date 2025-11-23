@@ -1,7 +1,7 @@
 package dev.fmcuttingboard.language;
 
-import com.intellij.icons.AllIcons;
 import com.intellij.openapi.fileTypes.LanguageFileType;
+import com.intellij.openapi.util.IconLoader;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -36,7 +36,7 @@ public final class FileMakerCalculationFileType extends LanguageFileType {
 
     @Override
     public @Nullable Icon getIcon() {
-        // Temporary default icon until a dedicated one is added in a later phase
-        return AllIcons.FileTypes.Any_type;
+        // Custom FileMaker Calculation file type icon
+        return IconLoader.getIcon("/icons/filemaker-calculation.svg", FileMakerCalculationFileType.class);
     }
 }
