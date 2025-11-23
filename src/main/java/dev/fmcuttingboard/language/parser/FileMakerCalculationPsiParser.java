@@ -11,6 +11,8 @@ import dev.fmcuttingboard.language.FileMakerCalculationTokenType;
 /**
  * Lightweight recursive-descent parser creating a minimal PSI structure for FileMaker calculations.
  * Handles function calls, parenthesized expressions, identifiers and literals.
+ *
+ * Phase 4.3: Replaced bootstrap flat parser with this structured parser.
  */
 public class FileMakerCalculationPsiParser implements PsiParser {
     @Override
