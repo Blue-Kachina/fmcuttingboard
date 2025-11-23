@@ -1,9 +1,14 @@
 package dev.fmcuttingboard.language.format;
 
+import com.intellij.application.options.CodeStyleAbstractConfigurable;
+import com.intellij.application.options.CodeStyleAbstractPanel;
+import com.intellij.application.options.TabbedLanguageCodeStylePanel;
 import com.intellij.lang.Language;
 import com.intellij.psi.codeStyle.CodeStyleSettingsCustomizable;
 import com.intellij.psi.codeStyle.CommonCodeStyleSettings;
+import com.intellij.psi.codeStyle.CodeStyleSettings;
 import com.intellij.psi.codeStyle.LanguageCodeStyleSettingsProvider;
+import com.intellij.psi.codeStyle.CodeStyleConfigurable;
 import dev.fmcuttingboard.language.FileMakerCalculationLanguage;
 import org.jetbrains.annotations.NotNull;
 
@@ -22,6 +27,23 @@ public class FileMakerCodeStyleSettingsProvider extends LanguageCodeStyleSetting
     @Override
     public void customizeSettings(@NotNull CodeStyleSettingsCustomizable consumer, @NotNull SettingsType settingsType) {
         // Use default common settings; future work can expose custom options (Phase 5.3 details)
+    }
+
+    /**
+     * Since IntelliJ Platform 2024.3, LanguageCodeStyleSettingsProvider must explicitly
+     * provide a Configurable for the language. We supply a minimal tabbed panel that uses
+     * the built‑in language code style UI.
+     */
+    @Override
+    public @NotNull CodeStyleConfigurable createConfigurable(@NotNull CodeStyleSettings settings,
+                                                             @NotNull CodeStyleSettings originalSettings) {
+        return new CodeStyleAbstractConfigurable(settings, originalSettings, "FileMaker Calculation") {
+            @Override
+            protected @NotNull CodeStyleAbstractPanel createPanel(@NotNull CodeStyleSettings settings) {
+                return new TabbedLanguageCodeStylePanel(FileMakerCalculationLanguage.INSTANCE, getCurrentSettings(), settings) {
+                };
+            }
+        };
     }
 
     @Override

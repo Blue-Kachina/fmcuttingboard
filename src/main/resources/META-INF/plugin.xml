@@ -66,7 +66,7 @@
         <lang.formatter language="FileMakerCalculation"
                          implementationClass="dev.fmcuttingboard.language.format.FileMakerCalculationFormattingModelBuilder"/>
 
-        <!-- Code style settings provider to surface preview/sample in settings -->
+        <!-- Code style settings provider for FileMaker Calculation language -->
         <codeStyleSettingsProvider implementation="dev.fmcuttingboard.language.format.FileMakerCodeStyleSettingsProvider"/>
 
         <!-- ParserDefinition to enable PSI for the FileMaker Calculation language -->
