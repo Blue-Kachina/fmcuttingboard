@@ -1,0 +1,36 @@
+<NotepadPlus>
+    <UserLang name="FileMaker" ext="groovy">
+        <Settings>
+            <Global caseIgnored="no" />
+            <TreatAsSymbol comment="no" commentLine="no" />
+            <Prefix words1="no" words2="no" words3="no" words4="no" />
+        </Settings>
+        <KeywordLists>
+            <Keywords name="Delimiters">&quot;&apos;0&quot;&apos;0</Keywords>
+            <Keywords name="Folder+"></Keywords>
+            <Keywords name="Folder-"></Keywords>
+            <Keywords name="Operators"></Keywords>
+            <Keywords name="Comment">1/* 2*/ 0//</Keywords>
+            <Keywords name="Words1">if case</Keywords>
+            <Keywords name="Words2">and or not</Keywords>
+            <Keywords name="Words3">boolean byte char class double float int interface long short void</Keywords>
+            <Keywords name="Words4">Abs Acos Asin Atan Average Case Ceiling Char Choose Code Combination Cos Count DatabaseNames Date Day DayName DayNameJ DayOfWeek DayOfYear Degrees Div Evaluate EvaluationError Exact Exp Extend External Factorial FieldBounds FieldComment FieldIDs FieldNames FieldRepetitions FieldStyle FieldType Filter FilterValues Floor FV Get(AccountExtendedPrivileges) Get(AccountName) Get(AccountPrivilegeSetName) Get(ActiveFieldContents) Get(ActiveFieldName) Get(ActiveFieldTableName) Get(ActiveLayoutObjectName) Get(ActiveModifierKeys) Get(ActivePortalRowNumber) Get(ActiveRepetitionNumber) Get(ActiveSelectionSize) Get(ActiveSelectionStart) Get(AllowAbortState) Get(AllowToolbarState) Get(ApplicationLanguage) Get(ApplicationVersion) Get(CalculationRepetitionNumber) Get(CurrentDate) Get(CurrentExtendedPrivileges) Get(CurrentHostTimestamp) Get(CurrentPrivilegeSetName) Get(CurrentTime) Get(CurrentTimestamp) Get(CustomMenuSetName) Get(DesktopPath) Get(DocumentsPath) Get(DocumentsPathListing) Get(ErrorCaptureState) Get(FileMakerPath) Get(FileName) Get(FilePath) Get(FileSize) Get(FoundCount) Get(HighContrastColor) Get(HighContrastState) Get(HostApplicationVersion) Get(HostIPAddress) Get(HostName) Get(LastError) Get(LastMessageChoice) Get(LastODBCError) Get(LayoutAccess) Get(LayoutCount) Get(LayoutName) Get(LayoutNumber) Get(LayoutTableName) Get(LayoutViewState) Get(MultiUserState) Get(NetworkProtocol) Get(PageNumber) Get(PreferencesPath) Get(PrinterName) Get(QuickFindText) Get(RecordAccess) Get(RecordID) Get(RecordModificationCount) Get(RecordNumber) Get(RecordOpenCount) Get(RecordOpenState) Get(RequestCount) Get(RequestOmitState) Get(ScreenDepth) Get(ScreenHeight) Get(ScreenWidth) Get(ScriptName) Get(ScriptParameter) Get(ScriptResult) Get(SortState) Get(StatusAreaState) Get(SystemDrive) Get(SystemIPAddress) Get(SystemLanguage) Get(SystemNICAddress) Get(SystemPlatform) Get(SystemVersion) Get(TemporaryPath) Get(TextRulerVisible) Get(TotalRecordCount) Get(TriggerKeystroke) Get(TriggerModifierKeys) Get(UserCount) Get(UserName) Get(UseSystemFormatsState) Get(WindowContentHeight) Get(WindowContentWidth) Get(WindowDesktopHeight) Get(WindowDesktopWidth) Get(WindowHeight) Get(WindowLeft) Get(WindowMode) Get(WindowName) Get(WindowTop) Get(WindowVisible) Get(WindowWidth) Get(WindowZoomLevel) GetAsBoolean GetAsCSS GetAsDate GetAsNumber GetAsSVG GetAsText GetAsTime GetAsTimestamp GetAsURLEncoded GetField GetFieldName GetLayoutObjectAttribute GetNextSerialValue GetNthRecord GetRepetition GetSummary GetValue Hiragana Hour If Int IsEmpty IsValid IsValidExpression KanaHankaku KanaZenkaku KanjiNumeral Katakana Last LayoutIDs LayoutNames LayoutObjectNames Left LeftValues LeftWords Length Let Lg List Ln Log Lookup LookupNext Lower Max Middle MiddleValues MiddleWords Min Minute Mod Month MonthName MonthNameJ NPV NumToJText PatternCount Pi PMT Position Proper PV Quote Radians Random RelationInfo Replace RGB Right RightValues RightWords RomanHankaku RomanZenkaku Round ScriptIDs ScriptNames Seconds Self SerialIncrement SetPrecision Sign Sin Sqrt StDev StDevP Substitute Sum TableIDs TableNames Tan TextColor TextColorRemove TextFont TextFontRemove TextFormatRemove TextSize TextSizeRemove TextStyleAdd TextStyleRemove Time Timestamp Trim TrimAll Truncate Upper ValueCount ValueListIDs ValueListItems ValueListNames Variance VarianceP WeekOfYear WeekOfYearFiscal WindowNames WordCount Year YearName</Keywords>
+        </KeywordLists>
+        <Styles>
+            <WordsStyle name="DEFAULT" styleID="11" fgColor="000000" bgColor="FFFFFF" fontName="" fontStyle="0" fontSize="" />
+            <WordsStyle name="FOLDEROPEN" styleID="12" fgColor="808040" bgColor="FFFFFF" fontName="" fontStyle="0" fontSize="" />
+            <WordsStyle name="FOLDERCLOSE" styleID="13" fgColor="808040" bgColor="FFFFFF" fontName="" fontStyle="0" fontSize="" />
+            <WordsStyle name="KEYWORD1" styleID="5" fgColor="0000FF" bgColor="FFFFFF" fontName="" fontStyle="1" fontSize="" />
+            <WordsStyle name="KEYWORD2" styleID="6" fgColor="006699" bgColor="FFFFFF" fontName="" fontStyle="1" fontSize="" />
+            <WordsStyle name="KEYWORD3" styleID="7" fgColor="FF8000" bgColor="FFFFFF" fontName="" fontStyle="1" fontSize="" />
+            <WordsStyle name="KEYWORD4" styleID="8" fgColor="8000FF" bgColor="FFFFFF" fontName="" fontStyle="1" fontSize="" />
+            <WordsStyle name="COMMENT" styleID="1" fgColor="008000" bgColor="FFFFFF" fontName="" fontStyle="0" fontSize="" />
+            <WordsStyle name="COMMENT LINE" styleID="2" fgColor="008000" bgColor="FFFFFF" fontName="" fontStyle="0" fontSize="" />
+            <WordsStyle name="NUMBER" styleID="4" fgColor="FF0000" bgColor="FFFFFF" fontName="" fontStyle="0" fontSize="" />
+            <WordsStyle name="OPERATOR" styleID="10" fgColor="804000" bgColor="FFFFFF" fontName="" fontStyle="1" fontSize="" />
+            <WordsStyle name="DELIMINER1" styleID="14" fgColor="DB599D" bgColor="FFFFFF" fontName="" fontStyle="0" />
+            <WordsStyle name="DELIMINER2" styleID="15" fgColor="DB599D" bgColor="FFFFFF" fontName="" fontStyle="0" />
+            <WordsStyle name="REGEX" styleID="52" fgColor="8000FF" bgColor="F2F4FF" fontName="" fontStyle="0" fontSize="" />
+        </Styles>
+    </UserLang>
+</NotepadPlus>

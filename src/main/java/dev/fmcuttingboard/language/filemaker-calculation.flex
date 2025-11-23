@@ -77,6 +77,38 @@ import com.intellij.psi.tree.IElementType;
                                { return FileMakerCalculationTokenType.KEYWORD_FUNCTION; }
   // Generic Get() family — highlight core function name
   "Get"                        { return FileMakerCalculationTokenType.KEYWORD_FUNCTION; }
+  /*
+   * Note: The FileMaker platform defines 100+ Get() variants (from the Notepad++ XML Words4 list).
+   * We purposefully highlight only the function identifier "Get" as a KEYWORD_FUNCTION so that
+   * the argument token (e.g., AccountName) remains a normal IDENTIFIER token. This preserves
+   * consistent operator/identifier highlighting across the language while still marking function calls.
+   *
+   * Authoritative list captured in resources/FileMakerCalcs_InNotepadPlusPlus.xml (Words4), including:
+   *   Get(AccountExtendedPrivileges), Get(AccountName), Get(AccountPrivilegeSetName),
+   *   Get(ActiveFieldContents), Get(ActiveFieldName), Get(ActiveFieldTableName),
+   *   Get(ActiveLayoutObjectName), Get(ActiveModifierKeys), Get(ActivePortalRowNumber),
+   *   Get(ActiveRepetitionNumber), Get(ActiveSelectionSize), Get(ActiveSelectionStart),
+   *   Get(AllowAbortState), Get(AllowToolbarState), Get(ApplicationLanguage), Get(ApplicationVersion),
+   *   Get(CalculationRepetitionNumber), Get(CurrentDate), Get(CurrentExtendedPrivileges),
+   *   Get(CurrentHostTimestamp), Get(CurrentPrivilegeSetName), Get(CurrentTime), Get(CurrentTimestamp),
+   *   Get(CustomMenuSetName), Get(DesktopPath), Get(DocumentsPath), Get(DocumentsPathListing),
+   *   Get(ErrorCaptureState), Get(FileMakerPath), Get(FileName), Get(FilePath), Get(FileSize),
+   *   Get(FoundCount), Get(HighContrastColor), Get(HighContrastState), Get(HostApplicationVersion),
+   *   Get(HostIPAddress), Get(HostName), Get(LastError), Get(LastMessageChoice), Get(LastODBCError),
+   *   Get(LayoutAccess), Get(LayoutCount), Get(LayoutName), Get(LayoutNumber), Get(LayoutTableName),
+   *   Get(LayoutViewState), Get(MultiUserState), Get(NetworkProtocol), Get(PageNumber),
+   *   Get(PreferencesPath), Get(PrinterName), Get(QuickFindText), Get(RecordAccess), Get(RecordID),
+   *   Get(RecordModificationCount), Get(RecordNumber), Get(RecordOpenCount), Get(RecordOpenState),
+   *   Get(RequestCount), Get(RequestOmitState), Get(ScreenDepth), Get(ScreenHeight), Get(ScreenWidth),
+   *   Get(ScriptName), Get(ScriptParameter), Get(ScriptResult), Get(SortState), Get(StatusAreaState),
+   *   Get(SystemDrive), Get(SystemIPAddress), Get(SystemLanguage), Get(SystemNICAddress),
+   *   Get(SystemPlatform), Get(SystemVersion), Get(TemporaryPath), Get(TextRulerVisible),
+   *   Get(TotalRecordCount), Get(TriggerKeystroke), Get(TriggerModifierKeys), Get(UserCount),
+   *   Get(UserName), Get(UseSystemFormatsState), Get(WindowContentHeight), Get(WindowContentWidth),
+   *   Get(WindowDesktopHeight), Get(WindowDesktopWidth), Get(WindowHeight), Get(WindowLeft),
+   *   Get(WindowMode), Get(WindowName), Get(WindowTop), Get(WindowVisible), Get(WindowWidth),
+   *   Get(WindowZoomLevel)
+   */
   // Field/database functions
   "DatabaseNames"|"FieldBounds"|"FieldComment"|"FieldIDs"|"FieldNames"|"FieldRepetitions"|"FieldStyle"|"FieldType"|"GetField"|"GetFieldName"|"GetNthRecord"|"GetRepetition"|"GetSummary"|"GetValue"|"Lookup"|"LookupNext"
                                { return FileMakerCalculationTokenType.KEYWORD_FUNCTION; }

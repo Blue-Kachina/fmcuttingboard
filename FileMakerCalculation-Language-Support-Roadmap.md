@@ -64,7 +64,7 @@ This roadmap outlines the implementation of FileMaker Calculation language suppo
 - [x] Define statistical functions: `Average`, `Count`, `StDev`, `StDevP`, `Sum`, `Variance`, `VarianceP`
 - [x] Define text functions: `Char`, `Code`, `Exact`, `Filter`, `FilterValues`, `Left`, `LeftValues`, `LeftWords`, `Length`, `Lower`, `Middle`, `MiddleValues`, `MiddleWords`, `Position`, `Proper`, `Quote`, `Replace`, `Right`, `RightValues`, `RightWords`, `Substitute`, `TextColor`, `TextColorRemove`, `TextFont`, `TextFontRemove`, `TextFormatRemove`, `TextSize`, `TextSizeRemove`, `TextStyleAdd`, `TextStyleRemove`, `Trim`, `TrimAll`, `Upper`, `WordCount`
 - [x] Define date/time functions: `Date`, `Day`, `DayName`, `DayNameJ`, `DayOfWeek`, `DayOfYear`, `Hour`, `Minute`, `Month`, `MonthName`, `MonthNameJ`, `Seconds`, `Time`, `Timestamp`, `WeekOfYear`, `WeekOfYearFiscal`, `Year`, `YearName`
-- [ ] Define Get functions (100+ functions): All `Get()` functions from XML line 17
+- [x] Define Get functions (100+ functions): All `Get()` functions from XML line 17
  - [x] Define conversion functions: `GetAsBoolean`, `GetAsCSS`, `GetAsDate`, `GetAsNumber`, `GetAsSVG`, `GetAsText`, `GetAsTime`, `GetAsTimestamp`, `GetAsURLEncoded`
  - [x] Define field/database functions: `DatabaseNames`, `FieldBounds`, `FieldComment`, `FieldIDs`, `FieldNames`, `FieldRepetitions`, `FieldStyle`, `FieldType`, `GetField`, `GetFieldName`, `GetNthRecord`, `GetRepetition`, `GetSummary`, `GetValue`, `Lookup`, `LookupNext`
  - [x] Define Japanese text functions: `Hiragana`, `KanaHankaku`, `KanaZenkaku`, `KanjiNumeral`, `Katakana`, `NumToJText`, `RomanHankaku`, `RomanZenkaku`
