@@ -31,6 +31,8 @@ import java.util.ArrayList;
  * Note: This is the initial implementation for Phase 5.2 and is intentionally
  * conservative to avoid surprising rewrites. Future phases may introduce
  * configurable code style options and more granular rules.
+ *
+ * Implements Phase 5.2 by providing AST-backed blocks and spacing rules.
  */
 public class FileMakerCalculationFormattingModelBuilder implements FormattingModelBuilder {
 
