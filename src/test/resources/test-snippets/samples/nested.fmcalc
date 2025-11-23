@@ -1,0 +1,10 @@
+// Nested expressions and complex calculation
+Case(
+  IsEmpty(Self); "empty";
+  Let([
+    a = Round(Sin(3.14159/2); 2);
+    b = Max( List(1; 2; 3); 2 )
+  ];
+    If(a >= b or not a < 0; Substitute("ok"; "o"; "0"); "ng")
+  )
+)

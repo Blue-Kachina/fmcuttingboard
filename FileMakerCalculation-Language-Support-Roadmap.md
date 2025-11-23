@@ -151,7 +151,7 @@ This roadmap outlines the implementation of FileMaker Calculation language suppo
 ## Phase 5: Testing & Validation
 
 ### 5.1 Manual Testing
-- [ ] Create sample `.fmcalc` files with various FileMaker calculations
+- [x] Create sample `.fmcalc` files with various FileMaker calculations
 - [ ] Verify syntax highlighting for all token types
 - [ ] Test comment highlighting (both `//` and `/* */`)
 - [ ] Test string highlighting (both `"` and `'`)
@@ -201,7 +201,7 @@ This roadmap outlines the implementation of FileMaker Calculation language suppo
 - [ ] Parameter hints for functions
 - [ ] Error detection for invalid syntax
 - [ ] Brace matching for parentheses and brackets
-- [ ] Code folding for `Let()` and `Case()` blocks
+- [ ] Code folding for `Let()`, `Case()`, `If()` blocks
 - [ ] Live templates for common calculation patterns
 - [ ] Integration with existing FileMaker clipboard features
 

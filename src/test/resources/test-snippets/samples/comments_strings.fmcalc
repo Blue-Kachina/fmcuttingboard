@@ -1,0 +1,8 @@
+// Single line comment example
+/*
+  Block comment example spanning
+  multiple lines
+*/
+"Quoted \"double\" string"
+'Single quoted string with \'escape\''
+Let(x; 1)
