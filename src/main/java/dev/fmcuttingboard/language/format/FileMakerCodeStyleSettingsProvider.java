@@ -41,6 +41,11 @@ public class FileMakerCodeStyleSettingsProvider extends LanguageCodeStyleSetting
             @Override
             protected @NotNull CodeStyleAbstractPanel createPanel(@NotNull CodeStyleSettings settings) {
                 return new TabbedLanguageCodeStylePanel(FileMakerCalculationLanguage.INSTANCE, getCurrentSettings(), settings) {
+                    @Override
+                    protected void initTabs(CodeStyleSettings settings) {
+                        // Keep only the Indent Options tab which does not require the preview editor.
+                        addIndentOptionsTab(settings);
+                    }
                 };
             }
         };

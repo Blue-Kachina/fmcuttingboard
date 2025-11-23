@@ -97,6 +97,14 @@ tasks.register<Task>("releasePlugin") {
     dependsOn("buildPlugin")
 }
 
+// The IDE's searchable options builder attempts to materialize settings UIs headlessly
+// and may crash for lightweight custom languages. It's not required for running or
+// publishing the plugin, so disable it to keep CI and local builds stable.
+// If you later add searchable options, remove this block.
+tasks.named("buildSearchableOptions") {
+    enabled = false
+}
+
 // ===== Phase 2.2: Lexer Generation & Integration =====
 val generatedDir = layout.buildDirectory.dir("generated-src/grammarkit")
 

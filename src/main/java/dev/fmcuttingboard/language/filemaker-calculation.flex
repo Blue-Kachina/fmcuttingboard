@@ -169,7 +169,7 @@ import com.intellij.psi.tree.IElementType;
   "]" { return FileMakerCalculationTokenType.RBRACKET; }
   "{" { return FileMakerCalculationTokenType.LBRACE; }
   "}" { return FileMakerCalculationTokenType.RBRACE; }
-  "≠"|"≤"|"≥"                 { return FileMakerCalculationTokenType.OPERATOR; }
+  "\u2260"|"\u2264"|"\u2265" { return FileMakerCalculationTokenType.OPERATOR; }
 
   // Identifier
   [A-Za-z_][A-Za-z0-9_]*      { return FileMakerCalculationTokenType.IDENTIFIER; }
