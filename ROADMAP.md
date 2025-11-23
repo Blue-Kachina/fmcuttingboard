@@ -89,6 +89,12 @@ Progress: Implemented best‑effort consolidation utilities
 - Update `FileMakerCalculationParserDefinition` to map element types to PSI implementations ✓
 - Basic verification with sample inputs; further tests to be added in Phase 9
 
+Refinement (2025‑11‑23):
+- Introduced basic operator parsing with precedence (arithmetic, comparison, logical AND/OR) ✓
+- Added unary NOT handling ✓
+- New PSI node types: `BINARY_EXPRESSION`, `UNARY_EXPRESSION` ✓
+- ParserDefinition updated to expose new PSI nodes ✓
+
 ## Phase 5: Intelligent Code Formatting
 **Goal:** Reformat Code that produces human-readable calculations
 

@@ -73,6 +73,8 @@ public class FileMakerCalculationParserDefinition implements ParserDefinition {
         if (type == FileMakerCalculationElementType.PAREN_EXPRESSION) return new FileMakerPsiElements.FileMakerParenExpressionImpl(node);
         if (type == FileMakerCalculationElementType.IDENTIFIER_EXPRESSION) return new FileMakerPsiElements.FileMakerIdentifierExpressionImpl(node);
         if (type == FileMakerCalculationElementType.LITERAL) return new FileMakerPsiElements.FileMakerLiteralImpl(node);
+        if (type == FileMakerCalculationElementType.BINARY_EXPRESSION) return new FileMakerPsiElements.FileMakerBinaryExpressionImpl(node);
+        if (type == FileMakerCalculationElementType.UNARY_EXPRESSION) return new FileMakerPsiElements.FileMakerUnaryExpressionImpl(node);
         return new ASTWrapperPsiElement(node);
     }
 

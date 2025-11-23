@@ -36,4 +36,13 @@ public final class FileMakerPsiElements {
     public static class FileMakerLiteralImpl extends ASTWrapperPsiElement {
         public FileMakerLiteralImpl(@NotNull ASTNode node) { super(node); }
     }
+
+    // Phase 4.3 refinement PSI wrappers
+    public static class FileMakerBinaryExpressionImpl extends ASTWrapperPsiElement {
+        public FileMakerBinaryExpressionImpl(@NotNull ASTNode node) { super(node); }
+    }
+
+    public static class FileMakerUnaryExpressionImpl extends ASTWrapperPsiElement {
+        public FileMakerUnaryExpressionImpl(@NotNull ASTNode node) { super(node); }
+    }
 }

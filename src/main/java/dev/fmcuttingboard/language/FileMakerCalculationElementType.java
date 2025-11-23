@@ -20,4 +20,7 @@ public class FileMakerCalculationElementType extends IElementType {
     public static final IElementType PAREN_EXPRESSION = new FileMakerCalculationElementType("PAREN_EXPRESSION");
     public static final IElementType IDENTIFIER_EXPRESSION = new FileMakerCalculationElementType("IDENTIFIER_EXPRESSION");
     public static final IElementType LITERAL = new FileMakerCalculationElementType("LITERAL");
+    // Phase 4.3 refinement: basic operator expressions
+    public static final IElementType BINARY_EXPRESSION = new FileMakerCalculationElementType("BINARY_EXPRESSION");
+    public static final IElementType UNARY_EXPRESSION = new FileMakerCalculationElementType("UNARY_EXPRESSION");
 }
