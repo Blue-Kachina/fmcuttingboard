@@ -10,6 +10,10 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Locale;
 
+import dev.fmcuttingboard.language.FileMakerFunctionRegistry;
+import dev.fmcuttingboard.language.FunctionMetadata;
+import dev.fmcuttingboard.language.FunctionParameter;
+
 /**
  * Advanced IDE Feature: Parameter hints for functions (Post-MVP).
  *
@@ -121,20 +125,47 @@ public class FileMakerCalculationParameterInfoHandler implements ParameterInfoHa
 
     private static @Nullable String buildSignature(String functionNameRaw) {
         String fn = functionNameRaw.trim();
+        // Prefer real metadata from the central registry (Phase 3.1)
+        FunctionMetadata meta = FileMakerFunctionRegistry.findByName(fn);
+        if (meta != null) {
+            return buildTypedSignature(meta);
+        }
+        // Fallbacks for common built-ins (in case registry is incomplete)
         String fnLower = fn.toLowerCase(Locale.ROOT);
         switch (fnLower) {
             case "get":
-                return "Get(name)";
+                return "Get(name: Text)";
             case "if":
-                return "If(test; resultTrue; resultFalse)";
+                return "If(test: Any; resultTrue: Any; [resultFalse: Any])";
             case "case":
-                return "Case(test1; result1; …; default)";
+                return "Case(test1: Any; result1: Any; [testN; resultN]...; [default: Any])";
             case "let":
-                return "Let([name = expr; …]; result)";
+                return "Let([name = expr; …]; result: Any)";
             default:
                 // Generic fallback: function(arg1; arg2; …)
                 return fn + "(arg1; arg2; …)";
         }
+    }
+
+    private static String buildTypedSignature(@NotNull FunctionMetadata meta) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(meta.getName()).append("(");
+        java.util.List<FunctionParameter> params = meta.getParameters();
+        for (int i = 0; i < params.size(); i++) {
+            if (i > 0) sb.append("; ");
+            FunctionParameter p = params.get(i);
+            boolean opt = p.isOptional();
+            if (opt) sb.append("[");
+            // Render as name: Type and preserve variadic … marks
+            sb.append(p.getName());
+            if (p.isRepeating() && !p.getName().endsWith("...")) sb.append("...");
+            if (p.getType() != null && !p.getType().isEmpty()) {
+                sb.append(": ").append(p.getType());
+            }
+            if (opt) sb.append("]");
+        }
+        sb.append(")");
+        return sb.toString();
     }
 
     private static int[] parameterSegments(String signature) {
