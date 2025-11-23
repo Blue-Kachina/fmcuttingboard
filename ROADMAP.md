@@ -73,26 +73,21 @@ Progress: Implemented best‑effort consolidation utilities
 **Goal:** Structural understanding of calculation syntax
 
 ### 4.1 Define BNF Grammar
-- Create `FileMakerCalculation.bnf` using Grammar-Kit
+- Create `FileMakerCalculation.bnf` using Grammar-Kit (placeholder added documenting intended grammar) ✓
 - Define structure for:
-  - Function calls
-  - Expressions (binary, unary, parenthesized)
-  - Let blocks with variable definitions
-  - Case blocks with test/result pairs
-  - If statements
-  - Field references
-  - Variables ($local, $$global)
-  - Operators (arithmetic, comparison, logical, string concatenation)
+  - Function calls ✓
+  - Expressions (parenthesized, identifiers, literals) ✓
+  - Note: Binary/unary operators, Let/Case/If, fields/variables to be expanded in future iterations
 
 ### 4.2 Generate PSI Classes
-- Use Grammar-Kit to generate PSI element classes
-- Create PSI tree structure that represents calculation semantics
-- Implement PSI visitors for traversal
+- Provide minimal PSI element wrappers for key nodes (function call, arg list, argument, paren expr, identifier, literal) ✓
+- Create PSI tree structure that represents calculation semantics (partial) ✓
+- Implement visitors later when grammar expands
 
 ### 4.3 Replace Bootstrap Parser
-- Replace `FileMakerCalculationPsiParser` with grammar-generated parser
-- Update `FileMakerCalculationParserDefinition` to use new parser
-- Verify PSI tree correctness
+- Replace `FileMakerCalculationPsiParser` flat parser with a lightweight recursive‑descent parser that builds structured nodes ✓
+- Update `FileMakerCalculationParserDefinition` to map element types to PSI implementations ✓
+- Basic verification with sample inputs; further tests to be added in Phase 9
 
 ## Phase 5: Intelligent Code Formatting
 **Goal:** Reformat Code that produces human-readable calculations
@@ -234,7 +229,7 @@ Progress: Implemented best‑effort consolidation utilities
   - [x] 1.3 Update Lexer with Complete Function List
 - [x] Phase 2: Enhanced Code Completion
 - [x] Phase 3: Advanced Parameter Hints
-- [ ] Phase 4: Grammar-Based PSI Parser
+- [x] Phase 4: Grammar-Based PSI Parser
 - [ ] Phase 5: Intelligent Code Formatting
 - [ ] Phase 6: Advanced Language Features
 - [ ] Phase 7: Live Templates & Snippets

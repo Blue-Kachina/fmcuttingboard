@@ -1,0 +1,27 @@
+// Phase 4.1 Define BNF Grammar (placeholder for Grammar-Kit)
+// This BNF documents the intended grammar while a hand-written parser is used.
+// Token names correspond to FileMakerCalculationTokenType.* constants via the JFlex lexer.
+
+{
+  // parserClass="dev.fmcuttingboard.language.parser.FileMakerCalculationPsiParser"
+  // psiPackage="dev.fmcuttingboard.language.psi"
+}
+
+file ::= expr
+
+expr ::= function_call
+       | parenthesized
+       | literal
+       | identifier
+
+function_call ::= (IDENTIFIER | KEYWORD_FUNCTION) LPAREN arg_list RPAREN { pin=2 }
+
+arg_list ::= (arg (SEMICOLON arg)*)?
+
+arg ::= expr
+
+parenthesized ::= LPAREN expr RPAREN
+
+literal ::= NUMBER | STRING
+
+identifier ::= IDENTIFIER

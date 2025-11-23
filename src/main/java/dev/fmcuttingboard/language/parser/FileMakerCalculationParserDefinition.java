@@ -15,7 +15,9 @@ import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import dev.fmcuttingboard.language.FileMakerCalculationLanguage;
 import dev.fmcuttingboard.language.FileMakerCalculationLexerAdapter;
 import dev.fmcuttingboard.language.FileMakerCalculationTokenType;
-import dev.fmcuttingboard.language.psi.FileMakerCalculationFile;
+import dev.fmcuttingboard.language.psi.*;
+import dev.fmcuttingboard.language.FileMakerCalculationElementType;
+import com.intellij.psi.tree.IElementType;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -64,6 +66,13 @@ public class FileMakerCalculationParserDefinition implements ParserDefinition {
 
     @Override
     public @NotNull PsiElement createElement(@NotNull ASTNode node) {
+        IElementType type = node.getElementType();
+        if (type == FileMakerCalculationElementType.FUNCTION_CALL) return new FileMakerPsiElements.FileMakerFunctionCallImpl(node);
+        if (type == FileMakerCalculationElementType.ARG_LIST) return new FileMakerPsiElements.FileMakerArgListImpl(node);
+        if (type == FileMakerCalculationElementType.ARGUMENT) return new FileMakerPsiElements.FileMakerArgumentImpl(node);
+        if (type == FileMakerCalculationElementType.PAREN_EXPRESSION) return new FileMakerPsiElements.FileMakerParenExpressionImpl(node);
+        if (type == FileMakerCalculationElementType.IDENTIFIER_EXPRESSION) return new FileMakerPsiElements.FileMakerIdentifierExpressionImpl(node);
+        if (type == FileMakerCalculationElementType.LITERAL) return new FileMakerPsiElements.FileMakerLiteralImpl(node);
         return new ASTWrapperPsiElement(node);
     }
 
