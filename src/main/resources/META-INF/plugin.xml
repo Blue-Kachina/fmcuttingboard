@@ -49,6 +49,10 @@
         <!-- Brace matching for parentheses and brackets -->
         <lang.braceMatcher language="FileMakerCalculation"
                            implementationClass="dev.fmcuttingboard.language.match.FileMakerCalculationBraceMatcher"/>
+
+        <!-- Code folding for Let(), Case(), If() blocks -->
+        <lang.foldingBuilder language="FileMakerCalculation"
+                             implementationClass="dev.fmcuttingboard.language.folding.FileMakerCalculationFoldingBuilder"/>
     </extensions>
 
     <!-- Phase 1.1: Register base actions group under Tools menu -->
