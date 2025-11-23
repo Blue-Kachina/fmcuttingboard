@@ -7,6 +7,8 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Minimal PSI element implementations for Phase 4 structured parsing.
  * These are thin wrappers over AST nodes to enable visitors and type checks.
+ *
+ * Phase 4.2: Generated (hand-written stand-in) PSI classes.
  */
 public final class FileMakerPsiElements {
     private FileMakerPsiElements() {}
