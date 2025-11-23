@@ -56,12 +56,132 @@ public class FileMakerCalculationAnnotator implements Annotator {
 
         // PSI-based validations (function calls)
         validateFunctions(element, holder);
+
+        // Undefined variable checks (Let() local variables and $/$$ script variables)
+        validateUndefinedVariables(element, holder);
     }
 
     private static void annotateUnmatched(AnnotationHolder holder, int offset, String brace) {
         holder.newAnnotation(HighlightSeverity.ERROR, "Unmatched closing " + brace)
                 .range(new TextRange(offset, offset + 1))
                 .create();
+    }
+
+    // === Phase 6.1: Undefined variable warnings (best-effort) ===
+    private static void validateUndefinedVariables(@NotNull PsiElement root, @NotNull AnnotationHolder holder) {
+        // Build simple Let() scopes: for each Let(bindings; result) collect variable names from bindings
+        java.util.List<LetScope> scopes = new java.util.ArrayList<>();
+
+        for (FileMakerPsiElements.FileMakerFunctionCallImpl call : PsiTreeUtil.findChildrenOfType(root, FileMakerPsiElements.FileMakerFunctionCallImpl.class)) {
+            String fn = extractFunctionName(call);
+            if (fn == null || !fn.equalsIgnoreCase("Let")) continue;
+
+            PsiElement bindingsArg = getArgumentAt(call, 0);
+            PsiElement resultArg = getArgumentAt(call, 1);
+            if (bindingsArg == null || resultArg == null) continue;
+
+            java.util.Set<String> names = extractLetBindingNames(bindingsArg);
+            if (!names.isEmpty()) {
+                scopes.add(new LetScope(resultArg.getTextRange(), names));
+            }
+        }
+
+        if (scopes.isEmpty()) return;
+
+        // For each identifier expression, if inside any scope but not defined in a containing scope chain, warn
+        for (FileMakerPsiElements.FileMakerIdentifierExpressionImpl id : PsiTreeUtil.findChildrenOfType(root, FileMakerPsiElements.FileMakerIdentifierExpressionImpl.class)) {
+            String name = id.getText();
+            if (name == null || name.isEmpty()) continue;
+
+            // Function names are not IDENTIFIER_EXPRESSIONs (they appear in FUNCTION_CALL), so safe.
+            // Skip literals disguised as identifiers (unlikely) or True/False which lexer marks differently anyway.
+
+            // Determine if this identifier is within any Let() result scope
+            int offset = id.getTextRange().getStartOffset();
+            LetScope innermost = findInnermostScope(scopes, offset);
+            if (innermost == null) {
+                // Outside Let result; only warn for $/$$ variables as a weak warning that they may be undefined
+                if (isScriptVariable(name)) {
+                    holder.newAnnotation(HighlightSeverity.WEAK_WARNING, "Script variable may be undefined here: " + name)
+                            .range(id.getTextRange())
+                            .create();
+                }
+                continue;
+            }
+
+            // Inside a Let() result. Check if defined in any containing scope.
+            if (!isDefinedInAnyContainingScope(scopes, offset, name)) {
+                holder.newAnnotation(HighlightSeverity.WEAK_WARNING, "Undefined variable '" + name + "' (not bound in any Let())")
+                        .range(id.getTextRange())
+                        .create();
+            }
+        }
+    }
+
+    private static boolean isDefinedInAnyContainingScope(java.util.List<LetScope> scopes, int offset, String name) {
+        // Consider all scopes that contain the offset; if any defines the name, return true.
+        for (LetScope s : scopes) {
+            if (s.range.containsOffset(offset) && s.definedNames.contains(name)) return true;
+        }
+        return false;
+    }
+
+    private static LetScope findInnermostScope(java.util.List<LetScope> scopes, int offset) {
+        LetScope best = null;
+        for (LetScope s : scopes) {
+            if (s.range.containsOffset(offset)) {
+                if (best == null || (s.range.getLength() < best.range.getLength())) {
+                    best = s;
+                }
+            }
+        }
+        return best;
+    }
+
+    private static boolean isScriptVariable(String name) {
+        return name.startsWith("$"); // $ or $$
+    }
+
+    private static PsiElement getArgumentAt(FileMakerPsiElements.FileMakerFunctionCallImpl call, int index) {
+        // Find ARG_LIST child and the Nth ARGUMENT
+        for (PsiElement child : call.getChildren()) {
+            ASTNode node = child.getNode();
+            if (node == null) continue;
+            if (node.getElementType() == FileMakerCalculationElementType.ARG_LIST) {
+                int i = 0;
+                for (PsiElement argChild : child.getChildren()) {
+                    ASTNode n = argChild.getNode();
+                    if (n != null && n.getElementType() == FileMakerCalculationElementType.ARGUMENT) {
+                        if (i == index) return argChild;
+                        i++;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    private static java.util.Set<String> extractLetBindingNames(PsiElement bindingsArg) {
+        String text = bindingsArg.getText();
+        java.util.Set<String> names = new java.util.LinkedHashSet<>();
+        if (text == null || text.isEmpty()) return names;
+        // Heuristic: find tokens that look like identifiers or $/$$ vars immediately followed by '='
+        java.util.regex.Pattern p = java.util.regex.Pattern.compile("(?m)(?:^|\\[|;|\\s)\\s*([\u0024]{0,2}[A-Za-z_][A-Za-z0-9_]*)\\s*=");
+        java.util.regex.Matcher m = p.matcher(text);
+        while (m.find()) {
+            String name = m.group(1);
+            if (name != null && !name.isEmpty()) names.add(name);
+        }
+        return names;
+    }
+
+    private static class LetScope {
+        final TextRange range;
+        final java.util.Set<String> definedNames;
+        LetScope(TextRange range, java.util.Set<String> names) {
+            this.range = range;
+            this.definedNames = names;
+        }
     }
 
     private static void validateFunctions(@NotNull PsiElement root, @NotNull AnnotationHolder holder) {
