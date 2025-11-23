@@ -122,6 +122,13 @@ public class ConvertClipboardToXmlAction extends AnAction {
                 "Success: Converted FileMaker clipboard content to XML and placed it on the clipboard.");
     }
 
+    @Override
+    public void update(@NotNull AnActionEvent e) {
+        // Hidden from menus per requirement; keep action registered for internal use/tests
+        e.getPresentation().setVisible(false);
+        e.getPresentation().setEnabled(false);
+    }
+
     private static String safeMessage(Throwable t) {
         String msg = t.getMessage();
         return (msg == null || msg.isBlank()) ? t.getClass().getSimpleName() : msg;

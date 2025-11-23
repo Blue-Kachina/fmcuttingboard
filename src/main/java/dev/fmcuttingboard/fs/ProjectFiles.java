@@ -78,11 +78,11 @@ public final class ProjectFiles {
 
     // ----- Phase 4.2 — Timestamped XML File Creation -----
     /**
-     * Generates a timestamp-based filename with the default prefix and .xml extension.
-     * Default format: "fmclip-{timestamp}.xml" where timestamp is epoch milliseconds.
+     * Generates a timestamp-based filename with .xml extension.
+     * Default format: "{timestamp}.xml" where timestamp is epoch milliseconds.
      */
     public static String generateTimestampedXmlFileName() {
-        return "fmclip-" + System.currentTimeMillis() + ".xml";
+        return System.currentTimeMillis() + ".xml";
     }
 
     /**
@@ -146,7 +146,7 @@ public final class ProjectFiles {
     /**
      * Creates a new empty XML file using a settings-provided base directory and filename pattern.
      * Supported pattern tokens: {timestamp} (epoch millis). Any other text remains literal.
-     * If pattern is null/blank, defaults to fmclip-{timestamp}.xml
+     * If pattern is null/blank, defaults to {timestamp} (extension automatically appended).
      */
     public static Path createSettingsBasedXmlFile(Path projectRoot, String baseDirName, String fileNamePattern) throws IOException {
         if (projectRoot == null) throw new IllegalArgumentException("projectRoot must not be null");
@@ -154,7 +154,7 @@ public final class ProjectFiles {
         Path dir = res.directory();
 
         String pattern = (fileNamePattern == null || fileNamePattern.isBlank())
-                ? "fmclip-{timestamp}.xml"
+                ? "{timestamp}"
                 : fileNamePattern;
         String baseName = pattern.replace("{timestamp}", String.valueOf(System.currentTimeMillis()));
         if (!baseName.endsWith(".xml")) {

@@ -58,9 +58,9 @@
         <annotator language="FileMakerCalculation"
                    implementationClass="dev.fmcuttingboard.language.validation.FileMakerCalculationAnnotator"/>
 
-        <!-- Parameter hints for functions -->
-        <lang.parameterInfo language="FileMakerCalculation"
-                            implementationClass="dev.fmcuttingboard.language.hints.FileMakerCalculationParameterInfoHandler"/>
+        <!-- Parameter hints for functions (temporarily disabled to stabilize settings UI). -->
+        <!-- <lang.parameterInfo language="FileMakerCalculation"
+                            implementationClass="dev.fmcuttingboard.language.hints.FileMakerCalculationParameterInfoHandler"/> -->
 
         <!-- Enable Reformat Code for fmcalc (minimal formatting model) -->
         <lang.formatter language="FileMakerCalculation"
@@ -85,6 +85,9 @@
 
     </extensions>
 
+    <!-- Ensure language features EPs are available -->
+    <depends>com.intellij.modules.lang</depends>
+
     <!-- Phase 1.1: Register base actions group under Tools menu -->
     <actions>
         <group id="dev.fmcuttingboard.toolsGroup"
@@ -93,23 +96,34 @@
                popup="true"
                icon="/icons/pluginIcon16.svg">
             <add-to-group group-id="ToolsMenu" anchor="last"/>
-            <!-- Phase 1.2: Register submenu actions -->
+            <!-- Phase 1.2: Register submenu actions (some are hidden by update() methods) -->
             <action id="dev.fmcuttingboard.actions.ConvertClipboardToXml"
                     class="dev.fmcuttingboard.actions.ConvertClipboardToXmlAction"
                     text="Convert FM Clipboard To XML Clipboard"
                     description="Convert FileMaker clipboard contents to XML and place on clipboard">
-                <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt C" second-keystroke="X"/>
-                <!-- Phase 7.2: Quick access in context menus -->
-                <add-to-group group-id="EditorPopupMenu" anchor="last"/>
-                <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
+                <!-- Shortcuts removed; item hidden via update() -->
             </action>
 
             <action id="dev.fmcuttingboard.actions.ReadClipboardIntoNewXmlFile"
                     class="dev.fmcuttingboard.actions.ReadClipboardIntoNewXmlFileAction"
                     text="New XML File From FM Clipboard"
                     description="Create a new XML file from the current clipboard contents">
-                <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt C" second-keystroke="F"/>
-                <!-- Phase 7.2: Quick access in context menus -->
+                <!-- Shortcuts removed; item hidden via update() -->
+            </action>
+
+            <action id="dev.fmcuttingboard.actions.GetFileMakerCalculationFromClipboard"
+                    class="dev.fmcuttingboard.actions.GetFileMakerCalculationFromClipboardAction"
+                    text="Get FileMaker Calculation From Clipboard"
+                    description="Create a new .fmcalc file from text on the clipboard and open it">
+                <!-- Shortcuts removed; item hidden via update() -->
+            </action>
+
+            <!-- New smart action replacing the above three in menus -->
+            <action id="dev.fmcuttingboard.actions.GetFileMakerClipboardContent"
+                    class="dev.fmcuttingboard.actions.GetFileMakerClipboardContentAction"
+                    text="Get FileMaker Clipboard Content"
+                    description="Smartly process FileMaker clipboard content: save XML or create .fmcalc, and replace clipboard with XML when applicable">
+                <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt C" second-keystroke="X"/>
                 <add-to-group group-id="EditorPopupMenu" anchor="last"/>
                 <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
             </action>

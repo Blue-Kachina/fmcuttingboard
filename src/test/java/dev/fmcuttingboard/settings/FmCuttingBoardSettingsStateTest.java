@@ -10,7 +10,7 @@ class FmCuttingBoardSettingsStateTest {
     void defaultsAreApplied() {
         FmCuttingBoardSettingsState state = new FmCuttingBoardSettingsState();
         assertEquals(".fmCuttingBoard", state.getBaseDirName());
-        assertEquals("fmclip-{timestamp}.xml", state.getFileNamePattern());
+        assertEquals("{timestamp}", state.getFileNamePattern());
     }
 
     @Test
@@ -21,7 +21,7 @@ class FmCuttingBoardSettingsStateTest {
         raw.fileNamePattern = null; // null should default
         s.loadState(raw);
         assertEquals(".fmCuttingBoard", s.getBaseDirName());
-        assertEquals("fmclip-{timestamp}.xml", s.getFileNamePattern());
+        assertEquals("{timestamp}", s.getFileNamePattern());
     }
 
     @Test
@@ -30,7 +30,7 @@ class FmCuttingBoardSettingsStateTest {
         s.setBaseDirName("");
         s.setFileNamePattern("");
         assertEquals(".fmCuttingBoard", s.getBaseDirName());
-        assertEquals("fmclip-{timestamp}.xml", s.getFileNamePattern());
+        assertEquals("{timestamp}", s.getFileNamePattern());
 
         s.setBaseDirName("clips");
         s.setFileNamePattern("my-{timestamp}.xml");

@@ -19,6 +19,7 @@ public class FmCuttingBoardConfigurable implements Configurable {
     private JTextField filePatternField;
     private JLabel helpLabel;
     private JCheckBox previewBeforeClipboardWriteCheckbox;
+    private JCheckBox enableDiagnosticsCheckbox;
 
     public FmCuttingBoardConfigurable(Project project) {
         this.project = project;
@@ -54,9 +55,13 @@ public class FmCuttingBoardConfigurable implements Configurable {
             previewBeforeClipboardWriteCheckbox = new JCheckBox("Show preview confirmation before writing to clipboard");
             fields.add(previewBeforeClipboardWriteCheckbox, gc);
 
+            gc.gridx = 0; gc.gridy = 3; gc.gridwidth = 2; gc.weightx = 1; gc.fill = GridBagConstraints.HORIZONTAL; gc.anchor = GridBagConstraints.LINE_START;
+            enableDiagnosticsCheckbox = new JCheckBox("Enable Diagnostics");
+            fields.add(enableDiagnosticsCheckbox, gc);
+
             mainPanel.add(fields, BorderLayout.NORTH);
 
-            helpLabel = new JLabel("Use {timestamp} for epoch millis. Defaults: .fmCuttingBoard and fmclip-{timestamp}.xml");
+            helpLabel = new JLabel("Use {timestamp} for epoch millis. Defaults: .fmCuttingBoard and {timestamp}. Extensions (.xml, .fmcalc) are added automatically.");
             helpLabel.setForeground(new Color(90, 90, 90));
             mainPanel.add(helpLabel, BorderLayout.SOUTH);
         }
@@ -71,7 +76,8 @@ public class FmCuttingBoardConfigurable implements Configurable {
         String bd = baseDirField.getText().trim();
         String pat = filePatternField.getText().trim();
         boolean preview = previewBeforeClipboardWriteCheckbox.isSelected();
-        return !bd.equals(st.getBaseDirName()) || !pat.equals(st.getFileNamePattern()) || preview != st.isPreviewBeforeClipboardWrite();
+        boolean diag = enableDiagnosticsCheckbox.isSelected();
+        return !bd.equals(st.getBaseDirName()) || !pat.equals(st.getFileNamePattern()) || preview != st.isPreviewBeforeClipboardWrite() || diag != st.isEnableDiagnostics();
     }
 
     @Override
@@ -80,6 +86,7 @@ public class FmCuttingBoardConfigurable implements Configurable {
         st.setBaseDirName(baseDirField.getText().trim());
         st.setFileNamePattern(filePatternField.getText().trim());
         st.setPreviewBeforeClipboardWrite(previewBeforeClipboardWriteCheckbox.isSelected());
+        st.setEnableDiagnostics(enableDiagnosticsCheckbox.isSelected());
     }
 
     @Override
@@ -88,6 +95,7 @@ public class FmCuttingBoardConfigurable implements Configurable {
         baseDirField.setText(st.getBaseDirName());
         filePatternField.setText(st.getFileNamePattern());
         previewBeforeClipboardWriteCheckbox.setSelected(st.isPreviewBeforeClipboardWrite());
+        enableDiagnosticsCheckbox.setSelected(st.isEnableDiagnostics());
     }
 
     @Override
@@ -97,5 +105,6 @@ public class FmCuttingBoardConfigurable implements Configurable {
         filePatternField = null;
         helpLabel = null;
         previewBeforeClipboardWriteCheckbox = null;
+        enableDiagnosticsCheckbox = null;
     }
 }

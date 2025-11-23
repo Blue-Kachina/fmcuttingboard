@@ -40,8 +40,10 @@ public class InsertMissingSemicolonsInArgumentsIntention implements IntentionAct
         // Heuristic: if caret is inside parentheses region and there exists a newline not preceded by ';'
         int offset = editor.getCaretModel().getOffset();
         CharSequence text = editor.getDocument().getCharsSequence();
-        int lparen = findMatchingLeftParen(text, offset);
-        int rparen = findRightParen(text, offset);
+        if (text.length() == 0) return false;
+        int safeOffset = Math.max(0, Math.min(offset, text.length() - 1));
+        int lparen = findMatchingLeftParen(text, safeOffset);
+        int rparen = findRightParen(text, safeOffset);
         if (lparen < 0 || rparen < 0 || rparen <= lparen) return false;
         return hasLineBreakMissingSemicolon(text, lparen + 1, rparen);
     }
@@ -50,9 +52,11 @@ public class InsertMissingSemicolonsInArgumentsIntention implements IntentionAct
     public void invoke(@NotNull Project project, Editor editor, PsiFile file) throws IncorrectOperationException {
         Document document = editor.getDocument();
         CharSequence text = document.getCharsSequence();
+        if (text.length() == 0) return;
         int offset = editor.getCaretModel().getOffset();
-        int lparen = findMatchingLeftParen(text, offset);
-        int rparen = findRightParen(text, offset);
+        int safeOffset = Math.max(0, Math.min(offset, text.length() - 1));
+        int lparen = findMatchingLeftParen(text, safeOffset);
+        int rparen = findRightParen(text, safeOffset);
         if (lparen < 0 || rparen < 0 || rparen <= lparen) return;
 
         // Insert semicolons before line breaks that separate arguments
@@ -114,7 +118,10 @@ public class InsertMissingSemicolonsInArgumentsIntention implements IntentionAct
     }
 
     private static int previousNonSpace(CharSequence text, int idx, int lowerBound) {
-        for (int i = idx; i >= lowerBound; i--) {
+        if (text.length() == 0) return -1;
+        int iStart = Math.min(idx, text.length() - 1);
+        int lb = Math.max(0, lowerBound);
+        for (int i = iStart; i >= lb; i--) {
             char c = text.charAt(i);
             if (!Character.isWhitespace(c)) return i;
         }
@@ -123,7 +130,9 @@ public class InsertMissingSemicolonsInArgumentsIntention implements IntentionAct
 
     private static int findRightParen(CharSequence text, int from) {
         int n = text.length();
-        for (int i = from; i < n; i++) {
+        if (n == 0) return -1;
+        int start = Math.max(0, Math.min(from, n));
+        for (int i = start; i < n; i++) {
             char c = text.charAt(i);
             if (c == ')') return i;
         }
@@ -131,7 +140,10 @@ public class InsertMissingSemicolonsInArgumentsIntention implements IntentionAct
     }
 
     private static int findMatchingLeftParen(CharSequence text, int from) {
-        for (int i = from; i >= 0; i--) {
+        int n = text.length();
+        if (n == 0) return -1;
+        int start = Math.min(from, n - 1);
+        for (int i = start; i >= 0; i--) {
             char c = text.charAt(i);
             if (c == '(') return i;
         }

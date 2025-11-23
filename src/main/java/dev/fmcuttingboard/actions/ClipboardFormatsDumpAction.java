@@ -3,6 +3,8 @@ package dev.fmcuttingboard.actions;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.project.Project;
+import dev.fmcuttingboard.settings.FmCuttingBoardSettingsState;
 import org.jetbrains.annotations.NotNull;
 
 import com.sun.jna.Native;
@@ -102,6 +104,23 @@ public class ClipboardFormatsDumpAction extends AnAction {
                 try { User32.INSTANCE.CloseClipboard(); } catch (Throwable ignore) {}
             }
         }
+    }
+
+    @Override
+    public void update(@NotNull AnActionEvent e) {
+        // Show this diagnostics action only when the user has enabled diagnostics in settings
+        Project project = e.getProject();
+        boolean enabled = false;
+        try {
+            if (project != null) {
+                FmCuttingBoardSettingsState st = FmCuttingBoardSettingsState.getInstance(project);
+                enabled = st != null && st.isEnableDiagnostics();
+            }
+        } catch (Throwable ignore) {
+            enabled = false;
+        }
+        e.getPresentation().setVisible(enabled);
+        e.getPresentation().setEnabled(enabled);
     }
 
     private static String getFormatName(int id) {

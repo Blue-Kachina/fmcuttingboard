@@ -136,6 +136,13 @@ public class ReadClipboardIntoNewXmlFileAction extends AnAction {
         }
     }
 
+    @Override
+    public void update(@NotNull AnActionEvent e) {
+        // Hidden from menus per requirement; keep action registered for internal use/tests
+        e.getPresentation().setVisible(false);
+        e.getPresentation().setEnabled(false);
+    }
+
     // Package-private for testing: writes provided xml to new settings-based file under projectRoot
     Path processIntoNewXmlFile(Project project, Path projectRoot, String xml) throws IOException {
         // Try to use settings; fall back to defaults if unavailable.
