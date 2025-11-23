@@ -5,6 +5,7 @@ import com.intellij.lang.parameterInfo.*;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
+import com.intellij.psi.util.PsiUtilCore;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -13,12 +14,13 @@ import java.util.Locale;
 import dev.fmcuttingboard.language.FileMakerFunctionRegistry;
 import dev.fmcuttingboard.language.FunctionMetadata;
 import dev.fmcuttingboard.language.FunctionParameter;
+import dev.fmcuttingboard.language.psi.FileMakerPsiUtil;
 
 /**
  * Advanced IDE Feature: Parameter hints for functions (Post-MVP).
  *
- * Lightweight implementation that parses the document text around the caret to detect a function call
- * and shows a simple signature with the current argument highlighted. Works without a full PSI grammar.
+ * Updated to use PSI-based traversal to detect enclosing function call and current argument index,
+ * leveraging Phase 4 structured PSI.
  */
 public class FileMakerCalculationParameterInfoHandler implements ParameterInfoHandler<PsiElement, String> {
 
@@ -26,16 +28,16 @@ public class FileMakerCalculationParameterInfoHandler implements ParameterInfoHa
     public @Nullable PsiElement findElementForParameterInfo(@NotNull CreateParameterInfoContext context) {
         PsiFile file = context.getFile();
         int offset = context.getOffset();
-        CharSequence text = file.getViewProvider().getContents();
-
-        CallInfo call = findEnclosingCall(text, offset);
+        PsiElement at = file.findElementAt(Math.max(0, Math.min(offset, file.getTextLength() - 1)));
+        if (at == null && offset > 0) at = file.findElementAt(offset - 1);
+        FileMakerPsiUtil.FunctionCallInfo call = FileMakerPsiUtil.getEnclosingFunctionCall(at);
         if (call == null) return null;
 
-        String signature = buildSignature(call.functionName);
+        String signature = buildSignature(call.name);
         if (signature == null) return null;
 
         context.setItemsToShow(new Object[]{signature});
-        return file; // use file as anchor element
+        return call.callElement; // use the function call PSI as anchor
     }
 
     @Override
@@ -45,15 +47,22 @@ public class FileMakerCalculationParameterInfoHandler implements ParameterInfoHa
 
     @Override
     public @Nullable PsiElement findElementForUpdatingParameterInfo(@NotNull UpdateParameterInfoContext context) {
-        return context.getFile();
+        PsiFile file = context.getFile();
+        int offset = context.getEditor().getCaretModel().getOffset();
+        PsiElement at = file.findElementAt(Math.max(0, Math.min(offset, file.getTextLength() - 1)));
+        if (at == null && offset > 0) at = file.findElementAt(offset - 1);
+        FileMakerPsiUtil.FunctionCallInfo call = FileMakerPsiUtil.getEnclosingFunctionCall(at);
+        return call != null ? call.callElement : null;
     }
 
     @Override
     public void updateParameterInfo(@NotNull PsiElement element, @NotNull UpdateParameterInfoContext context) {
         Editor editor = context.getEditor();
-        CharSequence text = context.getFile().getViewProvider().getContents();
-        CallInfo call = findEnclosingCall(text, editor.getCaretModel().getOffset());
-        int paramIndex = call != null ? call.paramIndex : 0;
+        PsiFile file = context.getFile();
+        PsiElement at = file.findElementAt(Math.max(0, Math.min(editor.getCaretModel().getOffset(), file.getTextLength() - 1)));
+        if (at == null && editor.getCaretModel().getOffset() > 0) at = file.findElementAt(editor.getCaretModel().getOffset() - 1);
+        FileMakerPsiUtil.FunctionCallInfo call = FileMakerPsiUtil.getEnclosingFunctionCall(at);
+        int paramIndex = (call != null && call.argIndex >= 0) ? call.argIndex : 0;
         context.setCurrentParameter(paramIndex);
     }
 
@@ -84,44 +93,6 @@ public class FileMakerCalculationParameterInfoHandler implements ParameterInfoHa
 
     // Note: Deprecated ParameterInfoHandler API methods (getParametersForLookup, getParametersForDocumentation,
     // couldShowInLookup, getHelpId) were intentionally omitted to align with modern IntelliJ Platform SDK.
-
-    // Helpers
-    private static class CallInfo {
-        final String functionName;
-        final int paramIndex;
-        CallInfo(String fn, int idx) { this.functionName = fn; this.paramIndex = idx; }
-    }
-
-    private static @Nullable CallInfo findEnclosingCall(CharSequence text, int offset) {
-        int i = Math.min(offset, text.length());
-        // Find preceding '('
-        int open = -1;
-        for (int p = i - 1; p >= 0; p--) {
-            char c = text.charAt(p);
-            if (c == '(') { open = p; break; }
-            if (c == ';' || c == '\n') break; // bail out unlikely
-        }
-        if (open < 1) return null;
-        // Find function name before '('
-        int end = open;
-        int start = end - 1;
-        while (start >= 0) {
-            char c = text.charAt(start);
-            if (Character.isLetterOrDigit(c) || c == '_') start--; else break;
-        }
-        start++;
-        if (start >= end) return null;
-        String fn = text.subSequence(start, end).toString();
-        // Compute parameter index inside parentheses
-        int idx = 0; int depth = 0;
-        for (int p = open + 1; p < i; p++) {
-            char c = text.charAt(p);
-            if (c == '(') depth++;
-            else if (c == ')') { if (depth == 0) break; depth--; }
-            else if ((c == ';' || c == ',') && depth == 0) idx++;
-        }
-        return new CallInfo(fn, idx);
-    }
 
     private static @Nullable String buildSignature(String functionNameRaw) {
         String fn = functionNameRaw.trim();
