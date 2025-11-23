@@ -22,7 +22,7 @@ import java.util.List;
 /**
  * Phase 2 – Enhanced Code Completion
  * 2.1 Context-Aware Completion using FileMakerFunctionRegistry
- * 2.2 Smart insertion with parameter placeholders via IntelliJ Live Templates
+ * 2.2 Smart insertion with parameter placeholders via IntelliJ Live Templates (implemented)
  */
 public class FileMakerCalculationCompletionContributor extends CompletionContributor {
 
