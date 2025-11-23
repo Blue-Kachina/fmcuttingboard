@@ -161,11 +161,11 @@ This roadmap outlines the implementation of FileMaker Calculation language suppo
 
 ### 5.2 Edge Cases
 - [x] Test calculations with mixed case keywords (should be case-sensitive)
-- [ ] Test multi-line calculations
-- [ ] Test calculations with special characters
-- [ ] Test Unicode in strings (Japanese characters for Japanese functions)
-- [ ] Test unterminated strings/comments
-- [ ] Test empty files
+ - [x] Test multi-line calculations
+ - [ ] Test calculations with special characters
+ - [ ] Test Unicode in strings (Japanese characters for Japanese functions)
+ - [ ] Test unterminated strings/comments
+ - [ ] Test empty files
 
 ### 5.3 Integration Testing
 - [ ] Verify plugin loads without errors

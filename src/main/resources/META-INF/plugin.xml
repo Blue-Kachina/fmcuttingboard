@@ -40,6 +40,30 @@
         <!-- Phase 3.2: Register syntax highlighter factory for FileMaker Calculation language -->
         <lang.syntaxHighlighterFactory language="FileMakerCalculation"
                                        implementationClass="dev.fmcuttingboard.language.FileMakerCalculationSyntaxHighlighterFactory"/>
+
+        <!-- Advanced IDE Features (Post-MVP) -->
+        <!-- Code completion for FileMaker functions -->
+        <completion.contributor language="FileMakerCalculation"
+                                implementationClass="dev.fmcuttingboard.language.completion.FileMakerCalculationCompletionContributor"/>
+
+        <!-- Parameter hints for functions -->
+        <lang.parameterInfo language="FileMakerCalculation"
+                            implementationClass="dev.fmcuttingboard.language.hints.FileMakerCalculationParameterInfoHandler"/>
+
+        <!-- Brace matching for parentheses and brackets -->
+        <lang.braceMatcher language="FileMakerCalculation"
+                           implementationClass="dev.fmcuttingboard.language.match.FileMakerCalculationBraceMatcher"/>
+
+        <!-- Code folding for Let(), Case(), If() blocks -->
+        <lang.foldingBuilder language="FileMakerCalculation"
+                             implementationClass="dev.fmcuttingboard.language.folding.FileMakerCalculationFoldingBuilder"/>
+
+        <!-- Error detection for invalid syntax (basic annotator) -->
+        <annotator language="FileMakerCalculation"
+                   implementationClass="dev.fmcuttingboard.language.validation.FileMakerCalculationAnnotator"/>
+
+        <!-- Live templates provider for common calculation patterns -->
+        <defaultLiveTemplates provider="dev.fmcuttingboard.language.templates.FileMakerCalculationLiveTemplatesProvider"/>
     </extensions>
 
     <!-- Phase 1.1: Register base actions group under Tools menu -->
