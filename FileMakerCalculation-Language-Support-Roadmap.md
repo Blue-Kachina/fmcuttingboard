@@ -197,10 +197,10 @@ This roadmap outlines the implementation of FileMaker Calculation language suppo
 ## Optional Future Enhancements
 
 ### Advanced IDE Features (Post-MVP)
-- [ ] Code completion for FileMaker functions
+- [x] Code completion for FileMaker functions
 - [ ] Parameter hints for functions
 - [ ] Error detection for invalid syntax
-- [ ] Brace matching for parentheses and brackets
+- [x] Brace matching for parentheses and brackets
 - [ ] Code folding for `Let()`, `Case()`, `If()` blocks
 - [ ] Live templates for common calculation patterns
 - [ ] Integration with existing FileMaker clipboard features

@@ -134,8 +134,15 @@ import com.intellij.psi.tree.IElementType;
   "Case"|"Choose"|"Evaluate"|"EvaluationError"|"If"|"IsEmpty"|"IsValid"|"IsValidExpression"|"Combination"|"Extend"|"External"|"Factorial"|"GetNextSerialValue"|"Last"|"Let"|"PatternCount"|"Random"|"RGB"|"Self"|"SerialIncrement"|"SetPrecision"
                                { return FileMakerCalculationTokenType.KEYWORD_FUNCTION; }
 
-  // Operators and punctuation
-  [\+\-\*\/=\^<>&;,()\[\]{}] { return FileMakerCalculationTokenType.OPERATOR; }
+  // Operators
+  [\+\-\*\/=\^<>&;,] { return FileMakerCalculationTokenType.OPERATOR; }
+  // Braces and parentheses as distinct tokens (for brace matcher/folding)
+  "(" { return FileMakerCalculationTokenType.LPAREN; }
+  ")" { return FileMakerCalculationTokenType.RPAREN; }
+  "[" { return FileMakerCalculationTokenType.LBRACKET; }
+  "]" { return FileMakerCalculationTokenType.RBRACKET; }
+  "{" { return FileMakerCalculationTokenType.LBRACE; }
+  "}" { return FileMakerCalculationTokenType.RBRACE; }
   "≠"|"≤"|"≥"                 { return FileMakerCalculationTokenType.OPERATOR; }
 
   // Identifier

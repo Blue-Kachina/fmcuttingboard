@@ -24,6 +24,14 @@ public final class FileMakerCalculationTokenType {
     public static final IElementType BLOCK_COMMENT = token("BLOCK_COMMENT");
     public static final IElementType OPERATOR = token("OPERATOR");
 
+    // Braces and punctuation (for brace matching/folding)
+    public static final IElementType LPAREN = token("LPAREN");
+    public static final IElementType RPAREN = token("RPAREN");
+    public static final IElementType LBRACKET = token("LBRACKET");
+    public static final IElementType RBRACKET = token("RBRACKET");
+    public static final IElementType LBRACE = token("LBRACE");
+    public static final IElementType RBRACE = token("RBRACE");
+
     // Keyword groups (Phase 2.1)
     public static final IElementType KEYWORD_CONTROL = token("KEYWORD_CONTROL"); // if, case
     public static final IElementType KEYWORD_LOGICAL = token("KEYWORD_LOGICAL"); // and, or, not
