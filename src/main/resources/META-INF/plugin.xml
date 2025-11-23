@@ -78,6 +78,11 @@
             <className>dev.fmcuttingboard.language.intentions.ReplaceCommaWithSemicolonIntention</className>
         </intentionAction>
 
+        <!-- Phase 6.2: Quick Fix - Insert missing semicolons in stacked argument lists -->
+        <intentionAction>
+            <className>dev.fmcuttingboard.language.intentions.InsertMissingSemicolonsInArgumentsIntention</className>
+        </intentionAction>
+
     </extensions>
 
     <!-- Phase 1.1: Register base actions group under Tools menu -->

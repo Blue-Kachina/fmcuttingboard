@@ -1,0 +1,27 @@
+<html>
+<body>
+<h2>Insert missing semicolons between function arguments</h2>
+<p>
+FileMaker calculations separate function parameters with semicolons (;). When writing
+arguments on separate lines (stacked style), it’s easy to forget the semicolon before a newline.
+This intention inserts the missing semicolons for you inside the current parentheses pair.
+</p>
+<p>Examples:</p>
+<pre>
+If (
+  test
+  resultTrue
+  resultFalse
+)
+
+becomes
+
+If (
+  test;
+  resultTrue;
+  resultFalse
+)
+</pre>
+<p>Place the caret anywhere inside the parentheses of a function call with stacked arguments and invoke the intention.</p>
+</body>
+</html>
