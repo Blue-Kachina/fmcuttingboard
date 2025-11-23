@@ -224,7 +224,7 @@ This roadmap outlines the implementation of FileMaker Calculation language suppo
 - `.fmcalc` - FileMaker Calculation files
 
 **Case Sensitivity:**
-- Language is case-sensitive (per Notepad++ XML: `caseIgnored="no"`)
+- Language is not case-sensitive (despite Notepad++ XML: `caseIgnored="no"`)
 
 **Estimated Effort:**
 - Phase 1: 2-3 hours
