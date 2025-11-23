@@ -16,7 +16,7 @@
 - Extract all functions from:
   - `FileMakerCalcs_InNotepadPlusPlus.xml` (~200 functions in Words4)
   - `filemaker-vscode-bundle-master/syntaxes/FileMaker.tmLanguage` (line 77: 280+ functions)
-  - `filemaker-vscode-bundle-master/snippets/filemaker.json` (detailed signatures with parameters)
+  - resources/filemaker_functions.json (copy of the VSCode snippets with detailed signatures and parameters)
 - Cross-reference with official FileMaker documentation to ensure completeness
 - Create comprehensive function registry
 
@@ -150,7 +150,7 @@ Refinement (2025‑11‑23):
 **Goal:** Rapid calculation authoring
 
 ### 7.1 Port VSCode Snippets
-- Convert snippets from `filemaker-vscode-bundle-master/snippets/filemaker.json`
+- Convert snippets from `resources/filemaker_functions.json`
 - Create IntelliJ Live Templates
 - Include both inline and stacked variants (Let, Case, If, ExecuteSQL, etc.)
 

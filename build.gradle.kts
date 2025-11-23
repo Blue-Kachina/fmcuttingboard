@@ -122,6 +122,18 @@ sourceSets {
         java {
             srcDir(generatedDir)
         }
+        resources {
+            // Include repository-level resources for runtime access to curated metadata
+            srcDir("resources")
+        }
+    }
+    test {
+        resources {
+            // Add repository-level "resources" directory to test runtime classpath so tests can
+            // read the VSCode snippets JSON via classpath instead of filesystem-relative paths.
+            // This avoids NoSuchFileException in CI where the working directory may differ.
+            srcDir("resources")
+        }
     }
 }
 

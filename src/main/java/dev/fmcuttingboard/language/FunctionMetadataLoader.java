@@ -39,7 +39,7 @@ public final class FunctionMetadataLoader {
     }
 
     /**
-     * Best-effort parser for VSCode snippet JSON (resources/filemaker-vscode-bundle-master/snippets/filemaker.json).
+     * Best-effort parser for VSCode snippet JSON (resources/filemaker_functions.json).
      *
      * This implementation purposefully avoids introducing a JSON library dependency. It uses regex to
      * extract entries of the form:
@@ -177,6 +177,29 @@ public final class FunctionMetadataLoader {
             // Filter out templated variants like "Case [inline]" → normalize to base name before first space
             String normalized = key.contains(" ") ? key.substring(0, key.indexOf(' ')) : key;
             names.add(normalized);
+        }
+        return names;
+    }
+
+    /**
+     * Extract function names from our curated JSON (resources/filemaker_functions.json).
+     * Minimal JSON parsing without external libraries. Expected shape:
+     * { "functions": [ "If", "Case", "Get(WindowWidth)", ... ] }
+     */
+    public static @NotNull java.util.Set<String> extractFunctionNamesFromCuratedJson(@NotNull String jsonText) {
+        java.util.Set<String> names = new java.util.LinkedHashSet<>();
+        // Find the functions array content between [ and ] after the "functions" key
+        java.util.regex.Matcher arrayMatcher = java.util.regex.Pattern.compile(
+                "\\\"functions\\\"\\s*:\\s*\\[(.*?)]",
+                java.util.regex.Pattern.DOTALL).matcher(jsonText);
+        if (arrayMatcher.find()) {
+            String arr = arrayMatcher.group(1);
+            java.util.regex.Matcher item = java.util.regex.Pattern.compile("\\\"(.*?)\\\"",
+                    java.util.regex.Pattern.DOTALL).matcher(arr);
+            while (item.find()) {
+                String name = item.group(1).trim();
+                if (!name.isEmpty()) names.add(name);
+            }
         }
         return names;
     }
