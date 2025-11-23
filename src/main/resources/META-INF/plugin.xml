@@ -58,6 +58,9 @@
         <annotator language="FileMakerCalculation"
                    implementationClass="dev.fmcuttingboard.language.validation.FileMakerCalculationAnnotator"/>
 
+        <!-- Parameter hints for functions -->
+        <lang.parameterInfo language="FileMakerCalculation"
+                            implementationClass="dev.fmcuttingboard.language.hints.FileMakerCalculationParameterInfoHandler"/>
     </extensions>
 
     <!-- Phase 1.1: Register base actions group under Tools menu -->
