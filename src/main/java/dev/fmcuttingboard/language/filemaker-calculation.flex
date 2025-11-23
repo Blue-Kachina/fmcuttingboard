@@ -45,6 +45,7 @@ import com.intellij.psi.tree.IElementType;
   "and"                       { return FileMakerCalculationTokenType.KEYWORD_LOGICAL; }
   "or"                        { return FileMakerCalculationTokenType.KEYWORD_LOGICAL; }
   "not"                       { return FileMakerCalculationTokenType.KEYWORD_LOGICAL; }
+  "xor"                       { return FileMakerCalculationTokenType.KEYWORD_LOGICAL; }
 
   // Keywords Group 3 - Type Keywords
   "boolean"                   { return FileMakerCalculationTokenType.KEYWORD_TYPE; }
@@ -109,6 +110,13 @@ import com.intellij.psi.tree.IElementType;
    *   Get(WindowMode), Get(WindowName), Get(WindowTop), Get(WindowVisible), Get(WindowWidth),
    *   Get(WindowZoomLevel)
    */
+   // FileMaker constants
+   "True"|"true"|"False"|"false" { return FileMakerCalculationTokenType.KEYWORD_TYPE; }
+   "JSONArray"|"JSONBoolean"|"JSONNull"|"JSONNumber"|"JSONObject"|"JSONRaw"|"JSONString"
+                                { return FileMakerCalculationTokenType.KEYWORD_TYPE; }
+
+   // Script variables ($local, $$global)
+   ("$$"|"$")[A-Za-z_][A-Za-z0-9_]* { return FileMakerCalculationTokenType.IDENTIFIER; }
   // Field/database functions
   "DatabaseNames"|"FieldBounds"|"FieldComment"|"FieldIDs"|"FieldNames"|"FieldRepetitions"|"FieldStyle"|"FieldType"|"GetField"|"GetFieldName"|"GetNthRecord"|"GetRepetition"|"GetSummary"|"GetValue"|"Lookup"|"LookupNext"
                                { return FileMakerCalculationTokenType.KEYWORD_FUNCTION; }
@@ -135,6 +143,7 @@ import com.intellij.psi.tree.IElementType;
                                { return FileMakerCalculationTokenType.KEYWORD_FUNCTION; }
 
   // Operators
+  "<="|">="|"<>"     { return FileMakerCalculationTokenType.OPERATOR; }
   [\+\-\*\/=\^<>&;,] { return FileMakerCalculationTokenType.OPERATOR; }
   // Braces and parentheses as distinct tokens (for brace matcher/folding)
   "(" { return FileMakerCalculationTokenType.LPAREN; }

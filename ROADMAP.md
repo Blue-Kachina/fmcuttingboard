@@ -6,13 +6,8 @@
 - File type (.fmcalc) registered
 - Lexer with token types (keywords, functions, operators, comments, strings)
 - Syntax highlighting
-- Basic code completion
 - Brace matching
-- Code folding (Let, Case, If)
-- Error detection/validation
-- Parameter hints (basic)
-- Minimal formatting model (enables Reformat Code action)
-- PSI parser (flat/bootstrap implementation)
+- Code folding (Let, Case, If) (needs to be expanded to include other structures too)
 
 ## Phase 1: Complete Function Knowledge Base
 **Goal:** IDE knows ALL FileMaker functions with complete parameter metadata
@@ -98,30 +93,23 @@
 **Goal:** Reformat Code that produces human-readable calculations
 
 ### 5.1 Define Formatting Rules
-- [x] Map FileMaker constructs to JetBrains formatting concepts:
+- Map FileMaker constructs to JetBrains formatting concepts:
   - Block structures: Let(), Case(), If() → indentation blocks
   - Parameter separators (semicolons) → spacing rules
   - Operators → spacing rules
   - Line breaks → after opening brackets, before closing brackets in multi-line blocks
-  
-  Notes (Phase 5 minimal pass):
-  - With the current flat/bootstrap PSI, we implement conservative spacing rules via SpacingBuilder:
-    - Space after separators (comma/semicolon), none before
-    - Tight parentheses (no extra space after LPAREN or before RPAREN)
-    - Optional spaces around operators honoring IDE code style settings
-  - Indentation for structured blocks will be refined after Grammar-based PSI in Phase 4.3
 
 ### 5.2 Implement Formatting Model Builder
-- [x] Replace stub in `FileMakerCalculationFormattingModelBuilder`
-- [x] Create Block implementations for each PSI element type (temporary flat AST block traversal)
-- [x] Define spacing rules between tokens
-- [ ] Define indentation rules for nested structures (deferred until grammar PSI)
-- [ ] Handle alignment of parameters (deferred until grammar PSI)
+- Replace stub in `FileMakerCalculationFormattingModelBuilder`
+- Create Block implementations for each PSI element type
+- Define spacing rules between tokens
+- Define indentation rules for nested structures
+- Handle alignment of parameters
 
 ### 5.3 Code Style Settings
-- [x] Create configurable code style settings provider (LanguageCodeStyleSettingsProvider)
-- [x] Options: use platform common settings (indent size, spaces around operators, separator spacing)
-- [x] Integration with IDE's Code Style preferences
+- Create configurable code style settings UI
+- Options: indent size, space around operators, semicolon spacing, line wrapping
+- Integration with IDE's Code Style preferences
 
 ## Phase 6: Advanced Language Features
 **Goal:** IDE features matching mainstream languages
@@ -237,7 +225,7 @@
 
 - [ ] Phase 1: Complete Function Knowledge Base
   - [ ] 1.1 Consolidate Function Information
-  - [ ] 1.2 Build Function Metadata Registry
+  - [x] 1.2 Build Function Metadata Registry
   - [ ] 1.3 Update Lexer with Complete Function List
 - [ ] Phase 2: Enhanced Code Completion
 - [ ] Phase 3: Advanced Parameter Hints
