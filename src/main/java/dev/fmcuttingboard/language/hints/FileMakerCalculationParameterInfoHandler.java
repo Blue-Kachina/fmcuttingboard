@@ -3,7 +3,6 @@ package dev.fmcuttingboard.language.hints;
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.lang.parameterInfo.*;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import org.jetbrains.annotations.NotNull;
@@ -79,30 +78,8 @@ public class FileMakerCalculationParameterInfoHandler implements ParameterInfoHa
         );
     }
 
-    @Override
-    public @Nullable Object[] getParametersForLookup(@NotNull LookupElement item, @NotNull ParameterInfoContext context) {
-        return null;
-    }
-
-    @Override
-    public @Nullable Object[] getParametersForDocumentation(@NotNull String p, @NotNull ParameterInfoContext context) {
-        return null;
-    }
-
-    @Override
-    public boolean couldShowInLookup() {
-        return true;
-    }
-
-    @Override
-    public @NotNull String getParameterCloseChars() {
-        return ",);";
-    }
-
-    @Override
-    public @Nullable String getHelpId(@NotNull PsiElement element) {
-        return "editing.parameter.info";
-    }
+    // Note: Deprecated ParameterInfoHandler API methods (getParametersForLookup, getParametersForDocumentation,
+    // couldShowInLookup, getHelpId) were intentionally omitted to align with modern IntelliJ Platform SDK.
 
     // Helpers
     private static class CallInfo {

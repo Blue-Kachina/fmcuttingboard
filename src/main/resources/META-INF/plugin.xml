@@ -57,6 +57,7 @@
         <!-- Error detection for invalid syntax (basic annotator) -->
         <annotator language="FileMakerCalculation"
                    implementationClass="dev.fmcuttingboard.language.validation.FileMakerCalculationAnnotator"/>
+
     </extensions>
 
     <!-- Phase 1.1: Register base actions group under Tools menu -->
