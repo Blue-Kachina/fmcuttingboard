@@ -36,6 +36,10 @@
                   language="FileMakerCalculation"
                   implementationClass="dev.fmcuttingboard.language.FileMakerCalculationFileType"
                   extensions="fmcalc"/>
+
+        <!-- Phase 3.2: Register syntax highlighter factory for FileMaker Calculation language -->
+        <lang.syntaxHighlighterFactory language="FileMakerCalculation"
+                                       implementationClass="dev.fmcuttingboard.language.FileMakerCalculationSyntaxHighlighterFactory"/>
     </extensions>
 
     <!-- Phase 1.1: Register base actions group under Tools menu -->

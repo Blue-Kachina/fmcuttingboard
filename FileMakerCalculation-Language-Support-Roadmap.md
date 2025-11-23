@@ -110,8 +110,8 @@ This roadmap outlines the implementation of FileMaker Calculation language suppo
 - `src/main/java/com/fmcuttingboard/language/FileMakerCalculationSyntaxHighlighter.java`
 
 **Tasks:**
-- [ ] Create `FileMakerCalculationSyntaxHighlighter` implementing `SyntaxHighlighterBase`
-- [ ] Define `TextAttributesKey` constants matching Notepad++ colors:
+- [x] Create `FileMakerCalculationSyntaxHighlighter` implementing `SyntaxHighlighterBase`
+- [x] Define `TextAttributesKey` constants matching Notepad++ colors:
   - `KEYWORD_CONTROL_FLOW` → Blue, Bold (`#0000FF`)
   - `KEYWORD_LOGICAL` → Dark Blue, Bold (`#006699`)
   - `KEYWORD_TYPE` → Orange, Bold (`#FF8000`)
@@ -120,17 +120,17 @@ This roadmap outlines the implementation of FileMaker Calculation language suppo
   - `STRING` → Pink (`#DB599D`)
   - `NUMBER` → Red (`#FF0000`)
   - `OPERATOR` → Brown, Bold (`#804000`)
-- [ ] Implement `getTokenHighlights()` method to map tokens to attributes
-- [ ] Override `getHighlightingLexer()` to return FileMaker calculation lexer
+- [x] Implement `getTokenHighlights()` method to map tokens to attributes
+- [x] Override `getHighlightingLexer()` to return FileMaker calculation lexer
 
 ### 3.2 Syntax Highlighter Factory
 **File to create:**
 - `src/main/java/com/fmcuttingboard/language/FileMakerCalculationSyntaxHighlighterFactory.java`
 
 **Tasks:**
-- [ ] Create factory class implementing `SyntaxHighlighterFactory`
-- [ ] Override `getSyntaxHighlighter()` to return highlighter instance
-- [ ] Register factory in `plugin.xml` with `<syntaxHighlighter>` extension point
+- [x] Create factory class implementing `SyntaxHighlighterFactory`
+- [x] Override `getSyntaxHighlighter()` to return highlighter instance
+- [x] Register factory in `plugin.xml` with `<syntaxHighlighter>` extension point
 
 ---
 
