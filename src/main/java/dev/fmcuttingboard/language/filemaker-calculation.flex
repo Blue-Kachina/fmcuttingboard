@@ -148,6 +148,17 @@ import com.intellij.psi.tree.IElementType;
   "Case"|"Choose"|"Evaluate"|"EvaluationError"|"If"|"IsEmpty"|"IsValid"|"IsValidExpression"|"Combination"|"Extend"|"External"|"Factorial"|"GetNextSerialValue"|"Last"|"Let"|"PatternCount"|"Random"|"RGB"|"Self"|"SerialIncrement"|"SetPrecision"
                                { return FileMakerCalculationTokenType.KEYWORD_FUNCTION; }
 
+  // Additional core functions (Phase 1.3 – expanded coverage)
+  // JSON functions
+  "JSONSetElement"|"JSONGetElement"|"JSONDeleteElement"|"JSONListKeys"|"JSONListValues"|"JSONFormatElements"
+                               { return FileMakerCalculationTokenType.KEYWORD_FUNCTION; }
+  // Data conversion and encoding
+  "Base64Encode"|"Base64Decode"|"TextEncode"|"TextDecode"
+                               { return FileMakerCalculationTokenType.KEYWORD_FUNCTION; }
+  // Query and iteration
+  "ExecuteSQL"|"While"
+                               { return FileMakerCalculationTokenType.KEYWORD_FUNCTION; }
+
   // Operators
   "<="|">="|"<>"     { return FileMakerCalculationTokenType.OPERATOR; }
   [\+\-\*\/=\^<>&;,] { return FileMakerCalculationTokenType.OPERATOR; }

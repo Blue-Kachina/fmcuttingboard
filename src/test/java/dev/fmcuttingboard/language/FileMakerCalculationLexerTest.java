@@ -29,7 +29,7 @@ public class FileMakerCalculationLexerTest {
 
     @Test
     public void smoke_sampleCalculation_tokensRecognized() {
-        String sample = "Let( [ a = Abs(-3.2); b = 5 ], If(a > b and not IsEmpty(Get(AccountName)); \"hi\"; 'lo') ) // end";
+        String sample = "Let( [ a = Abs(-3.2); b = 5 ], If(a > b and not IsEmpty(Get(AccountName)); \"hi\"; 'lo') ); JSONSetElement('{}'; 'a'; 1); While ( i < 10 ; i = i + 1 ; i ) // end";
 
         List<IElementType> tokens = tokenize(sample);
 
