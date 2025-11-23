@@ -114,6 +114,12 @@ import com.intellij.psi.tree.IElementType;
    "True"|"true"|"False"|"false" { return FileMakerCalculationTokenType.KEYWORD_TYPE; }
    "JSONArray"|"JSONBoolean"|"JSONNull"|"JSONNumber"|"JSONObject"|"JSONRaw"|"JSONString"
                                 { return FileMakerCalculationTokenType.KEYWORD_TYPE; }
+   // Text style constants (subset)
+   (?i)"Plain"|"Bold"|"Italic"|"Underline"|"HighlightYellow"|"Condense"|"Extend"|"Strikethrough"|"SmallCaps"|"Superscript"|"Subscript"|"Uppercase"|"Lowercase"|"Titlecase"|"WordUnderline"|"DoubleUnderline"|"AllStyles"
+                                { return FileMakerCalculationTokenType.KEYWORD_TYPE; }
+   // Layout object attribute constants (subset)
+   (?i)"objectType"|"hasFocus"|"objectName"|"containsFocus"|"isFrontPanel"|"isActive"|"isObjectHidden"|"bounds"|"left"|"right"|"top"|"bottom"|"width"|"height"|"rotation"|"startPoint"|"endPoint"|"source"|"content"|"enclosingObject"|"containedObjects"
+                                { return FileMakerCalculationTokenType.KEYWORD_TYPE; }
 
    // Script variables ($local, $$global)
    ("$$"|"$")[A-Za-z_][A-Za-z0-9_]* { return FileMakerCalculationTokenType.IDENTIFIER; }

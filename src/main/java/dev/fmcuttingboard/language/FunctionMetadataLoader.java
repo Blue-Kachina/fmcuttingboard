@@ -47,4 +47,46 @@ public final class FunctionMetadataLoader {
         //  "If ( ${1:test} ; ${2:resultTrue}${3: ; ${4:resultFalse}} )" into typed parameters.
         return new ArrayList<>();
     }
+
+    /**
+     * Extract top-level snippet keys (function names) from VSCode snippets JSON using a simple pattern.
+     * This is a best-effort approach to support Phase 1 consolidation without adding a JSON dependency.
+     */
+    public static @NotNull java.util.Set<String> extractSnippetFunctionNames(@NotNull String jsonText) {
+        java.util.Set<String> names = new java.util.LinkedHashSet<>();
+        // Matches entries like: "Abs": { "prefix": "Abs", ... }
+        java.util.regex.Pattern p = java.util.regex.Pattern.compile(
+                "\\\"([^\\\"]+)\\\"\\s*:\\s*\\{[^}]*?\\\"prefix\\\"\\s*:\\s*\\\".*?\\\"",
+                java.util.regex.Pattern.DOTALL);
+        java.util.regex.Matcher m = p.matcher(jsonText);
+        while (m.find()) {
+            String key = m.group(1);
+            // Filter out templated variants like "Case [inline]" → normalize to base name before first space
+            String normalized = key.contains(" ") ? key.substring(0, key.indexOf(' ')) : key;
+            names.add(normalized);
+        }
+        return names;
+    }
+
+    /**
+     * Extract the Notepad++ Words4 list (Get() constants) and other keyword lists as plain tokens.
+     * The file is a small XML; a regex approach keeps dependencies minimal.
+     */
+    public static @NotNull java.util.Set<String> extractNotepadPlusPlusWords(@NotNull String xmlText, @NotNull String listName) {
+        java.util.Set<String> names = new java.util.LinkedHashSet<>();
+        String start = "<Keywords name=\"" + listName + "\">";
+        int s = xmlText.indexOf(start);
+        if (s >= 0) {
+            int e = xmlText.indexOf("</Keywords>", s);
+            if (e > s) {
+                String content = xmlText.substring(s + start.length(), e).trim();
+                // Replace HTML entities
+                content = content.replace("&quot;", "\"").replace("&apos;", "'");
+                for (String token : content.split("\\s+")) {
+                    if (!token.isEmpty()) names.add(token);
+                }
+            }
+        }
+        return names;
+    }
 }
