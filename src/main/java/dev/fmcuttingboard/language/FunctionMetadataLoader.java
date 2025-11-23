@@ -39,13 +39,126 @@ public final class FunctionMetadataLoader {
     }
 
     /**
-     * Placeholder for future JSON-based extraction from VSCode snippets (resources/filemaker-vscode-bundle-master/snippets/filemaker.json).
-     * Currently returns an empty list; to be implemented in subsequent Phase 1 iterations.
+     * Best-effort parser for VSCode snippet JSON (resources/filemaker-vscode-bundle-master/snippets/filemaker.json).
+     *
+     * This implementation purposefully avoids introducing a JSON library dependency. It uses regex to
+     * extract entries of the form:
+     *   "If": { "prefix": "If", "body": "If ( ${1:test} ; ${2:resultTrue}${3: ; ${4:resultFalse}} )" }
+     * or with body as an array of strings. It normalizes names like "Case [inline]" → "Case".
+     * Parameters are derived from placeholders: ${index:name}. Optional/variadic parameters are
+     * heuristically detected when they appear inside optional fragments like "${3: ; ${4:resultFalse}}".
      */
     public static @NotNull List<FunctionMetadata> parseVsCodeSnippets(@NotNull String jsonText) {
-        // TODO: Implement robust JSON parsing and convert snippet bodies like
-        //  "If ( ${1:test} ; ${2:resultTrue}${3: ; ${4:resultFalse}} )" into typed parameters.
-        return new ArrayList<>();
+        List<FunctionMetadata> list = new ArrayList<>();
+
+        // Extract top-level entries: "Name": { ... }
+        java.util.regex.Pattern entryPattern = java.util.regex.Pattern.compile(
+                "\\\"([^\\\"]+)\\\"\\s*:\\s*\\{(.*?)\\}\",??",
+                java.util.regex.Pattern.DOTALL);
+        java.util.regex.Matcher entryMatcher = entryPattern.matcher(jsonText);
+        while (entryMatcher.find()) {
+            String rawName = entryMatcher.group(1);
+            String obj = entryMatcher.group(2);
+
+            // Normalize name by trimming variant suffix after first space, e.g., "Case [inline]" → "Case"
+            String name = rawName.contains(" ") ? rawName.substring(0, rawName.indexOf(' ')) : rawName;
+
+            // Extract body which can be a string or array
+            String body = extractJsonBody(obj);
+            if (body == null) continue;
+
+            // Derive parameter segment inside first parentheses
+            int lp = body.indexOf('(');
+            int rp = body.lastIndexOf(')');
+            if (lp < 0 || rp < lp) {
+                // Not a function shape (some snippets are boilerplate text), skip
+                continue;
+            }
+            String inside = body.substring(lp + 1, rp);
+
+            // Split on semicolons as FileMaker parameter delimiter
+            List<FunctionParameter> params = new ArrayList<>();
+            for (String rawPart : splitSemicolonTopLevel(inside)) {
+                String part = rawPart.trim();
+                if (part.isEmpty()) continue;
+                // Try to extract placeholder name ${n:name}
+                java.util.regex.Matcher pm = java.util.regex.Pattern
+                        .compile("\\$\\{\\d+:([^}]+)}`?", java.util.regex.Pattern.DOTALL)
+                        .matcher(part);
+                String pname = null;
+                if (pm.find()) {
+                    pname = pm.group(1).trim();
+                }
+                if (pname == null || pname.isEmpty()) {
+                    // Fallback: use the literal text without placeholder markup
+                    pname = part.replaceAll("\\$\\{\\d+:?", "").replace("}", "").trim();
+                    if (pname.isEmpty()) pname = "param" + (params.size() + 1);
+                }
+                // Heuristic: if the segment contains "+" or ellipsis, mark variadic
+                boolean variadic = part.contains("...");
+                // Heuristic: consider optional if the segment contains nested optional expansion "${n: ; ${m:...}}"
+                boolean optional = part.contains("${") && part.contains("}") && part.contains(";");
+                params.add(new FunctionParameter(pname, "Any", optional, variadic));
+            }
+
+            // Avoid duplicates caused by multiple variants of the same name
+            boolean exists = list.stream().anyMatch(f -> f.getName().equals(name));
+            if (!exists) {
+                list.add(new FunctionMetadata(name, params, "Unknown", "Any", "Imported from VSCode snippets"));
+            }
+        }
+        return list;
+    }
+
+    private static String extractJsonBody(String obj) {
+        // body can be: "body": "..." or "body": ["...", "..."]
+        java.util.regex.Matcher mString = java.util.regex.Pattern.compile(
+                "\\\"body\\\"\\s*:\\s*\\\"(.*?)\\\"",
+                java.util.regex.Pattern.DOTALL).matcher(obj);
+        if (mString.find()) {
+            return unescapeJson(mString.group(1));
+        }
+        java.util.regex.Matcher mArray = java.util.regex.Pattern.compile(
+                "\\\"body\\\"\\s*:\\s*\\[(.*?)\\]",
+                java.util.regex.Pattern.DOTALL).matcher(obj);
+        if (mArray.find()) {
+            String arr = mArray.group(1);
+            java.util.regex.Matcher item = java.util.regex.Pattern.compile("\\\"(.*?)\\\"",
+                    java.util.regex.Pattern.DOTALL).matcher(arr);
+            StringBuilder sb = new StringBuilder();
+            while (item.find()) {
+                sb.append(unescapeJson(item.group(1)));
+                sb.append('\n');
+            }
+            return sb.toString();
+        }
+        return null;
+    }
+
+    private static String unescapeJson(String s) {
+        return s.replace("\\\"", "\"")
+                .replace("\\n", "\n")
+                .replace("\\r", "\r")
+                .replace("\\t", "\t");
+    }
+
+    private static List<String> splitSemicolonTopLevel(String inside) {
+        List<String> parts = new ArrayList<>();
+        StringBuilder cur = new StringBuilder();
+        int depth = 0; // parentheses depth
+        for (int i = 0; i < inside.length(); i++) {
+            char c = inside.charAt(i);
+            if (c == '(') depth++;
+            else if (c == ')') depth = Math.max(0, depth - 1);
+            if (c == ';' && depth == 0) {
+                parts.add(cur.toString());
+                cur.setLength(0);
+            } else {
+                cur.append(c);
+            }
+        }
+        if (cur.length() > 0) parts.add(cur.toString());
+        return parts;
     }
 
     /**

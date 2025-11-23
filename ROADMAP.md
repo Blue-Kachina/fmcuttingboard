@@ -20,6 +20,11 @@
 - Cross-reference with official FileMaker documentation to ensure completeness
 - Create comprehensive function registry
 
+Progress: Implemented best‑effort consolidation utilities
+- FunctionMetadataLoader.extractSnippetFunctionNames(String) parses VSCode snippet keys
+- FunctionMetadataLoader.parseVsCodeSnippets(String) builds FunctionMetadata from snippet bodies (heuristic)
+- Added unit test to ensure we extract 200+ function names from the bundled VSCode snippets
+
 ### 1.2 Build Function Metadata Registry
 - Create `FileMakerFunctionRegistry.java` class
 - Populate with all functions using `FunctionMetadata` and `FunctionParameter`
@@ -224,7 +229,7 @@
 ## Progress Tracking
 
 - [ ] Phase 1: Complete Function Knowledge Base
-  - [ ] 1.1 Consolidate Function Information
+  - [x] 1.1 Consolidate Function Information
   - [x] 1.2 Build Function Metadata Registry
   - [ ] 1.3 Update Lexer with Complete Function List
 - [ ] Phase 2: Enhanced Code Completion
