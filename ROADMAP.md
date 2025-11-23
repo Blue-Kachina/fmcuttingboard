@@ -96,8 +96,9 @@ Progress: Implemented best‑effort consolidation utilities
 - Map FileMaker constructs to JetBrains formatting concepts:
   - Block structures: Let(), Case(), If() → indentation blocks
   - Parameter separators (semicolons) → spacing rules
-  - Operators → spacing rules
-  - Line breaks → after opening brackets, before closing brackets in multi-line blocks
+  - Operators → spacing rules (conservative default: one space around operators)
+  - Parentheses → no space just inside "(" or before ")"
+  - Line breaks → indent contents between parentheses for multi-line argument lists
 
 ### 5.2 Implement Formatting Model Builder
 - Replace stub in `FileMakerCalculationFormattingModelBuilder`
