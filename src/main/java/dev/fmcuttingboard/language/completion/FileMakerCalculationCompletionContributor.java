@@ -14,6 +14,7 @@ import dev.fmcuttingboard.language.FileMakerCalculationLanguage;
 import dev.fmcuttingboard.language.FileMakerFunctionRegistry;
 import dev.fmcuttingboard.language.FunctionMetadata;
 import dev.fmcuttingboard.language.FunctionParameter;
+import dev.fmcuttingboard.language.psi.FileMakerPsiUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
@@ -44,7 +45,7 @@ public class FileMakerCalculationCompletionContributor extends CompletionContrib
                                                   @NotNull ProcessingContext context,
                                                   @NotNull CompletionResultSet result) {
                         PsiElement position = parameters.getPosition();
-                        if (isInCommentOrString(position)) return;
+                        if (FileMakerPsiUtil.isInStringOrComment(position)) return;
 
                         // Offer function completions from the registry
                         for (FunctionMetadata meta : FileMakerFunctionRegistry.getAll()) {
@@ -57,8 +58,9 @@ public class FileMakerCalculationCompletionContributor extends CompletionContrib
                             );
                         }
 
-                        // Provide Get() constants when typing inside a Get( … ) call (simple heuristic)
-                        if (looksLikeInsideGet(parameters)) {
+                        // Provide Get() constants when caret is inside a Get( … ) call (PSI-based)
+                        FileMakerPsiUtil.FunctionCallInfo call = FileMakerPsiUtil.getEnclosingFunctionCall(position);
+                        if (call != null && "Get".equalsIgnoreCase(call.name)) {
                             for (String name : GET_CONSTANTS) {
                                 result.addElement(
                                         LookupElementBuilder.create(name)
@@ -68,22 +70,6 @@ public class FileMakerCalculationCompletionContributor extends CompletionContrib
                         }
                     }
                 });
-    }
-
-    private static boolean isInCommentOrString(PsiElement position) {
-        String text = position.getText();
-        return text != null && (text.startsWith("//") || text.startsWith("/*") || text.startsWith("\"") || text.startsWith("'"));
-    }
-
-    // Heuristic detection: We are inside the parentheses of a Get( … ) call
-    private static boolean looksLikeInsideGet(CompletionParameters parameters) {
-        Document doc = parameters.getEditor().getDocument();
-        int offset = parameters.getOffset();
-        int start = Math.max(0, offset - 200); // look back a small window
-        String before = doc.getText().substring(start, Math.max(start, offset));
-        int getIdx = before.lastIndexOf("Get(");
-        int closeIdx = before.lastIndexOf(")");
-        return getIdx >= 0 && (closeIdx < 0 || closeIdx < getIdx);
     }
 
     // Insert a live template like: Name($param1$; $param2$)
