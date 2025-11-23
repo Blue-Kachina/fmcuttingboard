@@ -107,7 +107,7 @@ This roadmap outlines the implementation of FileMaker Calculation language suppo
 
 ### 3.1 Syntax Highlighter Implementation
 **File to create:**
-- `src/main/java/com/fmcuttingboard/language/FileMakerCalculationSyntaxHighlighter.java`
+- `src/main/java/dev/fmcuttingboard/language/FileMakerCalculationSyntaxHighlighter.java`
 
 **Tasks:**
 - [x] Create `FileMakerCalculationSyntaxHighlighter` implementing `SyntaxHighlighterBase`
@@ -125,7 +125,7 @@ This roadmap outlines the implementation of FileMaker Calculation language suppo
 
 ### 3.2 Syntax Highlighter Factory
 **File to create:**
-- `src/main/java/com/fmcuttingboard/language/FileMakerCalculationSyntaxHighlighterFactory.java`
+- `src/main/java/dev/fmcuttingboard/language/FileMakerCalculationSyntaxHighlighterFactory.java`
 
 **Tasks:**
 - [x] Create factory class implementing `SyntaxHighlighterFactory`
