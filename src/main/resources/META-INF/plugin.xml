@@ -61,6 +61,18 @@
         <!-- Parameter hints for functions -->
         <lang.parameterInfo language="FileMakerCalculation"
                             implementationClass="dev.fmcuttingboard.language.hints.FileMakerCalculationParameterInfoHandler"/>
+
+        <!-- Enable Reformat Code for fmcalc (minimal formatting model) -->
+        <lang.formatter language="FileMakerCalculation"
+                         implementationClass="dev.fmcuttingboard.language.format.FileMakerCalculationFormattingModelBuilder"/>
+
+        <!-- ParserDefinition to enable PSI for the FileMaker Calculation language -->
+        <lang.parserDefinition language="FileMakerCalculation"
+                               implementationClass="dev.fmcuttingboard.language.parser.FileMakerCalculationParserDefinition"/>
+
+        <!-- Code style settings provider for FileMaker Calculation -->
+        <langCodeStyleSettingsProvider implementation="dev.fmcuttingboard.language.format.FileMakerCalculationCodeStyleSettingsProvider"/>
+
     </extensions>
 
     <!-- Phase 1.1: Register base actions group under Tools menu -->
