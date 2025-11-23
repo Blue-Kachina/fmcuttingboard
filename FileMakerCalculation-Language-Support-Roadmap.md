@@ -152,12 +152,12 @@ This roadmap outlines the implementation of FileMaker Calculation language suppo
 
 ### 5.1 Manual Testing
 - [x] Create sample `.fmcalc` files with various FileMaker calculations
-- [ ] Verify syntax highlighting for all token types
-- [ ] Test comment highlighting (both `//` and `/* */`)
-- [ ] Test string highlighting (both `"` and `'`)
+- [x] Verify syntax highlighting for all token types
+- [x] Test comment highlighting (both `//` and `/* */`)
+- [x] Test string highlighting (both `"` and `'`)
 - [ ] Verify function name recognition (all 250+ functions)
-- [ ] Test nested expressions and complex calculations
-- [ ] Verify file type recognition in IDE
+- [x] Test nested expressions and complex calculations
+- [x] Verify file type recognition in IDE
 
 ### 5.2 Edge Cases
 - [ ] Test calculations with mixed case keywords (should be case-sensitive)
