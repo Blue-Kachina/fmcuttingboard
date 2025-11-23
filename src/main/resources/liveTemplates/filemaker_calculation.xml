@@ -1,0 +1,34 @@
+<templateSet group="FileMaker Calculation">
+  <!-- Live templates for common FileMaker calculation patterns -->
+
+  <!-- Let() block template -->
+  <template name="let" value="Let( [&#10;  $NAME$ = $EXPR$&#10;];&#10;  $RESULT$&#10;)" description="Let() block" toReformat="true" toShortenFQNames="false">
+    <context>
+      <option name="OTHER" value="true"/>
+    </context>
+    <variable name="NAME" expression="complete()" defaultValue="name" alwaysStopAt="true"/>
+    <variable name="EXPR" expression="complete()" defaultValue="" alwaysStopAt="true"/>
+    <variable name="RESULT" expression="complete()" defaultValue="" alwaysStopAt="true"/>
+  </template>
+
+  <!-- If() template -->
+  <template name="if" value="If( $TEST$ ; $TRUE$ ; $FALSE$ )" description="If() expression" toReformat="false" toShortenFQNames="false">
+    <context>
+      <option name="OTHER" value="true"/>
+    </context>
+    <variable name="TEST" expression="complete()" defaultValue="" alwaysStopAt="true"/>
+    <variable name="TRUE" expression="complete()" defaultValue="" alwaysStopAt="true"/>
+    <variable name="FALSE" expression="complete()" defaultValue="" alwaysStopAt="true"/>
+  </template>
+
+  <!-- Case() template -->
+  <template name="case" value="Case( $TEST1$ ; $RESULT1$ ; $DEFAULT$ )" description="Case() expression" toReformat="false" toShortenFQNames="false">
+    <context>
+      <option name="OTHER" value="true"/>
+    </context>
+    <variable name="TEST1" expression="complete()" defaultValue="" alwaysStopAt="true"/>
+    <variable name="RESULT1" expression="complete()" defaultValue="" alwaysStopAt="true"/>
+    <variable name="DEFAULT" expression="complete()" defaultValue="" alwaysStopAt="true"/>
+  </template>
+
+</templateSet>

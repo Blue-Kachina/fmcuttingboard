@@ -202,7 +202,7 @@ This roadmap outlines the implementation of FileMaker Calculation language suppo
 - [x] Error detection for invalid syntax
 - [x] Brace matching for parentheses and brackets
 - [x] Code folding for `Let()`, `Case()`, `If()` blocks
-- [ ] Live templates for common calculation patterns
+- [x] Live templates for common calculation patterns
 - [ ] Integration with existing FileMaker clipboard features
 
 ---
