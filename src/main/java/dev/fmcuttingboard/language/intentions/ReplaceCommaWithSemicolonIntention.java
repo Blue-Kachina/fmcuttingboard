@@ -19,7 +19,7 @@ public class ReplaceCommaWithSemicolonIntention implements IntentionAction {
 
     @Override
     public @NotNull @Nls(capitalization = Nls.Capitalization.Sentence) String getText() {
-        return "Replace comma with semicolon";
+        return "Replace comma(s) with semicolon(s)";
     }
 
     @Override
@@ -30,6 +30,12 @@ public class ReplaceCommaWithSemicolonIntention implements IntentionAction {
     @Override
     public boolean isAvailable(@NotNull Project project, Editor editor, PsiFile file) {
         if (!(file.getLanguage() instanceof FileMakerCalculationLanguage)) return false;
+        // Available if caret is on a comma token OR selection contains any comma
+        var selection = editor.getSelectionModel();
+        if (selection.hasSelection()) {
+            String selected = selection.getSelectedText();
+            return selected != null && selected.contains(",");
+        }
         PsiElement at = file.findElementAt(editor.getCaretModel().getOffset());
         if (at == null || at.getNode() == null) return false;
         if (at.getNode().getElementType() != FileMakerCalculationTokenType.OPERATOR) return false;
@@ -38,9 +44,22 @@ public class ReplaceCommaWithSemicolonIntention implements IntentionAction {
 
     @Override
     public void invoke(@NotNull Project project, Editor editor, PsiFile file) throws IncorrectOperationException {
+        var selection = editor.getSelectionModel();
+        if (selection.hasSelection()) {
+            // Replace all commas in the selection with semicolons
+            var document = editor.getDocument();
+            int start = selection.getSelectionStart();
+            int end = selection.getSelectionEnd();
+            String text = document.getText(new com.intellij.openapi.util.TextRange(start, end));
+            String replaced = text.replace(',', ';');
+            if (!text.equals(replaced)) {
+                document.replaceString(start, end, replaced);
+            }
+            return;
+        }
         PsiElement at = file.findElementAt(editor.getCaretModel().getOffset());
         if (at == null) return;
-        // Simple replacement
+        // Simple single-token replacement
         at.replace(createSemicolonElement(file, ";"));
     }
 
