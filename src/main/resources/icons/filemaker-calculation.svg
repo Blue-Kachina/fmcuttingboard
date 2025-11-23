@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#8a2be2"/>
+      <stop offset="1" stop-color="#6a1bbf"/>
+    </linearGradient>
+  </defs>
+  <!-- File-like background -->
+  <path d="M3 1h6l4 4v10a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1z" fill="url(#g)"/>
+  <path d="M9 1v3a1 1 0 0 0 1 1h3" fill="#ffffff22"/>
+
+  <!-- Calculator glyph: + and = to hint calculations -->
+  <g stroke="#ffffff" stroke-linecap="round" stroke-width="1.2">
+    <!-- plus sign -->
+    <path d="M5 6h3"/>
+    <path d="M6.5 4.5v3"/>
+    <!-- equals sign -->
+    <path d="M5 10h4"/>
+    <path d="M5 12h4"/>
+  </g>
+
+  <!-- subtle border -->
+  <rect x="2.5" y="0.5" width="11" height="15" rx="1.2" ry="1.2" fill="none" stroke="#00000033"/>
+</svg>
