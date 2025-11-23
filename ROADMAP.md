@@ -231,7 +231,7 @@ Progress: Implemented best‑effort consolidation utilities
 - [x] Phase 2: Enhanced Code Completion
 - [x] Phase 3: Advanced Parameter Hints
 - [x] Phase 4: Grammar-Based PSI Parser
-- [ ] Phase 5: Intelligent Code Formatting
+- [x] Phase 5: Intelligent Code Formatting
 - [ ] Phase 6: Advanced Language Features
 - [ ] Phase 7: Live Templates & Snippets
 - [ ] Phase 8: Documentation & Help
