@@ -7,6 +7,7 @@ import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.codeStyle.CodeStyleSettings;
+import com.intellij.psi.codeStyle.CommonCodeStyleSettings;
 import com.intellij.psi.formatter.common.AbstractBlock;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
@@ -56,19 +57,28 @@ public class FileMakerCalculationFormattingModelBuilder implements FormattingMod
     }
 
     private static SpacingBuilder createSpacingBuilder(Language language, CodeStyleSettings settings) {
-        // Basic defaults without exposing settings yet. These can be wired to CodeStyle later (Phase 5.3).
-        return new SpacingBuilder(settings, language)
+        CommonCodeStyleSettings common = settings.getCommonSettings(language);
+        FileMakerCustomCodeStyleSettings custom = settings.getCustomSettings(FileMakerCustomCodeStyleSettings.class);
+
+        SpacingBuilder builder = new SpacingBuilder(settings, language)
                 // No space just inside parentheses: (expr) → "(" no space, and before ")" no space
                 .after(FileMakerCalculationTokenType.LPAREN).spaces(0)
                 .before(FileMakerCalculationTokenType.RPAREN).spaces(0)
 
                 // Space around generic operators (includes punctuation; keep conservative):
-                .around(FileMakerCalculationTokenType.OPERATOR).spaces(1)
+                .around(FileMakerCalculationTokenType.OPERATOR).spaces(1);
 
-                // After semicolons (treated as OPERATOR by lexer) ensure a single space
-                // SpacingBuilder cannot distinguish semicolon vs other operators here, but
-                // the around(OPERATOR) rule already ensures spaces around common separators.
-                ;
+        // Space before parentheses for control keywords / common functions (If/Case/While)
+        boolean wantSpaceBeforeParens =
+                common.SPACE_BEFORE_IF_PARENTHESES ||
+                common.SPACE_BEFORE_WHILE_PARENTHESES ||
+                common.SPACE_BEFORE_SWITCH_PARENTHESES; // map 'case' to 'switch'
+
+        int ctrlParenSpaces = wantSpaceBeforeParens ? 1 : 0;
+        builder = builder.between(FileMakerCalculationTokenType.KEYWORD_CONTROL, FileMakerCalculationTokenType.LPAREN).spaces(ctrlParenSpaces)
+                         .between(FileMakerCalculationTokenType.KEYWORD_FUNCTION, FileMakerCalculationTokenType.LPAREN).spaces(ctrlParenSpaces);
+
+        return builder;
     }
 
     private static final TokenSet WHITES = TokenSet.create(FileMakerCalculationTokenType.WHITE_SPACE);
