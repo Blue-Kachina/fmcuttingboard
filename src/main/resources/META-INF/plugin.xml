@@ -73,6 +73,10 @@
         <lang.parserDefinition language="FileMakerCalculation"
                                implementationClass="dev.fmcuttingboard.language.parser.FileMakerCalculationParserDefinition"/>
 
+        <!-- Enable Toggle Line/Block Comment actions for .fmcalc files -->
+        <lang.commenter language="FileMakerCalculation"
+                        implementationClass="dev.fmcuttingboard.language.FileMakerCalculationCommenter"/>
+
         <!-- Phase 6.2: Quick Fix - Replace comma with semicolon in .fmcalc files -->
         <intentionAction>
             <className>dev.fmcuttingboard.language.intentions.ReplaceCommaWithSemicolonIntention</className>
