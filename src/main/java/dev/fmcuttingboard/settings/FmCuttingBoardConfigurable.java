@@ -1,5 +1,6 @@
 package dev.fmcuttingboard.settings;
 
+import com.intellij.ide.BrowserUtil;
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.Nls;
@@ -20,6 +21,7 @@ public class FmCuttingBoardConfigurable implements Configurable {
     private JLabel helpLabel;
     private JCheckBox previewBeforeClipboardWriteCheckbox;
     private JCheckBox enableDiagnosticsCheckbox;
+    private JButton docsButton;
 
     public FmCuttingBoardConfigurable(Project project) {
         this.project = project;
@@ -63,7 +65,20 @@ public class FmCuttingBoardConfigurable implements Configurable {
 
             helpLabel = new JLabel("Use {timestamp} for epoch millis. Defaults: .fmCuttingBoard and {timestamp}. Extensions (.xml, .fmcalc) are added automatically.");
             helpLabel.setForeground(new Color(90, 90, 90));
-            mainPanel.add(helpLabel, BorderLayout.SOUTH);
+            JPanel south = new JPanel(new BorderLayout());
+            south.add(helpLabel, BorderLayout.CENTER);
+
+            JPanel buttons = new JPanel(new FlowLayout(FlowLayout.LEFT, 4, 4));
+            docsButton = new JButton("Documentation…");
+            docsButton.addActionListener(e -> {
+                // Prefer opening the online README so users always see the latest docs
+                String url = "https://github.com/Blue-Kachina/fmcuttingboard#readme";
+                BrowserUtil.browse(url);
+            });
+            buttons.add(docsButton);
+            south.add(buttons, BorderLayout.SOUTH);
+
+            mainPanel.add(south, BorderLayout.SOUTH);
         }
 
         reset();
