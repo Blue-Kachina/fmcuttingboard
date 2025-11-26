@@ -72,12 +72,14 @@ Below are placeholder screenshots; more detailed walkthrough images will be adde
 - FileMaker’s accepted clipboard formats can vary slightly by version; not all fmxmlsnippet variants may import identically across versions.
 - Very large fmxmlsnippet payloads may be truncated by the OS clipboard. The plugin guards where practical but cannot fully control OS limits.
 - On macOS, some pasteboard flavors are undocumented; behavior is best-effort based on observed formats.
+ - See also: docs/Windows-EndToEnd-Test-Report.md for version-specific observations and paste outcomes.
 
 ## Future Ideas
 - Richer transformations and refactorings of fmxmlsnippet content directly in the IDE.
 - Additional validations and quick‑fixes tailored to FileMaker-specific constructs.
 - Deeper integration with FileMaker (e.g., launching scripts, schema diffs, etc.) where feasible.
 - More actions surfaced in context menus and editor toolbars for quicker workflows.
+ - Track and prioritize enhancements in FMCuttingBoardPluginRoadmap.md and ROADMAP.md.
 
 ## Development
 
