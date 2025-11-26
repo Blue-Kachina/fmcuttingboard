@@ -3,7 +3,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
   <!-- Board base -->
   <g fill="none" stroke="none">
-
     <!-- Wood board body -->
     <rect x="2.6" y="2.7" width="10.8" height="10.2" rx="1.7" ry="1.7" fill="#d29b62"/>
     <!-- Handle notch suggestion at the top (rounded bump) -->

@@ -36,7 +36,6 @@ public final class FileMakerCalculationFileType extends LanguageFileType {
 
     @Override
     public @Nullable Icon getIcon() {
-        // Custom FileMaker Calculation file type icon
-        return IconLoader.getIcon("/icons/filemaker-calculation.svg", FileMakerCalculationFileType.class);
+        return IconLoader.getIcon("/icons/pluginIcon16.svg", FileMakerCalculationFileType.class);
     }
 }
