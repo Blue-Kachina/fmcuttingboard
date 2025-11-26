@@ -224,7 +224,7 @@ Each phase is broken down into small, AI-friendly tasks.
 
 ### 8.3 — Documentation
 
-- [ ] Update `README.md` with usage instructions, screenshots, and examples
+- [x] Update `README.md` with usage instructions, screenshots, and examples
 - [ ] Add a short in-IDE help section or link to documentation
 - [ ] Document known limitations and future ideas
 
