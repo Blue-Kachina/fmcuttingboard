@@ -11,6 +11,13 @@
   - New XML File From FM Clipboard
   - Push Clipboard Into FileMaker (only enabled when XML file is currently active)
 
+## Quick Start
+- Install the plugin (build locally with Gradle or install the ZIP from Releases/Marketplace).
+- Open any project in your JetBrains IDE.
+- Find Tools > FMCuttingBoard in the main menu.
+- Copy content from FileMaker (e.g., script steps, fields, etc.).
+- Use one of the FMCuttingBoard actions described below.
+
 ## Convert FM Clipboard To XML Clipboard
 When this option is selected, we will attempt to read FileMaker content from the clipboard.
 If we are successful in finding FileMaker content, then the clipboard will be replaced with it
@@ -33,11 +40,53 @@ The trick will be in getting the format right.
 If the fmxmlsnippet represents database fields, then after running this command the user would be able to paste fields into FileMaker's Manage Database dialog.
 If it contains an fmxmlsnippet of script steps, then we'd be able to paste Script Steps into FileMaker Script Workspace window, etc...
 
+## Usage Examples
+
+1) Convert FileMaker clipboard to XML on the clipboard
+- Copy a set of Script Steps inside FileMaker Script Workspace.
+- In the IDE: Tools > FMCuttingBoard > Convert FM Clipboard To XML Clipboard.
+- Paste into the IDE to view raw fmxmlsnippet, or save to a file.
+
+2) Save XML to a timestamped file
+- Copy any supported content in FileMaker (Fields, Tables, Scripts, etc.).
+- In the IDE: Tools > FMCuttingBoard > New XML File From FM Clipboard.
+- The plugin creates .fmCuttingBoard/fmclip-{timestamp}.xml in your project.
+
+3) Push XML back into FileMaker
+- Open one of the sample XML files under resources/test-snippets (e.g., ScriptSteps.xml).
+- In the IDE: Tools > FMCuttingBoard > Push Clipboard Into FileMaker.
+- Switch to FileMaker and Paste in the appropriate context.
+
+Notes
+- You can customize the base directory and filename pattern via Settings/Preferences > Tools > FMCuttingBoard.
+- Optionally enable a preview before writing to the clipboard, and diagnostics logging for troubleshooting.
+
+## Screenshots
+
+Below are placeholder screenshots; more detailed walkthrough images will be added as the UI stabilizes.
+
+![Plugin Icon](src/main/resources/META-INF/pluginIcon.svg)
+
+## Known Limitations
+- Clipboard interoperability depends on OS behavior (Windows and macOS supported; Linux is not).
+- FileMaker’s accepted clipboard formats can vary slightly by version; not all fmxmlsnippet variants may import identically across versions.
+- Very large fmxmlsnippet payloads may be truncated by the OS clipboard. The plugin guards where practical but cannot fully control OS limits.
+- On macOS, some pasteboard flavors are undocumented; behavior is best-effort based on observed formats.
+
+## Future Ideas
+- Richer transformations and refactorings of fmxmlsnippet content directly in the IDE.
+- Additional validations and quick‑fixes tailored to FileMaker-specific constructs.
+- Deeper integration with FileMaker (e.g., launching scripts, schema diffs, etc.) where feasible.
+- More actions surfaced in context menus and editor toolbars for quicker workflows.
+
 ## Development
 
 - Run the plugin in a sandbox IDE: `./gradlew runIde` (or `gradlew.bat runIde` on Windows)
 - Run tests: `./gradlew test`
 - The project uses JUnit 5 for unit tests and a GitHub Actions workflow to build and run tests on pushes/PRs.
+
+### In‑IDE Help
+- Open Settings/Preferences and search for "FMCuttingBoard". A Documentation button links to the online README for quick reference.
 
 ### Build & Install from Disk
 - Build a distributable plugin ZIP: `./gradlew buildPlugin` (or `gradlew.bat buildPlugin` on Windows)
