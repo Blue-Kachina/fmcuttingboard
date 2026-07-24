@@ -15,11 +15,7 @@
 ### 1.1 Consolidate Function Information
 - Extract all functions from:
   - `FileMakerCalcs_InNotepadPlusPlus.xml` (~200 functions in Words4)
-  - `filemaker-vscode-bundle-master/syntaxes/FileMaker.tmLanguage` (line 77: 280+ functions) — this
-    was a local-only reference clone of a third-party VSCode extension, never committed, and has
-    since been deleted; its useful output was already captured into `filemaker_functions.json`
-    before removal (see `put_on_marketplace.md` §1.2)
-  - `src/test/resources/filemaker_functions.json` (copy of the VSCode snippets with detailed signatures and parameters)
+  - `src/test/resources/filemaker_functions.json` (function snippets with detailed signatures and parameters)
 - Cross-reference with official FileMaker documentation to ensure completeness
 - Create comprehensive function registry
 
@@ -217,10 +213,7 @@ Refinement (2025‑11‑23):
 
 ### Resources Directory
 - `resources/FileMakerCalcs_InNotepadPlusPlus.xml` - Notepad++ language definition with function list
-- `src/test/resources/filemaker_functions.json` - curated function signatures with parameters,
-  originally extracted from a third-party VSCode extension's snippets/TextMate grammar; the
-  extension clone itself (`filemaker-vscode-bundle-master/`) was a local-only reference copy,
-  never committed, and has been deleted now that its data was captured
+- `src/test/resources/filemaker_functions.json` - curated function signatures with parameters
 
 ### Key Implementation Files
 - `src/main/java/dev/fmcuttingboard/language/`

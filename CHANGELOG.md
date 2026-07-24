@@ -9,10 +9,6 @@ adheres to Semantic Versioning as the plugin matures.
 
 ## [1.0.5] - 2026-07-24
 ### Changed
-- Removed the vendored `filemaker-vscode-bundle-master` third-party bundle from the build; it was
-  never actually read at runtime and was leaking into the shipped plugin ZIP via a blanket resources
-  `srcDir`. The one file tests do use (`filemaker_functions.json`) now lives under
-  `src/test/resources/`.
 - Bumped the IntelliJ Platform Gradle Plugin from `2.0.1` to `2.18.1`.
 - Documented known limitations, future ideas, and added an in-IDE "Documentation" link in Settings.
 - Added a devcontainer for reproducibly testing Gradle builds in a clean Linux environment.
