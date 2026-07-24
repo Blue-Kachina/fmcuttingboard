@@ -13,10 +13,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Set up Java
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: '21'
@@ -26,14 +26,16 @@ jobs:
 
       - name: Verify tag matches gradle.properties
         run: |
-          PROP_VERSION="$(grep -m1 '^pluginVersion=' gradle.properties | cut -d= -f2)"
+          # gradle.properties has CRLF line endings; strip \r (and any other whitespace)
+          # or the comparison silently fails even when both sides look identical in logs.
+          PROP_VERSION="$(grep -m1 '^pluginVersion=' gradle.properties | cut -d= -f2 | tr -d '\r\n ')"
           if [ "$PLUGIN_VERSION" != "$PROP_VERSION" ]; then
             echo "::error::Tag $GITHUB_REF_NAME (version $PLUGIN_VERSION) does not match pluginVersion=$PROP_VERSION in gradle.properties"
             exit 1
           fi
 
       - name: Cache Gradle
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: |
             ~/.gradle/caches
