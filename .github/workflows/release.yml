@@ -1,0 +1,76 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Determine version from tag
+        run: echo "PLUGIN_VERSION=${GITHUB_REF_NAME#v}" >> "$GITHUB_ENV"
+
+      - name: Verify tag matches gradle.properties
+        run: |
+          PROP_VERSION="$(grep -m1 '^pluginVersion=' gradle.properties | cut -d= -f2)"
+          if [ "$PLUGIN_VERSION" != "$PROP_VERSION" ]; then
+            echo "::error::Tag $GITHUB_REF_NAME (version $PLUGIN_VERSION) does not match pluginVersion=$PROP_VERSION in gradle.properties"
+            exit 1
+          fi
+
+      - name: Cache Gradle
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/notifications
+            ~/.gradle/native
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: Run tests
+        run: gradle --no-daemon test
+
+      - name: Build plugin
+        run: gradle --no-daemon buildPlugin
+
+      - name: Verify plugin (JetBrains Plugin Verifier)
+        run: gradle --no-daemon verifyPlugin
+
+      - name: Extract changelog section for this version
+        run: |
+          awk -v ver="$PLUGIN_VERSION" '
+            /^## \[/ {
+              if (found) exit
+              if (index($0, "[" ver "]") > 0) { found=1; next }
+              next
+            }
+            found { print }
+          ' CHANGELOG.md > release_notes.md
+          if [ ! -s release_notes.md ]; then
+            echo "See CHANGELOG.md for details." > release_notes.md
+          fi
+
+      - name: Create GitHub Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" \
+            build/distributions/*.zip \
+            --title "$GITHUB_REF_NAME" \
+            --notes-file release_notes.md
