@@ -34,8 +34,8 @@ dependencies {
             providers.gradleProperty("platformType").orNull ?: "IC",
             providers.gradleProperty("platformVersion").orNull ?: "2024.3",
         )
-        // Required for instrumentation (e.g., @NotNull assertions) during build
-        instrumentationTools()
+        // Instrumentation dependencies (e.g., @NotNull assertions) are now resolved
+        // automatically by the plugin; instrumentationTools() was removed in 2.x.
     }
 
     // JNA for Windows native clipboard fallback — rely on IDE-bundled JNA at runtime
@@ -122,18 +122,10 @@ sourceSets {
         java {
             srcDir(generatedDir)
         }
-        resources {
-            // Include repository-level resources for runtime access to curated metadata
-            srcDir("resources")
-        }
-    }
-    test {
-        resources {
-            // Add repository-level "resources" directory to test runtime classpath so tests can
-            // read the VSCode snippets JSON via classpath instead of filesystem-relative paths.
-            // This avoids NoSuchFileException in CI where the working directory may differ.
-            srcDir("resources")
-        }
+        // No extra resources srcDir here: nothing in the shipped plugin reads anything from
+        // the repo-root `resources/` folder at runtime. That folder is human reference material
+        // (captured samples, a curated function list) and previously leaked a whole vendored
+        // third-party repo into the plugin artifact via a blanket srcDir("resources").
     }
 }
 

@@ -1,0 +1,17 @@
+{
+	"name": "FmCuttingBoard Gradle Build",
+	"build": {
+		"dockerfile": "Dockerfile",
+		"context": "."
+	},
+	"workspaceFolder": "/workspace",
+	"workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached",
+	// Named volume, not a bind mount from the host: Gradle's cache format/paths aren't
+	// portable across a Windows host and this Linux container, so give the container
+	// its own persistent GRADLE_USER_HOME instead of sharing the host's ~/.gradle.
+	"mounts": [
+		"source=fmcuttingboard-gradle-cache,target=/home/gradle/.gradle,type=volume"
+	],
+	"remoteUser": "gradle",
+	"postCreateCommand": "./gradlew --version"
+}
