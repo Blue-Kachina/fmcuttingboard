@@ -50,6 +50,12 @@ public class GetFileMakerCalculationFromClipboardAction extends AnAction {
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
+        perform(e);
+    }
+
+    // Plain (non-override-only) entry point so other actions can reuse this workflow directly,
+    // e.g. GetFileMakerClipboardContentAction, without invoking the platform-only actionPerformed().
+    public void perform(@NotNull AnActionEvent e) {
         Project project = e.getProject();
         LOG.info("Invoke: GetFileMakerCalculationFromClipboardAction");
 

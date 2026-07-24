@@ -4,6 +4,8 @@ plugins {
     id("org.jetbrains.intellij.platform")
     // Grammar-Kit for generating the lexer from JFlex (Phase 2.2)
     id("org.jetbrains.grammarkit")
+    // Generates <change-notes> for plugin.xml from CHANGELOG.md
+    id("org.jetbrains.changelog")
 }
 
 group = "dev.fmcuttingboard"
@@ -52,15 +54,57 @@ dependencies {
     testRuntimeOnly("org.junit.platform:junit-platform-launcher:1.10.2")
 }
 
+// Read CHANGELOG.md and expose entries keyed by version (matches [x.y.z] headers)
+changelog {
+    version.set(providers.gradleProperty("pluginVersion"))
+    repositoryUrl.set("https://github.com/Blue-Kachina/fmcuttingboard")
+    // This project doesn't use Added/Changed/etc. grouping in every entry; don't require it.
+    groups.empty()
+}
+
 tasks.patchPluginXml {
     // Set the minimum compatible IDE build.
     // 242 = IntelliJ Platform 2024.2 baseline, which is the first version running on Java 21.
     // Our plugin targets Java 21 bytecode, so 2024.2 is the earliest compatible IDE.
     sinceBuild.set("242")
 
-    // Do NOT cap the upper build. Leaving untilBuild empty removes the upper bound,
-    // allowing the plugin to load on newer IDEs (e.g., 25x) unless there are API breaks.
-    untilBuild.set("")
+    // Do NOT cap the upper build. Simply never calling untilBuild.set(...) omits the
+    // until-build attribute entirely, allowing the plugin to load on newer IDEs (e.g., 25x)
+    // unless there are API breaks. (Setting untilBuild.set("") used to be silently tolerated,
+    // but the current Plugin Verifier rejects the resulting until-build="" as an invalid value.)
+
+    // Pull <change-notes> from the CHANGELOG.md entry matching the current pluginVersion,
+    // falling back to the Unreleased section if that version hasn't been given its own heading yet.
+    changeNotes.set(providers.gradleProperty("pluginVersion").map { pluginVersion ->
+        with(changelog) {
+            renderItem(
+                (getOrNull(pluginVersion) ?: getUnreleased())
+                    .withHeader(false)
+                    .withEmptySections(false),
+                org.jetbrains.changelog.Changelog.OutputType.HTML,
+            )
+        }
+    })
+}
+
+// Plugin Verifier and signing configuration for Marketplace publishing.
+intellijPlatform {
+    pluginVerification {
+        ides {
+            recommended()
+        }
+    }
+
+    signing {
+        // Sourced from CI secrets / local env vars — never commit these values.
+        certificateChain.set(providers.environmentVariable("CERTIFICATE_CHAIN"))
+        privateKey.set(providers.environmentVariable("PRIVATE_KEY"))
+        password.set(providers.environmentVariable("PRIVATE_KEY_PASSWORD"))
+    }
+
+    publishing {
+        token.set(providers.environmentVariable("PUBLISH_TOKEN"))
+    }
 }
 
 tasks.runIde {

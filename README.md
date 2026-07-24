@@ -74,6 +74,10 @@ Below are placeholder screenshots; more detailed walkthrough images will be adde
 - On macOS, some pasteboard flavors are undocumented; behavior is best-effort based on observed formats.
  - See also: docs/Windows-EndToEnd-Test-Report.md for version-specific observations and paste outcomes.
 
+## Privacy
+- FMCuttingBoard makes no network calls and collects no telemetry or analytics.
+- It only reads/writes the system clipboard and files within your project's `.fmCuttingBoard` directory. Nothing leaves your machine.
+
 ## Future Ideas
 - Richer transformations and refactorings of fmxmlsnippet content directly in the IDE.
 - Additional validations and quick‑fixes tailored to FileMaker-specific constructs.
@@ -110,3 +114,6 @@ Below are placeholder screenshots; more detailed walkthrough images will be adde
   - JVM option: `-Dfmcuttingboard.verbose=true`
   - Or environment variable: `FMCUTTINGBOARD_VERBOSE=true`
 - When errors occur, notifications may include a "Show Details" action with a stack trace to assist debugging.
+
+## License
+This project is licensed under the MIT License — see [LICENSE](LICENSE) for details.

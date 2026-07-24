@@ -30,7 +30,7 @@ Installation:
 - Install from disk using the ZIP built by Gradle, or via Marketplace once published.
 
 Changelog:
-- See CHANGELOG.md in the repository. Initial release 0.0.1.
+- See CHANGELOG.md in the repository.
 
 Vendor:
 - Name: FMCuttingBoard
@@ -39,3 +39,4 @@ Vendor:
 
 Privacy / Permissions:
 - No network access required. Operates on clipboard and local files within the project.
+- No telemetry or analytics collected. Nothing leaves the user's machine.

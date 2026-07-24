@@ -74,7 +74,7 @@ public class GetFileMakerClipboardContentAction extends AnAction {
 
             // 1) Run the existing routine that saves XML to a new file
             try {
-                new ReadClipboardIntoNewXmlFileAction().actionPerformed(e);
+                new ReadClipboardIntoNewXmlFileAction().perform(e);
             } catch (Throwable t) {
                 LOG.warn("Delegated file creation action failed (continuing to clipboard write)", t);
             }
@@ -117,7 +117,7 @@ public class GetFileMakerClipboardContentAction extends AnAction {
         } catch (ConversionException notFmXml) {
             // Not fmxmlsnippet. Treat as text calculation
             try {
-                new GetFileMakerCalculationFromClipboardAction().actionPerformed(e);
+                new GetFileMakerCalculationFromClipboardAction().perform(e);
             } catch (Throwable t) {
                 LOG.warn("Delegated calculation action failed", t);
                 notifier.notify(project, NotificationType.ERROR,

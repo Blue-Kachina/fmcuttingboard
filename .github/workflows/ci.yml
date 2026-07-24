@@ -17,7 +17,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: '17'
+          java-version: '21'
 
       - name: Show Gradle version
         run: gradle -v || true
@@ -38,3 +38,6 @@ jobs:
 
       - name: Run tests
         run: gradle --no-daemon test
+
+      - name: Verify plugin (JetBrains Plugin Verifier)
+        run: gradle --no-daemon verifyPlugin
