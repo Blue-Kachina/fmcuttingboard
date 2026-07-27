@@ -60,7 +60,7 @@ public class FileMakerCalculationFoldingBuilder extends FoldingBuilderEx {
                                                           @NotNull Document document,
                                                           boolean quick) {
         ASTNode node = root.getNode();
-        if (node == null) return FoldingDescriptor.EMPTY;
+        if (node == null) return FoldingDescriptor.EMPTY_ARRAY;
         return buildFoldRegions(node, document);
     }
 

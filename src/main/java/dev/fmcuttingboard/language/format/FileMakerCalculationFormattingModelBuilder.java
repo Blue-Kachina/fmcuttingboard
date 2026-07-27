@@ -47,15 +47,6 @@ public class FileMakerCalculationFormattingModelBuilder implements FormattingMod
         return FormattingModelProvider.createFormattingModelForPsiFile(file, rootBlock, settings);
     }
 
-    // Backwards compatibility with older IDEs (may be deprecated in newer SDKs)
-    @Override
-    public @NotNull FormattingModel createModel(@NotNull PsiElement element, @NotNull CodeStyleSettings settings) {
-        PsiFile file = element.getContainingFile();
-        SpacingBuilder spacing = createSpacingBuilder(FileMakerCalculationLanguage.INSTANCE, settings);
-        Block rootBlock = new FmBlock(file.getNode(), null, null, spacing, Indent.getNoneIndent());
-        return FormattingModelProvider.createFormattingModelForPsiFile(file, rootBlock, settings);
-    }
-
     private static SpacingBuilder createSpacingBuilder(Language language, CodeStyleSettings settings) {
         CommonCodeStyleSettings common = settings.getCommonSettings(language);
         FileMakerCustomCodeStyleSettings custom = settings.getCustomSettings(FileMakerCustomCodeStyleSettings.class);

@@ -7,6 +7,14 @@ adheres to Semantic Versioning as the plugin matures.
 
 ## [Unreleased]
 
+## [1.0.6] - 2026-07-27
+### Fixed
+- Migrated `FmXmlSnippetNotificationProvider` from the deprecated `EditorNotifications.Provider` to `EditorNotificationProvider`.
+- Replaced the deprecated `FoldingDescriptor.EMPTY` and `SyntaxHighlighterBase.EMPTY` fields with their `EMPTY_ARRAY` replacements.
+- Migrated syntax-highlighting `TextAttributesKey`s off the deprecated `createTextAttributesKey(String, TextAttributes)` overload onto scheme-aware fallback keys (`DefaultLanguageHighlighterColors`); calculation syntax colors now follow the active editor color scheme instead of fixed hex values.
+- Replaced the deprecated `LanguageCodeStyleSettingsProvider.getDefaultCommonSettings()` override with `customizeDefaults(...)`.
+- Removed the `FormattingModelBuilder.createModel(PsiElement, CodeStyleSettings)` override, which the Plugin Verifier flagged as scheduled for removal; the modern `createModel(FormattingContext)` overload already covers all supported IDE versions (`sinceBuild=242`).
+
 ## [1.0.5] - 2026-07-24
 ### Changed
 - Bumped the IntelliJ Platform Gradle Plugin from `2.0.1` to `2.18.1`.

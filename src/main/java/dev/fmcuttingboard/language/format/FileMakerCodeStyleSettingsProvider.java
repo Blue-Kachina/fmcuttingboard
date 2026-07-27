@@ -130,15 +130,13 @@ public class FileMakerCodeStyleSettingsProvider extends LanguageCodeStyleSetting
     }
 
     @Override
-    public @NotNull CommonCodeStyleSettings getDefaultCommonSettings() {
-        // Provide safe defaults so the preview panel can render without relying on IDE defaults.
-        CommonCodeStyleSettings settings = new CommonCodeStyleSettings(getLanguage());
-        CommonCodeStyleSettings.IndentOptions indent = settings.initIndentOptions();
+    protected void customizeDefaults(@NotNull CommonCodeStyleSettings settings,
+                                      @NotNull CommonCodeStyleSettings.IndentOptions indentOptions) {
         // Project defaults as requested
-        indent.USE_TAB_CHARACTER = true;
-        indent.TAB_SIZE = 4;
-        indent.INDENT_SIZE = 4;
-        indent.CONTINUATION_INDENT_SIZE = 8;
+        indentOptions.USE_TAB_CHARACTER = true;
+        indentOptions.TAB_SIZE = 4;
+        indentOptions.INDENT_SIZE = 4;
+        indentOptions.CONTINUATION_INDENT_SIZE = 8;
 
         // Spaces - Around operators
         settings.SPACE_AROUND_ASSIGNMENT_OPERATORS = true;
@@ -153,7 +151,6 @@ public class FileMakerCodeStyleSettingsProvider extends LanguageCodeStyleSetting
 
         // Parentheses interior
         settings.SPACE_WITHIN_PARENTHESES = false;
-        return settings;
     }
 
     // Not all platform versions declare this in superclass; keep without @Override for compatibility

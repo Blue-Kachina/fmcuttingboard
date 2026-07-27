@@ -1,52 +1,42 @@
 package dev.fmcuttingboard.language;
 
 import com.intellij.lexer.Lexer;
+import com.intellij.openapi.editor.DefaultLanguageHighlighterColors;
 import com.intellij.openapi.editor.HighlighterColors;
 import com.intellij.openapi.editor.colors.TextAttributesKey;
-import com.intellij.openapi.editor.markup.TextAttributes;
 import com.intellij.openapi.fileTypes.SyntaxHighlighterBase;
 import com.intellij.psi.tree.IElementType;
 import org.jetbrains.annotations.NotNull;
-
-import java.awt.*;
 
 /**
  * Syntax highlighter for the FileMaker Calculation language (Phase 3.1).
  */
 public class FileMakerCalculationSyntaxHighlighter extends SyntaxHighlighterBase {
 
-    // TextAttributesKey constants matching Notepad++ colors
+    // TextAttributesKey constants, falling back to the active color scheme's defaults
     public static final TextAttributesKey KEYWORD_CONTROL_FLOW = TextAttributesKey.createTextAttributesKey(
-            "FM_CALC_KEYWORD_CONTROL_FLOW",
-            new TextAttributes(new Color(0x00, 0x00, 0xFF), null, null, null, Font.BOLD)); // #0000FF bold
+            "FM_CALC_KEYWORD_CONTROL_FLOW", DefaultLanguageHighlighterColors.KEYWORD);
 
     public static final TextAttributesKey KEYWORD_LOGICAL = TextAttributesKey.createTextAttributesKey(
-            "FM_CALC_KEYWORD_LOGICAL",
-            new TextAttributes(new Color(0x00, 0x66, 0x99), null, null, null, Font.BOLD)); // #006699 bold
+            "FM_CALC_KEYWORD_LOGICAL", DefaultLanguageHighlighterColors.KEYWORD);
 
     public static final TextAttributesKey KEYWORD_TYPE = TextAttributesKey.createTextAttributesKey(
-            "FM_CALC_KEYWORD_TYPE",
-            new TextAttributes(new Color(0xFF, 0x80, 0x00), null, null, null, Font.BOLD)); // #FF8000 bold
+            "FM_CALC_KEYWORD_TYPE", DefaultLanguageHighlighterColors.KEYWORD);
 
     public static final TextAttributesKey FUNCTION = TextAttributesKey.createTextAttributesKey(
-            "FM_CALC_FUNCTION",
-            new TextAttributes(new Color(0x80, 0x00, 0xFF), null, null, null, Font.BOLD)); // #8000FF bold
+            "FM_CALC_FUNCTION", DefaultLanguageHighlighterColors.FUNCTION_CALL);
 
     public static final TextAttributesKey COMMENT = TextAttributesKey.createTextAttributesKey(
-            "FM_CALC_COMMENT",
-            new TextAttributes(new Color(0x00, 0x80, 0x00), null, null, null, Font.PLAIN)); // #008000
+            "FM_CALC_COMMENT", DefaultLanguageHighlighterColors.LINE_COMMENT);
 
     public static final TextAttributesKey STRING = TextAttributesKey.createTextAttributesKey(
-            "FM_CALC_STRING",
-            new TextAttributes(new Color(0xDB, 0x59, 0x9D), null, null, null, Font.PLAIN)); // #DB599D
+            "FM_CALC_STRING", DefaultLanguageHighlighterColors.STRING);
 
     public static final TextAttributesKey NUMBER = TextAttributesKey.createTextAttributesKey(
-            "FM_CALC_NUMBER",
-            new TextAttributes(new Color(0xFF, 0x00, 0x00), null, null, null, Font.PLAIN)); // #FF0000
+            "FM_CALC_NUMBER", DefaultLanguageHighlighterColors.NUMBER);
 
     public static final TextAttributesKey OPERATOR = TextAttributesKey.createTextAttributesKey(
-            "FM_CALC_OPERATOR",
-            new TextAttributes(new Color(0x80, 0x40, 0x00), null, null, null, Font.BOLD)); // #804000 bold
+            "FM_CALC_OPERATOR", DefaultLanguageHighlighterColors.OPERATION_SIGN);
 
     public static final TextAttributesKey BAD_CHAR = HighlighterColors.BAD_CHARACTER;
 
@@ -84,6 +74,6 @@ public class FileMakerCalculationSyntaxHighlighter extends SyntaxHighlighterBase
         if (tokenType == FileMakerCalculationTokenType.BAD_CHARACTER) {
             return pack(BAD_CHAR);
         }
-        return EMPTY;
+        return TextAttributesKey.EMPTY_ARRAY;
     }
 }
