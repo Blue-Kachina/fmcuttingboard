@@ -63,9 +63,11 @@ Notes
 
 ## Screenshots
 
-Below are placeholder screenshots; more detailed walkthrough images will be added as the UI stabilizes.
+![FMCuttingBoard Tools menu open over a generated fmxmlsnippet XML file](docs/screenshots/FmCuttingBoardScreenie.png)
 
-![Plugin Icon](src/main/resources/META-INF/pluginIcon.svg)
+The plugin's icon (small, visible next to "FMCuttingBoard" in the menu above) is used as the icon for the `Tools > FMCuttingBoard` menu item.
+
+![FileMaker calculation-language syntax highlighting in a .fmcalc file](docs/screenshots/FmCuttingBoard_fmcalc.png)
 
 ## Known Limitations
 - Clipboard interoperability depends on OS behavior (Windows and macOS supported; Linux is not).

@@ -24,7 +24,9 @@ Features:
 - Notifications and verbose logging for troubleshooting.
 
 Screenshots:
-- Placeholder: Add screenshots demonstrating the Tools menu and a sample XML preview.
+- docs/screenshots/FmCuttingBoardScreenie.png — the `Tools > FMCuttingBoard` menu open over a generated fmxmlsnippet XML file (also shows the "FileMaker XML Detected" editor notification banner).
+- The plugin's icon is used as the icon for the `Tools > FMCuttingBoard` menu item; no separate icon screenshot needed.
+- docs/screenshots/FmCuttingBoard_fmcalc.png: a `.fmcalc` file showing FileMaker calculation-language syntax highlighting.
 
 Installation:
 - Install from disk using the ZIP built by Gradle, or via Marketplace once published.

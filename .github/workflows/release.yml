@@ -54,6 +54,13 @@ jobs:
       - name: Verify plugin (JetBrains Plugin Verifier)
         run: gradle --no-daemon verifyPlugin
 
+      - name: Sign plugin
+        env:
+          CERTIFICATE_CHAIN: ${{ secrets.CERTIFICATE_CHAIN }}
+          PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
+          PRIVATE_KEY_PASSWORD: ${{ secrets.PRIVATE_KEY_PASSWORD }}
+        run: gradle --no-daemon signPlugin
+
       - name: Extract changelog section for this version
         run: |
           awk -v ver="$PLUGIN_VERSION" '
@@ -73,6 +80,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh release create "$GITHUB_REF_NAME" \
-            build/distributions/*.zip \
+            build/distributions/*-signed.zip \
             --title "$GITHUB_REF_NAME" \
             --notes-file release_notes.md

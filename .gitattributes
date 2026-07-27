@@ -1,0 +1,17 @@
+# Normalize text files to LF so behavior is consistent between Windows dev machines
+# and Linux CI runners (see: gradle.properties CRLF breaking a bash string comparison
+# in .github/workflows/release.yml).
+* text=auto eol=lf
+
+# Windows batch files must stay CRLF.
+*.bat text eol=crlf
+
+# Do not touch line endings in binaries (no-op for now, but guards future additions).
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.jar binary
+*.zip binary
+*.class binary
