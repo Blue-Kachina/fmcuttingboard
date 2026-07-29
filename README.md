@@ -1,6 +1,9 @@
 # FMCuttingBoard
 
 <!-- CI Status Badges -->
+[![Version](https://img.shields.io/jetbrains/plugin/v/33170.svg)](https://plugins.jetbrains.com/plugin/33170-fmcuttingboard)
+[![Downloads](https://img.shields.io/jetbrains/plugin/d/33170.svg)](https://plugins.jetbrains.com/plugin/33170-fmcuttingboard)
+
 ![Build](https://github.com/Blue-Kachina/fmcuttingboard/actions/workflows/ci.yml/badge.svg)
 ![Tests](https://github.com/Blue-Kachina/fmcuttingboard/actions/workflows/ci.yml/badge.svg)
 - A plugin for JetBrains IDEs
