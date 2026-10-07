@@ -1,0 +1,50 @@
+{
+  "name": "fmcuttingboard",
+  "displayName": "FMCuttingBoard",
+  "description": "Move FileMaker objects (scripts, fields, tables, layouts, custom functions, value lists) between FileMaker's clipboard and editable fmxmlsnippet XML.",
+  "version": "0.0.1",
+  "publisher": "bluekachina",
+  "license": "MIT",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Blue-Kachina/fmcuttingboard.git",
+    "directory": "vscode"
+  },
+  "engines": {
+    "vscode": "^1.101.0"
+  },
+  "categories": [
+    "Programming Languages",
+    "Other"
+  ],
+  "keywords": [
+    "FileMaker",
+    "fmxmlsnippet",
+    "clipboard"
+  ],
+  "extensionKind": [
+    "ui"
+  ],
+  "main": "./dist/extension.js",
+  "activationEvents": [],
+  "contributes": {},
+  "scripts": {
+    "build": "node esbuild.mjs",
+    "watch": "node esbuild.mjs --watch",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "check": "npm run typecheck && npm run test",
+    "vscode:prepublish": "node esbuild.mjs --production"
+  },
+  "dependencies": {
+    "@xmldom/xmldom": "0.9.12"
+  },
+  "devDependencies": {
+    "@types/node": "22.15.35",
+    "@types/vscode": "1.101.0",
+    "esbuild": "0.28.2",
+    "typescript": "6.0.3",
+    "vitest": "5.0.3"
+  }
+}

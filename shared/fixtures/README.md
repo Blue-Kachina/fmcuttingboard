@@ -11,7 +11,8 @@ case, change the spec, the fixtures and **both** plugins in the same PR.
 | `snippets/<type>/*.xml` | fmxmlsnippet samples, grouped by the snippet type they must be detected as |
 | `fmcalc/*.fmcalc` | FileMaker calculation samples for the `.fmcalc` language support |
 | `golden/snippets.generated.json` | Per-snippet expectations. **Generated**: run `node shared/tools/generate-golden.mjs` after adding or changing a snippet |
-| `golden/cases.json` | Hand-written edge cases (detection, normalization, decoding, extraction) |
+| `golden/cases.json` | Hand-written edge cases (detection, normalization, decoding, extraction, XML validation, file naming) |
+| `golden/function-signatures.txt` | How each function in `shared/data/filemaker-functions.json` is displayed (name, category, return type, signatures, description). Update it deliberately when that data changes |
 | `clipboard/<type>/<capture>/` | Raw bytes captured from real FileMaker (see below) |
 
 Fixture text files must use LF line endings. `.gitattributes` enforces this, and the generator checks it.
@@ -45,6 +46,17 @@ variant's bytes as described in `build`, then:
 **`cases.json` → `decodeBytesWithBomHeuristics` / `extractFmxmlFromBytes`**: the input is either `hex`
 (bytes) or `text` plus `encoding` (`utf8`, `utf16le` or `utf16be`, with no BOM). The result must equal
 `expect`, where `null` means nothing was extracted.
+
+**`cases.json` → `parseSnippet`**: run `FmXmlParser.parse(xml)`.
+
+- With `error`: parsing must fail with exactly that message. The messages are shown to users, so both plugins must use the same wording.
+- Otherwise, the parsed model must match `expect`, with `elementTypes` in the order `FIELDS, SCRIPTS, TABLES, LAYOUTS, CUSTOM_FUNCTIONS, VALUE_LISTS`.
+- Then `DefaultXmlToClipboardConverter.convertToClipboardPayload(xml)` must return `payload`, or fail with exactly `payloadError`.
+
+**`cases.json` → `fmSnippetDetectTypes`**: `FmSnippet.detectTypes(xml)` must equal `expect`, in the same order.
+
+**`cases.json` → `fileNaming`**: `uniqueFileName(resolveFileName(pattern, extension, nowMillis), name ∈ existing)`
+must equal `expect`. A `null` pattern means the setting is unset.
 
 ## Raw clipboard captures (`clipboard/`)
 

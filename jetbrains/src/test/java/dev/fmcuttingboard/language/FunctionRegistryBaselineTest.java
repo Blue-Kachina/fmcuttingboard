@@ -13,16 +13,17 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * Guards the move of function data from hardcoded Java into shared/data/filemaker-functions.json.
  *
- * registry-baseline.txt was generated from the hardcoded registry (plugin 1.0.6) before the move. If you
- * deliberately change shared/data/filemaker-functions.json, update the baseline file to match.
+ * shared/fixtures/golden/function-signatures.txt was generated from the hardcoded registry (plugin 1.0.6)
+ * before the move; the VS Code extension checks the same file. If you deliberately change
+ * shared/data/filemaker-functions.json, update that file to match.
  */
 public class FunctionRegistryBaselineTest {
 
     @Test
     void registryLoadedFromSharedJsonMatchesBaseline() throws Exception {
         List<String> expected;
-        try (InputStream in = getClass().getClassLoader().getResourceAsStream("registry-baseline.txt")) {
-            assertNotNull(in, "registry-baseline.txt test resource missing");
+        try (InputStream in = getClass().getClassLoader().getResourceAsStream("golden/function-signatures.txt")) {
+            assertNotNull(in, "shared/fixtures/golden/function-signatures.txt missing from test classpath");
             expected = Arrays.asList(new String(in.readAllBytes(), StandardCharsets.UTF_8).split("\n"));
         }
 

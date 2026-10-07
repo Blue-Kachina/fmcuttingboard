@@ -4,9 +4,10 @@
   "title": "Hand-written golden cases",
   "type": "object",
   "additionalProperties": false,
-  "required": ["byteVariants", "detection", "normalizeToXmlText", "decodeBytesWithBomHeuristics", "extractFmxmlFromBytes"],
+  "required": ["byteVariants", "detection", "normalizeToXmlText", "decodeBytesWithBomHeuristics", "extractFmxmlFromBytes", "parseSnippet", "fmSnippetDetectTypes", "fileNaming"],
   "definitions": {
     "nullableString": { "type": ["string", "null"] },
+    "elementType": { "enum": ["FIELDS", "SCRIPTS", "TABLES", "LAYOUTS", "CUSTOM_FUNCTIONS", "VALUE_LISTS", "UNKNOWN"] },
     "byteInput": {
       "type": "object",
       "additionalProperties": false,
@@ -81,6 +82,68 @@
       }
     },
     "decodeBytesWithBomHeuristics": { "type": "array", "items": { "$ref": "#/definitions/byteInput" } },
-    "extractFmxmlFromBytes": { "type": "array", "items": { "$ref": "#/definitions/byteInput" } }
+    "extractFmxmlFromBytes": { "type": "array", "items": { "$ref": "#/definitions/byteInput" } },
+    "parseSnippet": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "xml"],
+        "oneOf": [
+          { "required": ["error"], "not": { "anyOf": [{ "required": ["expect"] }, { "required": ["payload"] }, { "required": ["payloadError"] }] } },
+          { "required": ["expect", "payload"], "not": { "anyOf": [{ "required": ["error"] }, { "required": ["payloadError"] }] } },
+          { "required": ["expect", "payloadError"], "not": { "anyOf": [{ "required": ["error"] }, { "required": ["payload"] }] } }
+        ],
+        "properties": {
+          "id": { "type": "string" },
+          "xml": { "type": "string" },
+          "error": { "type": "string", "description": "FmXmlParser.parse must fail with exactly this message" },
+          "expect": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["elementTypes", "version", "typeHint", "fieldNames", "layoutNames", "scriptNames"],
+            "properties": {
+              "elementTypes": { "type": "array", "items": { "$ref": "#/definitions/elementType" } },
+              "version": { "$ref": "#/definitions/nullableString" },
+              "typeHint": { "$ref": "#/definitions/nullableString" },
+              "fieldNames": { "type": "array", "items": { "type": "string" } },
+              "layoutNames": { "type": "array", "items": { "type": "string" } },
+              "scriptNames": { "type": "array", "items": { "type": "string" } }
+            }
+          },
+          "payload": { "type": "string", "description": "DefaultXmlToClipboardConverter result" },
+          "payloadError": { "type": "string", "description": "DefaultXmlToClipboardConverter must fail with exactly this message" }
+        }
+      }
+    },
+    "fmSnippetDetectTypes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "xml", "expect"],
+        "properties": {
+          "id": { "type": "string" },
+          "xml": { "type": "string" },
+          "expect": { "type": "array", "minItems": 1, "items": { "$ref": "#/definitions/elementType" } }
+        }
+      }
+    },
+    "fileNaming": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "pattern", "extension", "nowMillis", "existing", "expect"],
+        "properties": {
+          "id": { "type": "string" },
+          "pattern": { "$ref": "#/definitions/nullableString" },
+          "extension": { "type": "string", "pattern": "^\\." },
+          "nowMillis": { "type": "integer", "minimum": 0 },
+          "existing": { "type": "array", "items": { "type": "string" } },
+          "expect": { "type": "string" }
+        }
+      }
+    }
   }
 }

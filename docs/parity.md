@@ -10,6 +10,12 @@ that has the feature in that plugin.
 Shared foundations (both plugins must pass them, see `shared/fixtures/README.md`):
 `shared/data/clipboard-formats.json`, `shared/data/filemaker-functions.json`, `shared/fixtures/`.
 
+| Foundation | JetBrains | VS Code | Notes |
+|---|:---:|:---:|---|
+| Reads shared data (formats, functions) | ✅ Unreleased | ✅ Unreleased | |
+| Passes shared golden fixtures | ✅ Unreleased | ✅ Unreleased | Same 230 cases in both; CI runs both on every push |
+| Passes raw FileMaker captures | — | — | No captures recorded yet |
+
 ## Clipboard workflow
 
 | Capability | JetBrains | VS Code | Notes |

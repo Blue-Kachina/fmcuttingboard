@@ -146,27 +146,8 @@ public class GetFileMakerCalculationFromClipboardAction extends AnAction {
     }
 
     private static Path createUniqueFmcalcFile(Path dir, String fileNamePattern) throws IOException {
-        String pattern = (fileNamePattern == null || fileNamePattern.isBlank())
-                ? "{timestamp}"
-                : fileNamePattern;
-        String baseName = pattern.replace("{timestamp}", String.valueOf(System.currentTimeMillis()));
-        if (!baseName.endsWith(".fmcalc")) {
-            baseName = baseName + ".fmcalc";
-        }
-        Path candidate = dir.resolve(baseName);
-        int attempt = 0;
-        while (Files.exists(candidate)) {
-            attempt++;
-            int dot = baseName.lastIndexOf('.');
-            String withSuffix = (dot > 0)
-                    ? baseName.substring(0, dot) + "-" + attempt + baseName.substring(dot)
-                    : baseName + "-" + attempt;
-            candidate = dir.resolve(withSuffix);
-            if (attempt > 1000) {
-                throw new IOException("Unable to create a unique filename after 1000 attempts for baseName=" + baseName);
-            }
-        }
-        return Files.createFile(candidate);
+        String baseName = ProjectFiles.resolveFileName(fileNamePattern, ".fmcalc", System.currentTimeMillis());
+        return Files.createFile(dir.resolve(ProjectFiles.uniqueFileName(baseName, name -> Files.exists(dir.resolve(name)))));
     }
 
     private static String safeMessage(Throwable t) {

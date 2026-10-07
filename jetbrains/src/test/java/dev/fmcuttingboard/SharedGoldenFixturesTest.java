@@ -6,7 +6,13 @@ import com.google.gson.JsonParser;
 import dev.fmcuttingboard.clipboard.ClipboardFormats;
 import dev.fmcuttingboard.clipboard.FmClipboardCodec;
 import dev.fmcuttingboard.clipboard.SnippetType;
+import dev.fmcuttingboard.fm.ConversionException;
 import dev.fmcuttingboard.fm.DefaultFileMakerClipboardParser;
+import dev.fmcuttingboard.fm.DefaultXmlToClipboardConverter;
+import dev.fmcuttingboard.fm.FmSnippet;
+import dev.fmcuttingboard.fm.FmXmlParser;
+import dev.fmcuttingboard.fm.ParsedSnippet;
+import dev.fmcuttingboard.fs.ProjectFiles;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
 
@@ -184,7 +190,61 @@ public class SharedGoldenFixturesTest {
             tests.add(dynamicTest("extract: " + c.get("id").getAsString(), () ->
                     assertEquals(expectedOrNull(c), FmClipboardCodec.extractFmxmlFromBytes(inputBytes(c)))));
         }
+        for (JsonElement e : cases.getAsJsonArray("parseSnippet")) {
+            JsonObject c = e.getAsJsonObject();
+            tests.add(dynamicTest("parseSnippet: " + c.get("id").getAsString(), () -> assertParseCase(c)));
+        }
+        for (JsonElement e : cases.getAsJsonArray("fmSnippetDetectTypes")) {
+            JsonObject c = e.getAsJsonObject();
+            tests.add(dynamicTest("fmSnippetDetectTypes: " + c.get("id").getAsString(), () ->
+                    assertEquals(strings(c, "expect"),
+                            FmSnippet.detectTypes(c.get("xml").getAsString()).stream().map(Enum::name).toList())));
+        }
+        for (JsonElement e : cases.getAsJsonArray("fileNaming")) {
+            JsonObject c = e.getAsJsonObject();
+            tests.add(dynamicTest("fileNaming: " + c.get("id").getAsString(), () -> {
+                String pattern = c.get("pattern").isJsonNull() ? null : c.get("pattern").getAsString();
+                String base = ProjectFiles.resolveFileName(pattern, c.get("extension").getAsString(), c.get("nowMillis").getAsLong());
+                List<String> existing = strings(c, "existing");
+                assertEquals(c.get("expect").getAsString(), ProjectFiles.uniqueFileName(base, existing::contains));
+            }));
+        }
         return tests.stream();
+    }
+
+    private static List<String> strings(JsonObject o, String key) {
+        List<String> out = new ArrayList<>();
+        o.getAsJsonArray(key).forEach(x -> out.add(x.getAsString()));
+        return out;
+    }
+
+    private static String stringOrNull(JsonObject o, String key) {
+        return o.get(key).isJsonNull() ? null : o.get(key).getAsString();
+    }
+
+    private static void assertParseCase(JsonObject c) throws Exception {
+        String xml = c.get("xml").getAsString();
+        if (c.has("error")) {
+            ConversionException ex = assertThrows(ConversionException.class, () -> new FmXmlParser().parse(xml));
+            assertEquals(c.get("error").getAsString(), ex.getMessage());
+            return;
+        }
+        ParsedSnippet model = new FmXmlParser().parse(xml);
+        JsonObject expect = c.getAsJsonObject("expect");
+        assertEquals(strings(expect, "elementTypes"), model.getElementTypes().stream().map(Enum::name).toList(), "elementTypes");
+        assertEquals(stringOrNull(expect, "version"), model.getVersion(), "version");
+        assertEquals(stringOrNull(expect, "typeHint"), model.getTypeHint(), "typeHint");
+        assertEquals(strings(expect, "fieldNames"), model.getFieldNames(), "fieldNames");
+        assertEquals(strings(expect, "layoutNames"), model.getLayoutNames(), "layoutNames");
+        assertEquals(strings(expect, "scriptNames"), model.getScriptNames(), "scriptNames");
+
+        DefaultXmlToClipboardConverter converter = new DefaultXmlToClipboardConverter();
+        if (c.has("payloadError")) {
+            ConversionException ex = assertThrows(ConversionException.class, () -> converter.convertToClipboardPayload(xml));
+            assertEquals(c.get("payloadError").getAsString(), ex.getMessage());
+        } else {
+            assertEquals(c.get("payload").getAsString(), converter.convertToClipboardPayload(xml));
+        }
     }
 
     /** Raw captures from real FileMaker: our encoding must reproduce FileMaker's bytes exactly. */

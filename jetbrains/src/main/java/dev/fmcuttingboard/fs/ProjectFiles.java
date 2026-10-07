@@ -153,35 +153,44 @@ public final class ProjectFiles {
         EnsureResult res = ensureCustomBaseDir(projectRoot, baseDirName);
         Path dir = res.directory();
 
-        String pattern = (fileNamePattern == null || fileNamePattern.isBlank())
-                ? "{timestamp}"
-                : fileNamePattern;
-        String baseName = pattern.replace("{timestamp}", String.valueOf(System.currentTimeMillis()));
-        if (!baseName.endsWith(".xml")) {
-            baseName = baseName + ".xml"; // ensure extension
-        }
-
-        Path candidate = dir.resolve(baseName);
-        int attempt = 0;
-        while (Files.exists(candidate)) {
-            attempt++;
-            String withSuffix;
-            int dot = baseName.lastIndexOf('.')
-                    ;
-            if (dot > 0) {
-                withSuffix = baseName.substring(0, dot) + "-" + attempt + baseName.substring(dot);
-            } else {
-                withSuffix = baseName + "-" + attempt;
-            }
-            candidate = dir.resolve(withSuffix);
-            if (attempt > 1000) {
-                throw new IOException("Unable to create a unique filename after 1000 attempts for baseName=" + baseName);
-            }
-        }
+        String baseName = resolveFileName(fileNamePattern, ".xml", System.currentTimeMillis());
+        Path candidate = dir.resolve(uniqueFileName(baseName, name -> Files.exists(dir.resolve(name))));
         try {
             return Files.createFile(candidate);
         } catch (IOException ioe) {
             throw new IOException("Failed to create XML file at: " + candidate, ioe);
         }
+    }
+
+    // ----- File naming (pure; pinned by the shared golden fixtures, mirrored in the VS Code extension) -----
+
+    /**
+     * Expands a settings file name pattern: {@code {timestamp}} becomes epoch millis, a blank pattern means
+     * {@code {timestamp}}, and {@code extension} (e.g. ".xml") is appended unless the name already ends with it.
+     */
+    public static String resolveFileName(String fileNamePattern, String extension, long nowMillis) {
+        String pattern = (fileNamePattern == null || fileNamePattern.isBlank()) ? "{timestamp}" : fileNamePattern;
+        String baseName = pattern.replace("{timestamp}", String.valueOf(nowMillis));
+        return baseName.endsWith(extension) ? baseName : baseName + extension;
+    }
+
+    /**
+     * Returns {@code baseName} if it is free, otherwise the first free {@code name-N.ext} (N = 1, 2, …),
+     * with the suffix inserted before the last dot.
+     */
+    public static String uniqueFileName(String baseName, java.util.function.Predicate<String> exists) throws IOException {
+        String candidate = baseName;
+        int attempt = 0;
+        while (exists.test(candidate)) {
+            attempt++;
+            if (attempt > 1000) {
+                throw new IOException("Unable to create a unique filename after 1000 attempts for baseName=" + baseName);
+            }
+            int dot = baseName.lastIndexOf('.');
+            candidate = (dot > 0)
+                    ? baseName.substring(0, dot) + "-" + attempt + baseName.substring(dot)
+                    : baseName + "-" + attempt;
+        }
+        return candidate;
     }
 }
