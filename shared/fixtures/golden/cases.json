@@ -1,0 +1,64 @@
+{
+  "$schema": "../../schemas/golden-cases.schema.json",
+  "about": "Hand-written golden cases. Both plugins' test suites must run every case here and in snippets.generated.json. See shared/fixtures/README.md for the exact meaning of each section.",
+
+  "byteVariants": {
+    "about": "For every snippet fixture and both line-ending styles (lf, crlf), build these byte arrays from the text and check decodeBytesWithBomHeuristics and extractFmxmlFromBytes. 'decode' and 'extract' name what each function must return.",
+    "variants": [
+      { "id": "utf8",                   "build": "UTF-8 bytes of text",                           "decode": "text",  "extract": "snippet" },
+      { "id": "utf8-bom",               "build": "EF BB BF + UTF-8 bytes of text",                "decode": "text",  "extract": "snippet" },
+      { "id": "utf16le",                "build": "UTF-16LE bytes of text",                        "decode": "text",  "extract": "snippet" },
+      { "id": "utf16le-bom",            "build": "FF FE + UTF-16LE bytes of text",                "decode": "text",  "extract": "snippet" },
+      { "id": "utf16le-nul-terminated", "build": "UTF-16LE bytes of text + 00 00 (CF_UNICODETEXT)", "decode": "text", "extract": "snippet" },
+      { "id": "utf16be",                "build": "UTF-16BE bytes of text",                        "decode": "text",  "extract": "snippet" },
+      { "id": "utf16be-bom",            "build": "FE FF + UTF-16BE bytes of text",                "decode": "text",  "extract": "snippet" },
+      { "id": "custom-format-payload",  "build": "encodeCustomFormatPayload(text)",               "decode": "skip",  "extract": "lf-snippet" }
+    ]
+  },
+
+  "detection": [
+    { "id": "empty", "text": "", "expect": "UNKNOWN" },
+    { "id": "plain-text", "text": "Hello, world", "expect": "UNKNOWN" },
+    { "id": "script-steps", "text": "<fmxmlsnippet type=\"FMObjectList\"><Step enable=\"True\" id=\"1\" name=\"Beep\"/></fmxmlsnippet>", "expect": "SCRIPT_STEPS" },
+    { "id": "script-beats-step", "text": "<fmxmlsnippet><Script name=\"S\"><Step id=\"1\"/></Script></fmxmlsnippet>", "expect": "SCRIPT" },
+    { "id": "table-beats-field", "text": "<fmxmlsnippet><BaseTable name=\"T\"><Field name=\"F\"/></BaseTable></fmxmlsnippet>", "expect": "TABLE_DEFINITION" },
+    { "id": "layout-beats-field", "text": "<fmxmlsnippet><Layout><Object type=\"Field\"><Field name=\"F\"/></Object></Layout></fmxmlsnippet>", "expect": "LAYOUT_OBJECTS" },
+    { "id": "layout-object-list", "text": "<fmxmlsnippet><LayoutObjectList/></fmxmlsnippet>", "expect": "LAYOUT_OBJECTS" },
+    { "id": "object-with-space", "text": "<fmxmlsnippet><Object type=\"Text\"/></fmxmlsnippet>", "expect": "LAYOUT_OBJECTS" },
+    { "id": "part", "text": "<fmxmlsnippet><Part type=\"Body\"/></fmxmlsnippet>", "expect": "LAYOUT_OBJECTS" },
+    { "id": "field-definition", "text": "<fmxmlsnippet><FieldDefinition name=\"F\"/></fmxmlsnippet>", "expect": "FIELD_DEFINITION" },
+    { "id": "field-with-space", "text": "<fmxmlsnippet><Field id=\"1\" name=\"F\"/></fmxmlsnippet>", "expect": "FIELD_DEFINITION" },
+    { "id": "field-without-attributes-is-unknown", "text": "<fmxmlsnippet><Field></Field></fmxmlsnippet>", "expect": "UNKNOWN" },
+    { "id": "detection-is-case-sensitive", "text": "<fmxmlsnippet><step id=\"1\"/></fmxmlsnippet>", "expect": "UNKNOWN" },
+    { "id": "custom-function", "text": "<fmxmlsnippet><CustomFunction name=\"CF\"/></fmxmlsnippet>", "expect": "CUSTOM_FUNCTION" },
+    { "id": "value-list", "text": "<fmxmlsnippet><ValueList name=\"VL\"/></fmxmlsnippet>", "expect": "VALUE_LIST" }
+  ],
+
+  "normalizeToXmlText": [
+    { "id": "already-clean", "input": "<fmxmlsnippet type=\"FMObjectList\"><Step/></fmxmlsnippet>", "expect": "<fmxmlsnippet type=\"FMObjectList\"><Step/></fmxmlsnippet>" },
+    { "id": "surrounding-junk", "input": "junk before\n<fmxmlsnippet type=\"FMObjectList\"><Step/></fmxmlsnippet>\njunk after", "expect": "<fmxmlsnippet type=\"FMObjectList\"><Step/></fmxmlsnippet>" },
+    { "id": "tags-case-insensitive", "input": "x<FMXMLSNIPPET type=\"FMObjectList\"><Step/></FmXmlSnippet>y", "expect": "<FMXMLSNIPPET type=\"FMObjectList\"><Step/></FmXmlSnippet>" },
+    { "id": "first-snippet-wins", "input": "<fmxmlsnippet a=\"1\"><Step/></fmxmlsnippet><fmxmlsnippet a=\"2\"><Step/></fmxmlsnippet>", "expect": "<fmxmlsnippet a=\"1\"><Step/></fmxmlsnippet>" },
+    { "id": "no-closing-tag", "input": "<fmxmlsnippet type=\"FMObjectList\"><Step/>", "expect": null },
+    { "id": "not-a-snippet", "input": "If ( x > 1 ; \"a\" ; \"b\" )", "expect": null },
+    { "id": "empty", "input": "", "expect": null }
+  ],
+
+  "decodeBytesWithBomHeuristics": [
+    { "id": "empty", "hex": "", "expect": "" },
+    { "id": "utf8-no-bom", "hex": "3C613E", "expect": "<a>" },
+    { "id": "utf8-bom", "hex": "EFBBBF3C613E", "expect": "<a>" },
+    { "id": "utf16le-bom", "hex": "FFFE3C0061003E00", "expect": "<a>" },
+    { "id": "utf16be-bom", "hex": "FEFF003C0061003E", "expect": "<a>" },
+    { "id": "utf16le-no-bom", "hex": "3C0061003E00", "expect": "<a>", "note": "Zeros at odd offsets mean UTF-16LE. Plugin 1.0.6 got this backwards." },
+    { "id": "utf16be-no-bom", "hex": "003C0061003E", "expect": "<a>" },
+    { "id": "embedded-nuls-removed", "hex": "3C00613E", "expect": "<a>", "note": "Too few zeros for the UTF-16 guess, so UTF-8 with the NUL removed" }
+  ],
+
+  "extractFmxmlFromBytes": [
+    { "id": "empty", "hex": "", "expect": null },
+    { "id": "no-snippet", "hex": "3C613E", "expect": null },
+    { "id": "first-open-to-last-close", "text": "<fmxmlsnippet a=\"1\"/></fmxmlsnippet>x</fmxmlsnippet>", "encoding": "utf8", "expect": "<fmxmlsnippet a=\"1\"/></fmxmlsnippet>x</fmxmlsnippet>", "note": "Unlike normalizeToXmlText, which stops at the first closing tag" },
+    { "id": "utf16be-non-ascii-not-misread-as-le", "text": "<fmxmlsnippet>é</fmxmlsnippet>\n", "encoding": "utf16be", "expect": "<fmxmlsnippet>é</fmxmlsnippet>", "note": "Plugin 1.0.6 matched the UTF-16LE pattern one byte into UTF-16BE data and garbled non-ASCII text" }
+  ]
+}

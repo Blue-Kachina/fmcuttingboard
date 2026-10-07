@@ -7,7 +7,38 @@ on:
     branches: [ "**" ]
 
 jobs:
+  # Validates shared/ (data + golden fixtures used by both plugins) before either plugin builds.
+  shared-validation:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      # Node is preinstalled on GitHub's ubuntu runners
+      - name: Validate shared data and golden fixtures against schemas
+        run: |
+          set -euo pipefail
+          validate() { npx --yes ajv-cli@5.0.0 validate --spec=draft7 --errors=text -s "$1" -d "$2"; }
+          validate shared/schemas/clipboard-formats.schema.json   shared/data/clipboard-formats.json
+          validate shared/schemas/filemaker-functions.schema.json shared/data/filemaker-functions.json
+          validate shared/schemas/golden-snippets.schema.json     shared/fixtures/golden/snippets.generated.json
+          validate shared/schemas/golden-cases.schema.json        shared/fixtures/golden/cases.json
+          if find shared/fixtures/clipboard -name capture.json | grep -q .; then
+            find shared/fixtures/clipboard -name capture.json -print0 | while IFS= read -r -d '' f; do
+              validate shared/schemas/capture.schema.json "$f"
+            done
+          fi
+
+      - name: Check generated golden file is up to date
+        run: |
+          node shared/tools/generate-golden.mjs
+          if ! git diff --exit-code -- shared/fixtures/golden/snippets.generated.json; then
+            echo "::error::shared/fixtures/golden/snippets.generated.json is stale. Run 'node shared/tools/generate-golden.mjs' and commit the result."
+            exit 1
+          fi
+
   jetbrains:
+    needs: shared-validation
     runs-on: ubuntu-latest
     defaults:
       run:

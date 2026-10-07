@@ -52,7 +52,7 @@ jobs:
             ${{ runner.os }}-gradle-
 
       - name: Run tests
-        run: gradle --no-daemon test
+        run: gradle --no-daemon test verifySharedDataPackaged
 
       - name: Build plugin
         run: gradle --no-daemon buildPlugin

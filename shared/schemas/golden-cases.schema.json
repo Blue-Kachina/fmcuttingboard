@@ -1,0 +1,86 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "golden-cases.schema.json",
+  "title": "Hand-written golden cases",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["byteVariants", "detection", "normalizeToXmlText", "decodeBytesWithBomHeuristics", "extractFmxmlFromBytes"],
+  "definitions": {
+    "nullableString": { "type": ["string", "null"] },
+    "byteInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "expect"],
+      "oneOf": [
+        { "required": ["hex"], "not": { "anyOf": [{ "required": ["text"] }, { "required": ["encoding"] }] } },
+        { "required": ["text", "encoding"], "not": { "required": ["hex"] } }
+      ],
+      "properties": {
+        "id": { "type": "string" },
+        "hex": { "type": "string", "pattern": "^([0-9A-Fa-f]{2})*$" },
+        "text": { "type": "string" },
+        "encoding": { "enum": ["utf8", "utf16le", "utf16be"] },
+        "expect": { "$ref": "#/definitions/nullableString" },
+        "note": { "type": "string" }
+      }
+    }
+  },
+  "properties": {
+    "$schema": { "type": "string" },
+    "about": { "type": "string" },
+    "byteVariants": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["variants"],
+      "properties": {
+        "about": { "type": "string" },
+        "variants": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "build", "decode", "extract"],
+            "properties": {
+              "id": {
+                "enum": ["utf8", "utf8-bom", "utf16le", "utf16le-bom", "utf16le-nul-terminated", "utf16be", "utf16be-bom", "custom-format-payload"]
+              },
+              "build": { "type": "string" },
+              "decode": { "enum": ["text", "skip"] },
+              "extract": { "enum": ["snippet", "lf-snippet"] }
+            }
+          }
+        }
+      }
+    },
+    "detection": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "text", "expect"],
+        "properties": {
+          "id": { "type": "string" },
+          "text": { "type": "string" },
+          "expect": {
+            "enum": ["SCRIPT", "SCRIPT_STEPS", "FIELD_DEFINITION", "TABLE_DEFINITION", "CUSTOM_FUNCTION", "VALUE_LIST", "LAYOUT_OBJECTS", "UNKNOWN"]
+          }
+        }
+      }
+    },
+    "normalizeToXmlText": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "input", "expect"],
+        "properties": {
+          "id": { "type": "string" },
+          "input": { "type": "string" },
+          "expect": { "$ref": "#/definitions/nullableString" }
+        }
+      }
+    },
+    "decodeBytesWithBomHeuristics": { "type": "array", "items": { "$ref": "#/definitions/byteInput" } },
+    "extractFmxmlFromBytes": { "type": "array", "items": { "$ref": "#/definitions/byteInput" } }
+  }
+}

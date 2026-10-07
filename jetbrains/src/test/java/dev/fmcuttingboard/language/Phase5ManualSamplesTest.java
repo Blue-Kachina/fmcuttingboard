@@ -46,7 +46,7 @@ public class Phase5ManualSamplesTest {
 
     @Test
     public void sample_basic_highlights_core_tokens() {
-        String text = readResource("test-snippets/samples/basic.fmcalc");
+        String text = readResource("fmcalc/basic.fmcalc");
         List<IElementType> tokens = tokenize(text);
 
         assertTrue(tokens.stream().anyMatch(t -> t == FileMakerCalculationTokenType.KEYWORD_FUNCTION), "Should contain function tokens");
@@ -57,7 +57,7 @@ public class Phase5ManualSamplesTest {
 
     @Test
     public void sample_comments_and_strings_are_highlighted() {
-        String text = readResource("test-snippets/samples/comments_strings.fmcalc");
+        String text = readResource("fmcalc/comments_strings.fmcalc");
         List<IElementType> tokens = tokenize(text);
 
         assertTrue(tokens.stream().anyMatch(t -> t == FileMakerCalculationTokenType.LINE_COMMENT), "Should contain line comment");
@@ -67,7 +67,7 @@ public class Phase5ManualSamplesTest {
 
     @Test
     public void sample_nested_expressions_and_functions() {
-        String text = readResource("test-snippets/samples/nested.fmcalc");
+        String text = readResource("fmcalc/nested.fmcalc");
         List<IElementType> tokens = tokenize(text);
 
         // Expect both control/logical keywords and functions
@@ -79,7 +79,7 @@ public class Phase5ManualSamplesTest {
 
     @Test
     public void sample_empty_file_yields_no_tokens() {
-        String text = readResource("test-snippets/samples/empty.fmcalc");
+        String text = readResource("fmcalc/empty.fmcalc");
         List<IElementType> tokens = tokenize(text);
         // Only whitespace at most
         assertFalse(tokens.stream().anyMatch(t -> t != FileMakerCalculationTokenType.WHITE_SPACE), "Empty file should produce no significant tokens");

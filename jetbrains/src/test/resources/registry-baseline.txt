@@ -1,0 +1,22 @@
+If | Logical | Any | If(test; resultTrue; [resultFalse]) | If(test; resultTrue; resultFalse) | If(test; resultTrue; [resultFalse])
+Case | Logical | Any | Case(test1; result1; [testN; resultN...]; [default]) | Case(test1; result1; testN; resultN; default) | Case(test1; result1; [test2; result2; …]; [default])
+Let | Logical | Any | Let(bindings; result) | Let(bindings; result) | Let([name = expr; …]; result)
+Left | Text | Text | Left(text; count) | Left(text; count) | 
+Right | Text | Text | Right(text; count) | Right(text; count) | 
+Middle | Text | Text | Middle(text; start; count) | Middle(text; start; count) | 
+Substitute | Text | Text | Substitute(text; search; replace) | Substitute(text; search; replace) | 
+Round | Math | Number | Round(number; numDecimals) | Round(number; numDecimals) | 
+Abs | Math | Number | Abs(number) | Abs(number) | 
+Sum | Aggregate | Number | Sum(field; [field......]) | Sum(field; field...) | 
+Average | Aggregate | Number | Average(field; [field......]) | Average(field; field...) | 
+Date | Date/Time | Date | Date(month; day; year) | Date(month; day; year) | 
+Time | Date/Time | Time | Time(hour; minute; second) | Time(hour; minute; second) | 
+Timestamp | Date/Time | Timestamp | Timestamp(date; time) | Timestamp(date; time) | 
+Year | Date/Time | Number | Year(date) | Year(date) | 
+Month | Date/Time | Number | Month(date) | Month(date) | 
+Day | Date/Time | Number | Day(date) | Day(date) | 
+List | List | Text | List(value1; [valueN...]) | List(value1; valueN) | 
+ValueCount | List | Number | ValueCount(values) | ValueCount(values) | 
+GetField | Data/Fields | Any | GetField(fieldName) | GetField(fieldName) | 
+GetValue | List | Text | GetValue(values; index) | GetValue(values; index) | 
+Get | Get() | Any | Get(name) | Get(name) | Get(name) — name is one of the FileMaker environment constants, e.g., AccountName, HostName, LastError, …

@@ -11,6 +11,13 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
+import static dev.fmcuttingboard.clipboard.FmClipboardCodec.decodeBytesWithBomHeuristics;
+import static dev.fmcuttingboard.clipboard.FmClipboardCodec.extractFmxmlFromBytes;
+import static dev.fmcuttingboard.clipboard.FmClipboardCodec.normalizeToLfNewlines;
+import static dev.fmcuttingboard.clipboard.FmClipboardCodec.stripNulls;
+import static dev.fmcuttingboard.clipboard.FmClipboardCodec.utf16leNullTerminated;
+import static dev.fmcuttingboard.clipboard.FmClipboardCodec.utf8LengthPrefixedNoBom;
+
 /**
  * Default implementation backed by IntelliJ's CopyPasteManager.
  */
@@ -391,14 +398,8 @@ public class DefaultClipboardService implements ClipboardService {
         // 1) Always publish CF_UNICODETEXT (format id 13) containing a UTF-16LE, NUL-terminated string.
         //    - No BOM is included for CF_UNICODETEXT (Windows convention for this format).
         //    - The terminator is a 16-bit 0x0000 (i.e., two trailing zero bytes).
-        // 2) Additionally publish exactly one FileMaker custom format, depending on fmxmlsnippet type. Known mappings:
-        //    - Script (entire script): "Mac-XMSC"
-        //    - Script Steps (selection): "Mac-XMSS"
-        //    - Fields: "Mac-XMFD"
-        //    - Tables: "Mac-XMTB"   <-- updated per latest captures
-        //    - Custom Functions: "Mac-XMFN"
-        //    - Value Lists: "Mac-XMVL"
-        //    - Layout Objects: "Mac-XML2" (very large; currently read/diagnostic only in this plugin)
+        // 2) Additionally publish exactly one FileMaker custom format (plus any aliases), depending on fmxmlsnippet
+        //    type. The type → format mapping lives in shared/data/clipboard-formats.json (e.g. Script Steps → "Mac-XMSS").
         //    Payload details for FileMaker custom formats:
         //    - 4-byte little-endian length prefix of the following XML bytes
         //    - Encoding: UTF-8 without BOM
@@ -417,7 +418,7 @@ public class DefaultClipboardService implements ClipboardService {
         }
 
         // Detect fmxmlsnippet content type for selecting correct FileMaker clipboard flavor
-        SnippetType type = detectSnippetType(text);
+        SnippetType type = ClipboardFormats.detectSnippetType(text);
         if (type == SnippetType.UNKNOWN) {
             // Unknown content — fall back to generic multi-flavor AWT writer
             LOG.info("[CB-DIAG] Native write skipped: unknown fmxmlsnippet type (falling back to text-only flavors)");
@@ -429,9 +430,8 @@ public class DefaultClipboardService implements ClipboardService {
         // Guard extremely large payloads to avoid excessive allocations
         final byte[] utf16 = utf16leNullTerminated(text);
         // For FileMaker's custom Mac-* formats, normalize newlines to LF ("\n").
-        final String customPayload = normalizeToLfNewlines(text);
         // FileMaker's custom Mac-* formats: 4-byte LE length prefix + UTF-8 (no BOM), no trailing NUL.
-        final byte[] fmCustom = utf8LengthPrefixedNoBom(customPayload);
+        final byte[] fmCustom = FmClipboardCodec.encodeCustomFormatPayload(text);
 
         // Diagnostics: verify BOMs, terminators, newline normalization and length prefix expectations at runtime.
         if (Diagnostics.isVerbose()) {
@@ -477,7 +477,7 @@ public class DefaultClipboardService implements ClipboardService {
             int inLf = countOccurrences(text.replace("\r\n", ""), "\n");
             LOG.info("[CB-DIAG] Input newlines: CRLF=" + inCrLf + ", CR=" + inCr + ", LF=" + inLf + "; normalized to LF for custom format");
         }
-        final long MAX = 10L * 1024 * 1024; // 10 MB cap per format
+        final long MAX = ClipboardFormats.maxCustomPayloadBytes(); // per-format cap (shared data)
         if (utf16.length > MAX || fmCustom.length > MAX) {
             LOG.info("[CB] Native path: payload too large for native write; falling back");
             return false;
@@ -501,40 +501,14 @@ public class DefaultClipboardService implements ClipboardService {
                 return false;
             }
 
-            // Register only the specific FileMaker format matching the content type
+            // Register only the specific FileMaker format matching the content type, plus any aliases
+            // (e.g. legacy "Mac-XML" for layout objects). Names come from shared/data/clipboard-formats.json.
             int targetFormatId = 0;
-            String targetFormatName = null;
-            // For certain types (e.g., Layout Objects), some environments might use an
-            // alternate custom format name. We optionally try additional aliases.
-            java.util.List<String> extraAliases = java.util.Collections.emptyList();
-            switch (type) {
-                case SCRIPT:
-                    targetFormatName = "Mac-XMSC"; // Full Scripts
-                    break;
-                case SCRIPT_STEPS:
-                    targetFormatName = "Mac-XMSS"; // Script Steps
-                    break;
-                case FIELD_DEFINITION:
-                    targetFormatName = "Mac-XMFD"; // Fields & Tables
-                    break;
-                case TABLE_DEFINITION:
-                    targetFormatName = "Mac-XMTB"; // Tables per analysis (was previously mapped to XMFD)
-                    break;
-                case CUSTOM_FUNCTION:
-                    targetFormatName = "Mac-XMFN"; // Custom Functions
-                    break;
-                case VALUE_LIST:
-                    targetFormatName = "Mac-XMVL"; // Value Lists
-                    break;
-                case LAYOUT_OBJECTS:
-                    // Layout Objects (selection on a layout) use Mac-XML2 per captures
-                    targetFormatName = "Mac-XML2";
-                    // Some installations may advertise legacy name "Mac-XML"; attempt both
-                    extraAliases = java.util.Arrays.asList("Mac-XML");
-                    break;
-                default:
-                    break;
-            }
+            java.util.List<String> formatNames = ClipboardFormats.windowsFormatNames(type);
+            String targetFormatName = formatNames.isEmpty() ? null : formatNames.get(0);
+            java.util.List<String> extraAliases = formatNames.size() > 1
+                    ? formatNames.subList(1, formatNames.size())
+                    : java.util.Collections.emptyList();
             // Always emit CB-DIAG for target format
             LOG.info("[CB-DIAG] targetFormat=" + (targetFormatName == null ? "none" : targetFormatName));
             if (targetFormatName != null) {
@@ -629,78 +603,6 @@ public class DefaultClipboardService implements ClipboardService {
                 try { User32.INSTANCE.CloseClipboard(); } catch (Throwable ignore) {}
             }
         }
-    }
-
-    private static byte[] utf16leNullTerminated(String s) {
-        byte[] data = (s == null ? "" : s).getBytes(StandardCharsets.UTF_16LE);
-        byte[] out = new byte[data.length + 2];
-        System.arraycopy(data, 0, out, 0, data.length);
-        // last two bytes already zero
-        return out;
-    }
-
-    private static byte[] utf8NullTerminated(String s) {
-        byte[] data = (s == null ? "" : s).getBytes(StandardCharsets.UTF_8);
-        byte[] out = new byte[data.length + 1];
-        System.arraycopy(data, 0, out, 0, data.length);
-        // last byte zero
-        return out;
-    }
-
-    // Build: [4-byte little-endian payload length] + [UTF-8 payload without BOM], no trailing NUL
-    private static byte[] utf8LengthPrefixedNoBom(String s) {
-        byte[] payload = (s == null ? "" : s).getBytes(StandardCharsets.UTF_8);
-        int len = payload.length;
-        byte[] out = new byte[4 + len];
-        out[0] = (byte) (len & 0xFF);
-        out[1] = (byte) ((len >>> 8) & 0xFF);
-        out[2] = (byte) ((len >>> 16) & 0xFF);
-        out[3] = (byte) ((len >>> 24) & 0xFF);
-        System.arraycopy(payload, 0, out, 4, len);
-        return out;
-    }
-
-    // Snippet type classification to select FileMaker custom clipboard format
-    static enum SnippetType {
-        SCRIPT,
-        SCRIPT_STEPS,
-        FIELD_DEFINITION,
-        TABLE_DEFINITION,
-        CUSTOM_FUNCTION,
-        VALUE_LIST,
-        LAYOUT_OBJECTS,
-        UNKNOWN
-    }
-
-    // Package-private for unit testing
-    static SnippetType detectSnippetType(String text) {
-        if (text == null || text.isEmpty()) return SnippetType.UNKNOWN;
-        // Simple heuristics per roadmap 1.4
-        // Order matters; check the most specific/common first
-        // Important: detect full Script before bare Step selection, since scripts contain steps
-        if (text.contains("<Script")) return SnippetType.SCRIPT;
-        if (text.contains("<Step")) return SnippetType.SCRIPT_STEPS;
-        // Important: check for BaseTable before Field/FieldDefinition because table snippets often contain <Field>
-        // and must be classified as TABLE_DEFINITION to target Mac-XMTB (not Mac-XMFD).
-        if (text.contains("<BaseTable")) return SnippetType.TABLE_DEFINITION;
-        // Layout-related tags should be detected BEFORE fields because layout object XML may include
-        // <Field> references inside DDRInfo or nested elements; we must still treat the snippet as layout objects.
-        if (text.contains("<Layout") || text.contains("<ObjectList") || text.contains("<LayoutObject") || text.contains("<Object ") || text.contains("<Part")) {
-            return SnippetType.LAYOUT_OBJECTS;
-        }
-        if (text.contains("<FieldDefinition") || text.contains("<Field ")) return SnippetType.FIELD_DEFINITION;
-        // Custom Functions and Value Lists
-        if (text.contains("<CustomFunction")) return SnippetType.CUSTOM_FUNCTION;
-        if (text.contains("<ValueList")) return SnippetType.VALUE_LIST;
-        return SnippetType.UNKNOWN;
-    }
-
-    // Normalize any mix of CRLF/CR/LF to LF newlines for custom Mac-* formats based on analysis.
-    private static String normalizeToLfNewlines(String s) {
-        if (s == null || s.isEmpty()) return "";
-        String tmp = s.replace("\r\n", "\n");
-        tmp = tmp.replace("\r", "\n");
-        return tmp;
     }
 
     // Utility: simple non-overlapping substring count for diagnostics
@@ -936,134 +838,6 @@ public class DefaultClipboardService implements ClipboardService {
         } catch (IOException e) {
             return new byte[0];
         }
-    }
-
-    private static String decodeBytesWithBomHeuristics(byte[] bytes) {
-        if (bytes == null || bytes.length == 0) return "";
-
-        // BOM detection
-        if (bytes.length >= 3 && (bytes[0] & 0xFF) == 0xEF && (bytes[1] & 0xFF) == 0xBB && (bytes[2] & 0xFF) == 0xBF) {
-            return new String(bytes, 3, bytes.length - 3, StandardCharsets.UTF_8);
-        }
-        if (bytes.length >= 2) {
-            int b0 = bytes[0] & 0xFF;
-            int b1 = bytes[1] & 0xFF;
-            if (b0 == 0xFE && b1 == 0xFF) {
-                return stripNulls(new String(bytes, 2, bytes.length - 2, StandardCharsets.UTF_16BE));
-            }
-            if (b0 == 0xFF && b1 == 0xFE) {
-                return stripNulls(new String(bytes, 2, bytes.length - 2, StandardCharsets.UTF_16LE));
-            }
-        }
-
-        // Heuristic for UTF-16 without BOM (check zero distribution)
-        int zerosEven = 0, zerosOdd = 0;
-        for (int i = 0; i < bytes.length; i++) {
-            if (bytes[i] == 0) {
-                if ((i & 1) == 0) zerosEven++; else zerosOdd++;
-            }
-        }
-        int threshold = Math.max(2, bytes.length / 10); // 10% zeros is a hint
-        if (zerosOdd > zerosEven && zerosOdd >= threshold) {
-            return stripNulls(new String(bytes, StandardCharsets.UTF_16BE));
-        } else if (zerosEven > zerosOdd && zerosEven >= threshold) {
-            return stripNulls(new String(bytes, StandardCharsets.UTF_16LE));
-        }
-
-        // Fallback to UTF-8 (as PS script does)
-        String utf8 = new String(bytes, StandardCharsets.UTF_8);
-        return stripNulls(utf8);
-    }
-
-    private static String stripNulls(String s) {
-        if (s == null) return null;
-        // Remove embedded NULs which can cause isBlank() to see effectively empty text
-        return s.replace("\u0000", "");
-    }
-
-    /**
-     * Attempts to locate an <fmxmlsnippet>…</fmxmlsnippet> block directly in the raw bytes in common encodings
-     * (UTF-8/ASCII, UTF-16LE, UTF-16BE). If found, decodes and returns the snippet; otherwise returns null.
-     */
-    private static String extractFmxmlFromBytes(byte[] bytes) {
-        if (bytes == null || bytes.length == 0) return null;
-
-        // UTF-8 / ASCII search
-        int startUtf8 = indexOf(bytes, ascii("<fmxmlsnippet"));
-        if (startUtf8 >= 0) {
-            int endUtf8 = lastIndexOf(bytes, ascii("</fmxmlsnippet>"));
-            if (endUtf8 >= 0 && endUtf8 >= startUtf8) {
-                int endPos = endUtf8 + ascii("</fmxmlsnippet>").length;
-                return new String(bytes, startUtf8, endPos - startUtf8, StandardCharsets.UTF_8).trim();
-            }
-        }
-
-        // UTF-16LE search
-        byte[] startLe = utf16le("<fmxmlsnippet");
-        byte[] endLe = utf16le("</fmxmlsnippet>");
-        int start16le = indexOf(bytes, startLe);
-        if (start16le >= 0) {
-            int end16le = lastIndexOf(bytes, endLe);
-            if (end16le >= 0 && end16le >= start16le) {
-                int endPos = end16le + endLe.length;
-                String s = new String(bytes, start16le, endPos - start16le, StandardCharsets.UTF_16LE);
-                return stripNulls(s).trim();
-            }
-        }
-
-        // UTF-16BE search
-        byte[] startBe = utf16be("<fmxmlsnippet");
-        byte[] endBe = utf16be("</fmxmlsnippet>");
-        int start16be = indexOf(bytes, startBe);
-        if (start16be >= 0) {
-            int end16be = lastIndexOf(bytes, endBe);
-            if (end16be >= 0 && end16be >= start16be) {
-                int endPos = end16be + endBe.length;
-                String s = new String(bytes, start16be, endPos - start16be, StandardCharsets.UTF_16BE);
-                return stripNulls(s).trim();
-            }
-        }
-
-        return null;
-    }
-
-    private static byte[] ascii(String s) {
-        return s.getBytes(StandardCharsets.US_ASCII);
-    }
-
-    private static byte[] utf16le(String s) {
-        // Encode and drop potential BOM
-        byte[] b = s.getBytes(StandardCharsets.UTF_16LE);
-        return b;
-    }
-
-    private static byte[] utf16be(String s) {
-        byte[] b = s.getBytes(StandardCharsets.UTF_16BE);
-        return b;
-    }
-
-    private static int indexOf(byte[] data, byte[] pattern) {
-        if (pattern.length == 0) return 0;
-        outer:
-        for (int i = 0; i <= data.length - pattern.length; i++) {
-            for (int j = 0; j < pattern.length; j++) {
-                if (data[i + j] != pattern[j]) continue outer;
-            }
-            return i;
-        }
-        return -1;
-    }
-
-    private static int lastIndexOf(byte[] data, byte[] pattern) {
-        if (pattern.length == 0) return data.length;
-        outer:
-        for (int i = data.length - pattern.length; i >= 0; i--) {
-            for (int j = 0; j < pattern.length; j++) {
-                if (data[i + j] != pattern[j]) continue outer;
-            }
-            return i;
-        }
-        return -1;
     }
 
     private static CopyPasteManager safeCopyPasteManager() {

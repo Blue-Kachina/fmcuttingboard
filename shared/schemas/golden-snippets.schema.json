@@ -1,0 +1,55 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "golden-snippets.schema.json",
+  "title": "Generated per-snippet golden expectations",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["generatedBy", "cases"],
+  "definitions": {
+    "bytes": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["length", "sha256", "headHex"],
+      "properties": {
+        "length": { "type": "integer", "minimum": 0 },
+        "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        "headHex": { "type": "string", "pattern": "^([0-9A-F]{2}){0,16}$" }
+      }
+    }
+  },
+  "properties": {
+    "$schema": { "type": "string" },
+    "generatedBy": { "type": "string" },
+    "cases": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "fixture", "expect"],
+        "properties": {
+          "id": { "type": "string" },
+          "fixture": { "type": "string", "pattern": "^snippets/[a-z-]+/[^/]+\\.xml$" },
+          "expect": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["snippetType", "windowsFormats", "customFormatPayload", "unicodeText"],
+            "properties": {
+              "snippetType": { "type": "string" },
+              "windowsFormats": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+              "customFormatPayload": { "$ref": "#/definitions/bytes" },
+              "unicodeText": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["lf", "crlf"],
+                "properties": {
+                  "lf": { "$ref": "#/definitions/bytes" },
+                  "crlf": { "$ref": "#/definitions/bytes" }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

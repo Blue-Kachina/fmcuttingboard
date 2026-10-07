@@ -1,3 +1,5 @@
+import java.util.zip.ZipFile
+
 plugins {
     id("java")
     // Version is managed centrally in settings.gradle.kts -> pluginManagement.plugins
@@ -171,7 +173,44 @@ sourceSets {
         // (captured samples, a curated function list) and previously leaked a whole vendored
         // third-party repo into the plugin artifact via a blanket srcDir("resources").
     }
+    test {
+        // Shared golden fixtures (also used by the VS Code extension's tests); see shared/fixtures/README.md
+        resources {
+            srcDir("../shared/fixtures")
+        }
+    }
 }
+
+// ===== Shared data (shared/ at the repo root, also consumed by the VS Code extension) =====
+// Packaged into the jar under /shared/ and loaded at runtime by dev.fmcuttingboard.shared.SharedData.
+val sharedDataDir = layout.projectDirectory.dir("../shared/data")
+val sharedDataFiles = listOf("filemaker-functions.json", "clipboard-formats.json")
+
+tasks.processResources {
+    from(sharedDataDir) {
+        include(sharedDataFiles)
+        into("shared")
+    }
+}
+
+// Guard against shipping a plugin without its shared data (completion, validation and clipboard
+// format selection would all break for users). Runs as part of `check`, so CI's `build` enforces it.
+val verifySharedDataPackaged = tasks.register("verifySharedDataPackaged") {
+    group = "verification"
+    description = "Fails if the plugin jar is missing any shared/data JSON file"
+    val jarFile = tasks.jar.flatMap { it.archiveFile }
+    inputs.file(jarFile)
+    doLast {
+        val entries = ZipFile(jarFile.get().asFile).use { zip ->
+            zip.entries().asSequence().map { it.name }.toSet()
+        }
+        val missing = sharedDataFiles.map { "shared/$it" }.filterNot { it in entries }
+        if (missing.isNotEmpty()) {
+            throw GradleException("Plugin jar is missing shared data: $missing")
+        }
+    }
+}
+tasks.check { dependsOn(verifySharedDataPackaged) }
 
 // Ensure lexer is generated before compilation
 tasks.withType<JavaCompile>().configureEach {

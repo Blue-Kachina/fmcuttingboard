@@ -1,0 +1,78 @@
+{
+  "$schema": "../schemas/clipboard-formats.schema.json",
+  "spec": "docs/FileMaker-Native-Clipboard-Analysis.md",
+  "snippetTypes": [
+    {
+      "id": "SCRIPT",
+      "label": "Script",
+      "detectIfContainsAny": ["<Script"],
+      "windows": { "format": "Mac-XMSC", "aliases": [] },
+      "notes": "Checked before SCRIPT_STEPS because whole scripts also contain <Step> elements."
+    },
+    {
+      "id": "SCRIPT_STEPS",
+      "label": "Script steps",
+      "detectIfContainsAny": ["<Step"],
+      "windows": { "format": "Mac-XMSS", "aliases": [] }
+    },
+    {
+      "id": "TABLE_DEFINITION",
+      "label": "Tables",
+      "detectIfContainsAny": ["<BaseTable"],
+      "windows": { "format": "Mac-XMTB", "aliases": [] },
+      "notes": "Checked before FIELD_DEFINITION because table snippets contain <Field> elements."
+    },
+    {
+      "id": "LAYOUT_OBJECTS",
+      "label": "Layout objects",
+      "detectIfContainsAny": ["<Layout", "<ObjectList", "<LayoutObject", "<Object ", "<Part"],
+      "windows": { "format": "Mac-XML2", "aliases": ["Mac-XML"] },
+      "notes": "Checked before FIELD_DEFINITION because layout objects can reference <Field> elements. The legacy Mac-XML alias is also written for compatibility."
+    },
+    {
+      "id": "FIELD_DEFINITION",
+      "label": "Fields",
+      "detectIfContainsAny": ["<FieldDefinition", "<Field "],
+      "windows": { "format": "Mac-XMFD", "aliases": [] }
+    },
+    {
+      "id": "CUSTOM_FUNCTION",
+      "label": "Custom functions",
+      "detectIfContainsAny": ["<CustomFunction"],
+      "windows": { "format": "Mac-XMFN", "aliases": [] }
+    },
+    {
+      "id": "VALUE_LIST",
+      "label": "Value lists",
+      "detectIfContainsAny": ["<ValueList"],
+      "windows": { "format": "Mac-XMVL", "aliases": [] }
+    }
+  ],
+  "detection": {
+    "rule": "Walk snippetTypes in array order; the first type whose detectIfContainsAny has a case-sensitive substring match wins. No match (or empty text) means UNKNOWN, and no FileMaker format is written.",
+    "unknownId": "UNKNOWN"
+  },
+  "windows": {
+    "textFormat": {
+      "name": "CF_UNICODETEXT",
+      "id": 13,
+      "encoding": "UTF-16LE",
+      "bom": false,
+      "terminator": "U+0000 (two zero bytes)",
+      "newlines": "unchanged"
+    },
+    "customFormatPayload": {
+      "lengthPrefix": "uint32 little-endian byte length of the UTF-8 payload that follows",
+      "encoding": "UTF-8",
+      "bom": false,
+      "terminator": "none",
+      "newlines": "LF (CRLF and lone CR are converted to LF before encoding)",
+      "maxBytes": 10485760
+    },
+    "write": "In one clipboard session: CF_UNICODETEXT plus the type's format, then any aliases, all with the same customFormatPayload bytes."
+  },
+  "macos": {
+    "status": "unknown",
+    "notes": "FileMaker's pasteboard type names on macOS have not been captured yet (see docs/MacPasteboardResearch.md). Both plugins write plain text only on macOS."
+  }
+}

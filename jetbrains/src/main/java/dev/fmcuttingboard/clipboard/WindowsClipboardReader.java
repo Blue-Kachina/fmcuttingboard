@@ -11,6 +11,10 @@ import com.sun.jna.win32.W32APIOptions;
 import java.nio.charset.Charset;
 import java.util.Optional;
 
+import static dev.fmcuttingboard.clipboard.FmClipboardCodec.decodeBytesWithBomHeuristics;
+import static dev.fmcuttingboard.clipboard.FmClipboardCodec.extractFmxmlFromBytes;
+import static dev.fmcuttingboard.clipboard.FmClipboardCodec.stripNulls;
+
 /**
  * Windows-native clipboard reader using JNA with correct stdcall mappings.
  * Attempts CF_UNICODETEXT first, then CF_TEXT.
@@ -31,9 +35,9 @@ class WindowsClipboardReader implements NativeClipboardReader {
     public Optional<String> read() {
         // Try CF_UNICODETEXT then CF_TEXT
         Optional<String> uni = readFormat(CF_UNICODETEXT);
-        if (uni.isPresent() && !uni.get().isBlank()) return uni.map(WindowsClipboardReader::stripNulls).map(String::trim).filter(s -> !s.isBlank());
+        if (uni.isPresent() && !uni.get().isBlank()) return uni.map(FmClipboardCodec::stripNulls).map(String::trim).filter(s -> !s.isBlank());
         Optional<String> ansi = readFormat(CF_TEXT);
-        if (ansi.isPresent() && !ansi.get().isBlank()) return ansi.map(WindowsClipboardReader::stripNulls).map(String::trim).filter(s -> !s.isBlank());
+        if (ansi.isPresent() && !ansi.get().isBlank()) return ansi.map(FmClipboardCodec::stripNulls).map(String::trim).filter(s -> !s.isBlank());
         // If neither simple text format helped, enumerate all formats and probe bytes for fmxmlsnippet
         Optional<String> fromFormats = enumerateAndProbeFormats();
         if (fromFormats.isPresent()) return fromFormats;
@@ -113,18 +117,8 @@ class WindowsClipboardReader implements NativeClipboardReader {
                 return Optional.empty();
             }
 
-            // First pass: find known FileMaker-specific formats by name and try them immediately
-            // Known variants observed in the wild include:
-            //  - Mac-XMSS (Script Steps)
-            //  - Mac-XMSC (Scripts)
-            //  - Mac-XMFD (Fields)
-            //  - Mac-XMTB (Tables)
-            //  - Mac-XMFN (Custom Functions)
-            //  - Mac-XMVL (Value Lists)
-            //  - Mac-XML2 (Layout Objects/Layouts)
-            final String[] interestingNames = new String[] {
-                    "Mac-XMSS", "Mac-XMSC", "Mac-XMFD", "Mac-XMTB", "Mac-XMFN", "Mac-XMVL", "Mac-XML2"
-            };
+            // First pass: find known FileMaker-specific formats by name (Mac-XMSS, Mac-XML2, …; see
+            // shared/data/clipboard-formats.json) and try them immediately
             int id = 0;
             boolean any = false;
             while (true) {
@@ -132,14 +126,10 @@ class WindowsClipboardReader implements NativeClipboardReader {
                 if (id == 0) break;
                 any = true;
                 String name = getFormatName(id);
-                if (name != null) {
-                    for (String target : interestingNames) {
-                        if (name.equalsIgnoreCase(target)) {
-                            LOG.info("[CB] Native path: probing known format id=" + id + ", name='" + name + "'");
-                            Optional<String> result = tryReadFormatBytesAndExtract(id, name);
-                            if (result.isPresent()) return result;
-                        }
-                    }
+                if (ClipboardFormats.isFileMakerWindowsFormat(name)) {
+                    LOG.info("[CB] Native path: probing known format id=" + id + ", name='" + name + "'");
+                    Optional<String> result = tryReadFormatBytesAndExtract(id, name);
+                    if (result.isPresent()) return result;
                 }
             }
 
@@ -241,96 +231,6 @@ class WindowsClipboardReader implements NativeClipboardReader {
         } catch (Throwable ignore) {
         }
         return null;
-    }
-
-    // Minimal decoding/scan helpers (mirrors DefaultClipboardService logic)
-    private static String decodeBytesWithBomHeuristics(byte[] bytes) {
-        if (bytes == null || bytes.length == 0) return "";
-        if (bytes.length >= 3 && (bytes[0] & 0xFF) == 0xEF && (bytes[1] & 0xFF) == 0xBB && (bytes[2] & 0xFF) == 0xBF) {
-            return stripNulls(new String(bytes, 3, bytes.length - 3, java.nio.charset.StandardCharsets.UTF_8));
-        }
-        if (bytes.length >= 2) {
-            int b0 = bytes[0] & 0xFF;
-            int b1 = bytes[1] & 0xFF;
-            if (b0 == 0xFE && b1 == 0xFF) {
-                return stripNulls(new String(bytes, 2, bytes.length - 2, java.nio.charset.StandardCharsets.UTF_16BE));
-            }
-            if (b0 == 0xFF && b1 == 0xFE) {
-                return stripNulls(new String(bytes, 2, bytes.length - 2, java.nio.charset.StandardCharsets.UTF_16LE));
-            }
-        }
-        int zerosEven = 0, zerosOdd = 0;
-        for (int i = 0; i < bytes.length; i++) {
-            if (bytes[i] == 0) {
-                if ((i & 1) == 0) zerosEven++; else zerosOdd++;
-            }
-        }
-        int threshold = Math.max(2, bytes.length / 10);
-        if (zerosOdd > zerosEven && zerosOdd >= threshold) {
-            return stripNulls(new String(bytes, java.nio.charset.StandardCharsets.UTF_16BE));
-        } else if (zerosEven > zerosOdd && zerosEven >= threshold) {
-            return stripNulls(new String(bytes, java.nio.charset.StandardCharsets.UTF_16LE));
-        }
-        return stripNulls(new String(bytes, java.nio.charset.StandardCharsets.UTF_8));
-    }
-
-    private static String extractFmxmlFromBytes(byte[] bytes) {
-        if (bytes == null || bytes.length == 0) return null;
-        int startUtf8 = indexOf(bytes, ascii("<fmxmlsnippet"));
-        if (startUtf8 >= 0) {
-            int endUtf8 = lastIndexOf(bytes, ascii("</fmxmlsnippet>"));
-            if (endUtf8 >= 0 && endUtf8 >= startUtf8) {
-                int endPos = endUtf8 + ascii("</fmxmlsnippet>").length;
-                return new String(bytes, startUtf8, endPos - startUtf8, java.nio.charset.StandardCharsets.UTF_8).trim();
-            }
-        }
-        byte[] startLe = utf16le("<fmxmlsnippet");
-        byte[] endLe = utf16le("</fmxmlsnippet>");
-        int start16le = indexOf(bytes, startLe);
-        if (start16le >= 0) {
-            int end16le = lastIndexOf(bytes, endLe);
-            if (end16le >= 0 && end16le >= start16le) {
-                int endPos = end16le + endLe.length;
-                String s = new String(bytes, start16le, endPos - start16le, java.nio.charset.StandardCharsets.UTF_16LE);
-                return stripNulls(s).trim();
-            }
-        }
-        byte[] startBe = utf16be("<fmxmlsnippet");
-        byte[] endBe = utf16be("</fmxmlsnippet>");
-        int start16be = indexOf(bytes, startBe);
-        if (start16be >= 0) {
-            int end16be = lastIndexOf(bytes, endBe);
-            if (end16be >= 0 && end16be >= start16be) {
-                int endPos = end16be + endBe.length;
-                String s = new String(bytes, start16be, endPos - start16be, java.nio.charset.StandardCharsets.UTF_16BE);
-                return stripNulls(s).trim();
-            }
-        }
-        return null;
-    }
-
-    private static byte[] ascii(String s) { return s.getBytes(java.nio.charset.StandardCharsets.US_ASCII); }
-    private static byte[] utf16le(String s) { return s.getBytes(java.nio.charset.StandardCharsets.UTF_16LE); }
-    private static byte[] utf16be(String s) { return s.getBytes(java.nio.charset.StandardCharsets.UTF_16BE); }
-    private static int indexOf(byte[] data, byte[] pattern) {
-        if (pattern.length == 0) return 0;
-        outer: for (int i = 0; i <= data.length - pattern.length; i++) {
-            for (int j = 0; j < pattern.length; j++) { if (data[i + j] != pattern[j]) continue outer; }
-            return i;
-        }
-        return -1;
-    }
-    private static int lastIndexOf(byte[] data, byte[] pattern) {
-        if (pattern.length == 0) return data.length;
-        outer: for (int i = data.length - pattern.length; i >= 0; i--) {
-            for (int j = 0; j < pattern.length; j++) { if (data[i + j] != pattern[j]) continue outer; }
-            return i;
-        }
-        return -1;
-    }
-
-    private static String stripNulls(String s) {
-        return s == null ? null : s.replace("\u0000", "");
     }
 
     /** User32 with stdcall and default W32 options. */

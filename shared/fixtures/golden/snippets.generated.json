@@ -1,0 +1,223 @@
+{
+  "$schema": "../../schemas/golden-snippets.schema.json",
+  "generatedBy": "shared/tools/generate-golden.mjs (do not edit by hand)",
+  "cases": [
+    {
+      "id": "custom-functions/CustomFunctions",
+      "fixture": "snippets/custom-functions/CustomFunctions.xml",
+      "expect": {
+        "snippetType": "CUSTOM_FUNCTION",
+        "windowsFormats": [
+          "Mac-XMFN"
+        ],
+        "customFormatPayload": {
+          "length": 197,
+          "sha256": "f1e6442ff3f5aed701e5e1eb429d48c2c13f76cf9ffb29aaaf6a2ea913966b16",
+          "headHex": "C10000003C666D786D6C736E69707065"
+        },
+        "unicodeText": {
+          "lf": {
+            "length": 388,
+            "sha256": "442d88b89b97224ced3c51544dcdfd3242653714268bd30763bde060d100f4ca",
+            "headHex": "3C0066006D0078006D006C0073006E00"
+          },
+          "crlf": {
+            "length": 400,
+            "sha256": "3650caa524750bec7f336f8a78d2cb8b32df4768eda555211ca81bafecf6cfc9",
+            "headHex": "3C0066006D0078006D006C0073006E00"
+          }
+        }
+      }
+    },
+    {
+      "id": "fields/Fields",
+      "fixture": "snippets/fields/Fields.xml",
+      "expect": {
+        "snippetType": "FIELD_DEFINITION",
+        "windowsFormats": [
+          "Mac-XMFD"
+        ],
+        "customFormatPayload": {
+          "length": 866,
+          "sha256": "b4aa270413f4bb56f11e352cb7118c48472b0c475158e6a4c074a2383e78dae9",
+          "headHex": "5E0300003C666D786D6C736E69707065"
+        },
+        "unicodeText": {
+          "lf": {
+            "length": 1726,
+            "sha256": "9881812990b3f4d24016d1c2162ff3e28bf632f37a62f186199ef69ec0c5b247",
+            "headHex": "3C0066006D0078006D006C0073006E00"
+          },
+          "crlf": {
+            "length": 1756,
+            "sha256": "b3ad0588a62c507d141f1e445258660549c5cc208c51dcdb42217579f4924f94",
+            "headHex": "3C0066006D0078006D006C0073006E00"
+          }
+        }
+      }
+    },
+    {
+      "id": "layout-objects/LayoutObjects",
+      "fixture": "snippets/layout-objects/LayoutObjects.xml",
+      "expect": {
+        "snippetType": "LAYOUT_OBJECTS",
+        "windowsFormats": [
+          "Mac-XML2",
+          "Mac-XML"
+        ],
+        "customFormatPayload": {
+          "length": 224,
+          "sha256": "d8f7e10c65c90d2249501c9ff67f4d013430bd5be1997b67c6e39efe881855c1",
+          "headHex": "DC0000003C666D786D6C736E69707065"
+        },
+        "unicodeText": {
+          "lf": {
+            "length": 442,
+            "sha256": "199863b73b900ecba75157489150fa659f2afb7b86f976a06213b4dda3fa65e5",
+            "headHex": "3C0066006D0078006D006C0073006E00"
+          },
+          "crlf": {
+            "length": 456,
+            "sha256": "2f50eaceac2f4699924b78b49048b94e12929d6ad282b505454cf74cd8c76523",
+            "headHex": "3C0066006D0078006D006C0073006E00"
+          }
+        }
+      }
+    },
+    {
+      "id": "script/GreetUser",
+      "fixture": "snippets/script/GreetUser.xml",
+      "expect": {
+        "snippetType": "SCRIPT",
+        "windowsFormats": [
+          "Mac-XMSC"
+        ],
+        "customFormatPayload": {
+          "length": 852,
+          "sha256": "871d74b7182efcf07c59212b2083c4b4000d383f90085eb48bf3ebeca248a6d6",
+          "headHex": "500300003C666D786D6C736E69707065"
+        },
+        "unicodeText": {
+          "lf": {
+            "length": 1670,
+            "sha256": "2f46d48513ac3ffe41f1cac1d052a6e0a310406c52d28b3f15c0be392727b50f",
+            "headHex": "3C0066006D0078006D006C0073006E00"
+          },
+          "crlf": {
+            "length": 1718,
+            "sha256": "04ac8c730603038b35ab4d6885ea352149c4512831cba0b2c3eb1b662893723d",
+            "headHex": "3C0066006D0078006D006C0073006E00"
+          }
+        }
+      }
+    },
+    {
+      "id": "script-steps/NonAsciiComment",
+      "fixture": "snippets/script-steps/NonAsciiComment.xml",
+      "expect": {
+        "snippetType": "SCRIPT_STEPS",
+        "windowsFormats": [
+          "Mac-XMSS"
+        ],
+        "customFormatPayload": {
+          "length": 183,
+          "sha256": "70079057feb8de76e1e12cf2d7099a344403e962d626ded89d705ca08c23b973",
+          "headHex": "B30000003C666D786D6C736E69707065"
+        },
+        "unicodeText": {
+          "lf": {
+            "length": 328,
+            "sha256": "8bbb0c892cec27e5bbc8eeccdadafdabb4b0ae1a35afd0700ed700ef1d25c500",
+            "headHex": "3C0066006D0078006D006C0073006E00"
+          },
+          "crlf": {
+            "length": 338,
+            "sha256": "429db6e0bb119a61e9eea1c460771fded908d1c629ae602a0f6973af8dc16f37",
+            "headHex": "3C0066006D0078006D006C0073006E00"
+          }
+        }
+      }
+    },
+    {
+      "id": "script-steps/ScriptSteps",
+      "fixture": "snippets/script-steps/ScriptSteps.xml",
+      "expect": {
+        "snippetType": "SCRIPT_STEPS",
+        "windowsFormats": [
+          "Mac-XMSS"
+        ],
+        "customFormatPayload": {
+          "length": 195,
+          "sha256": "a51791d68924277d44d5cfba039a5b7dd3bf88fe9f01f38e62e51512ca5ca169",
+          "headHex": "BF0000003C666D786D6C736E69707065"
+        },
+        "unicodeText": {
+          "lf": {
+            "length": 384,
+            "sha256": "49316fe7906a7346ca5a6d30f59813af58093ce426e3d5447f890ab2ef19c893",
+            "headHex": "3C0066006D0078006D006C0073006E00"
+          },
+          "crlf": {
+            "length": 394,
+            "sha256": "c31c2dc11d8e31d6d7aae4661055dba5fdd90500548112622a01bbe63410a8a6",
+            "headHex": "3C0066006D0078006D006C0073006E00"
+          }
+        }
+      }
+    },
+    {
+      "id": "tables/Tables",
+      "fixture": "snippets/tables/Tables.xml",
+      "expect": {
+        "snippetType": "TABLE_DEFINITION",
+        "windowsFormats": [
+          "Mac-XMTB"
+        ],
+        "customFormatPayload": {
+          "length": 979,
+          "sha256": "b9926ee04561a75b310d2eedf0198b16cbe376f4d8720f7e516fa86cdf7bf3a1",
+          "headHex": "CF0300003C666D786D6C736E69707065"
+        },
+        "unicodeText": {
+          "lf": {
+            "length": 1952,
+            "sha256": "f945c77996c05e6050575d574dda262e5bb35933eaade4268355d71164434aa2",
+            "headHex": "3C0066006D0078006D006C0073006E00"
+          },
+          "crlf": {
+            "length": 1986,
+            "sha256": "0a76357390afc1257bedd12fe39afcd0a0d8fb5ad93636aacfc2f54411da3fba",
+            "headHex": "3C0066006D0078006D006C0073006E00"
+          }
+        }
+      }
+    },
+    {
+      "id": "value-lists/ValueLists",
+      "fixture": "snippets/value-lists/ValueLists.xml",
+      "expect": {
+        "snippetType": "VALUE_LIST",
+        "windowsFormats": [
+          "Mac-XMVL"
+        ],
+        "customFormatPayload": {
+          "length": 218,
+          "sha256": "18d11fab36ac97975f5434a2f352885253b127c466563da70c79170cfe992e0b",
+          "headHex": "D60000003C666D786D6C736E69707065"
+        },
+        "unicodeText": {
+          "lf": {
+            "length": 430,
+            "sha256": "09b0515dad8cab4d2fee13466fbcda048b3178ea0f8f539d5155b9eb71573f20",
+            "headHex": "3C0066006D0078006D006C0073006E00"
+          },
+          "crlf": {
+            "length": 446,
+            "sha256": "3c2ebeb0dc77eaf1a9a1ced6e8abfb8ba6e38e782135bbd032ec465cbaf9ff01",
+            "headHex": "3C0066006D0078006D006C0073006E00"
+          }
+        }
+      }
+    }
+  ]
+}

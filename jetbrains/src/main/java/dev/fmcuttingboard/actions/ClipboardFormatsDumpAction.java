@@ -23,15 +23,6 @@ import com.sun.jna.win32.W32APIOptions;
  */
 public class ClipboardFormatsDumpAction extends AnAction {
     private static final Logger LOG = Logger.getInstance(ClipboardFormatsDumpAction.class);
-    private static final String[] INTERESTING_NAMES = new String[] {
-            "Mac-XMSC", // Scripts
-            "Mac-XMSS", // Script Steps
-            "Mac-XMFD", // Fields
-            "Mac-XMTB", // Tables
-            "Mac-XMFN", // Custom Functions
-            "Mac-XMVL", // Value Lists
-            "Mac-XML2"  // Layout Objects
-    };
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
@@ -123,7 +114,7 @@ public class ClipboardFormatsDumpAction extends AnAction {
         e.getPresentation().setEnabled(enabled);
     }
 
-    private static String getFormatName(int id) {
+    static String getFormatName(int id) {
         try {
             char[] buf = new char[128];
             int n = User32.INSTANCE.GetClipboardFormatName(id, buf, buf.length);
@@ -148,12 +139,7 @@ public class ClipboardFormatsDumpAction extends AnAction {
         com.sun.jna.platform.win32.BaseTSD.SIZE_T GlobalSize(WinNT.HANDLE hMem);
     }
 
-    private static boolean isInteresting(String name) {
-        for (String s : INTERESTING_NAMES) if (s.equalsIgnoreCase(name)) return true;
-        return false;
-    }
-
-    private static byte[] readAllBytes(int formatId) {
+    static byte[] readAllBytes(int formatId) {
         try {
             WinNT.HANDLE h = User32.INSTANCE.GetClipboardData(formatId);
             if (h == null) return null;

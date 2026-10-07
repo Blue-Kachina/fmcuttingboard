@@ -1,0 +1,33 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "capture.schema.json",
+  "title": "Raw clipboard capture index (shared/fixtures/clipboard/**/capture.json)",
+  "type": "object",
+  "required": ["capturedAt", "source", "os", "fileMakerVersion", "detectedSnippetType", "formats"],
+  "properties": {
+    "capturedAt": { "type": "string" },
+    "source": { "type": "string" },
+    "os": { "type": "string" },
+    "fileMakerVersion": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Must be filled in before a capture is committed as a fixture."
+    },
+    "detectedSnippetType": { "type": "string" },
+    "notes": { "type": "string" },
+    "formats": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "id", "size", "file", "fileMakerFormat"],
+        "properties": {
+          "name": { "type": "string" },
+          "id": { "type": "integer" },
+          "size": { "type": "integer", "minimum": 0 },
+          "file": { "type": "string", "pattern": "^[A-Za-z0-9._-]+\\.bin$" },
+          "fileMakerFormat": { "type": "boolean" }
+        }
+      }
+    }
+  }
+}

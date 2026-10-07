@@ -6,6 +6,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 adheres to Semantic Versioning as the plugin matures.
 
 ## [Unreleased]
+### Added
+- Diagnostics: new **Save Raw Clipboard Capture** action (Windows; visible when diagnostics are enabled). It saves the raw bytes of every clipboard format to `<cutting board folder>/captures/`, so they can be used as test fixtures.
+
+### Fixed
+- Clipboard data in UTF-16 without a byte-order mark could come out garbled: UTF-16LE was misdetected as UTF-16BE, and non-ASCII characters in UTF-16BE data could be misread.
+- On macOS, reading byte-based clipboard flavors now uses the same, more robust decoding as on Windows.
+
+### Changed
+- The FileMaker function list and clipboard format rules now load from data files shared with the upcoming VS Code extension, so both stay in sync. No behavior change.
 
 ## [1.0.6] - 2026-07-27
 ### Fixed

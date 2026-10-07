@@ -151,6 +151,15 @@
                 <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
             </action>
 
+            <!-- Diagnostics: save raw bytes of every clipboard format as a golden-fixture capture (Windows only) -->
+            <action id="dev.fmcuttingboard.actions.SaveRawClipboardCaptureAction"
+                    class="dev.fmcuttingboard.actions.SaveRawClipboardCaptureAction"
+                    text="Diagnostics: Save Raw Clipboard Capture"
+                    description="Save the raw bytes of every clipboard format to the cutting board folder, for use as test fixtures">
+                <add-to-group group-id="EditorPopupMenu" anchor="last"/>
+                <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
+            </action>
+
         </group>
     </actions>
 </idea-plugin>

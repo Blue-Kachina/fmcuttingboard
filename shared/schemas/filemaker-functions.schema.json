@@ -1,0 +1,45 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "filemaker-functions.schema.json",
+  "title": "FMCuttingBoard FileMaker function registry",
+  "description": "FileMaker calculation functions used for completion, signature help and argument-count validation in both plugins.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["functions"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "functions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "category", "returnType", "parameters"],
+        "properties": {
+          "name": { "type": "string", "pattern": "^[A-Za-z][A-Za-z0-9_]*$" },
+          "category": {
+            "enum": ["Logical", "Text", "Math", "Date/Time", "Aggregate", "Data/Fields", "List", "Get()"]
+          },
+          "returnType": { "type": "string", "minLength": 1 },
+          "description": { "type": "string" },
+          "parameters": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["name", "type"],
+              "properties": {
+                "name": { "type": "string", "minLength": 1 },
+                "type": { "type": "string", "minLength": 1 },
+                "optional": { "type": "boolean" },
+                "repeating": {
+                  "type": "boolean",
+                  "description": "May appear any number of times (counts as unlimited maximum arguments)."
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

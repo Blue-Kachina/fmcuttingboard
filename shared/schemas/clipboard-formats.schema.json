@@ -1,0 +1,93 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "clipboard-formats.schema.json",
+  "title": "FMCuttingBoard clipboard formats",
+  "description": "Snippet-type detection rules and FileMaker clipboard format names, shared by the JetBrains and VS Code plugins.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["snippetTypes", "detection", "windows", "macos"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "spec": { "type": "string" },
+    "snippetTypes": {
+      "description": "In detection order: the first type with a matching marker wins.",
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "label", "detectIfContainsAny", "windows"],
+        "properties": {
+          "id": {
+            "enum": ["SCRIPT", "SCRIPT_STEPS", "FIELD_DEFINITION", "TABLE_DEFINITION", "CUSTOM_FUNCTION", "VALUE_LIST", "LAYOUT_OBJECTS"]
+          },
+          "label": { "type": "string", "minLength": 1 },
+          "detectIfContainsAny": {
+            "type": "array",
+            "minItems": 1,
+            "items": { "type": "string", "pattern": "^<" }
+          },
+          "windows": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["format", "aliases"],
+            "properties": {
+              "format": { "type": "string", "pattern": "^Mac-" },
+              "aliases": { "type": "array", "items": { "type": "string", "pattern": "^Mac-" } }
+            }
+          },
+          "notes": { "type": "string" }
+        }
+      }
+    },
+    "detection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["rule", "unknownId"],
+      "properties": {
+        "rule": { "type": "string" },
+        "unknownId": { "const": "UNKNOWN" }
+      }
+    },
+    "windows": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["textFormat", "customFormatPayload", "write"],
+      "properties": {
+        "textFormat": {
+          "type": "object",
+          "required": ["name", "id", "encoding", "bom", "terminator", "newlines"],
+          "properties": {
+            "name": { "const": "CF_UNICODETEXT" },
+            "id": { "const": 13 },
+            "encoding": { "const": "UTF-16LE" },
+            "bom": { "const": false },
+            "terminator": { "type": "string" },
+            "newlines": { "type": "string" }
+          }
+        },
+        "customFormatPayload": {
+          "type": "object",
+          "required": ["lengthPrefix", "encoding", "bom", "terminator", "newlines", "maxBytes"],
+          "properties": {
+            "lengthPrefix": { "type": "string" },
+            "encoding": { "const": "UTF-8" },
+            "bom": { "const": false },
+            "terminator": { "type": "string" },
+            "newlines": { "type": "string" },
+            "maxBytes": { "type": "integer", "minimum": 1 }
+          }
+        },
+        "write": { "type": "string" }
+      }
+    },
+    "macos": {
+      "type": "object",
+      "required": ["status"],
+      "properties": {
+        "status": { "enum": ["unknown", "text-only", "native"] },
+        "notes": { "type": "string" }
+      }
+    }
+  }
+}
