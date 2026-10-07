@@ -113,7 +113,7 @@ tasks.runIde {
         "-Xmx1g",
         // Workaround: disable the bundled Gradle plugin in the runIde sandbox to avoid
         // a startup crash observed in 2024.3 where GradleJvmSupportMatrix fails parsing
-        // JavaVersion "25" (see resources/startup_runIde.log). This does NOT affect our
+        // JavaVersion "25" (see docs/reference/resources/startup_runIde.log). This does NOT affect our
         // plugin’s functionality and only applies to the runIde task.
         // Remove this flag once the upstream issue is fixed to re-enable Gradle features.
         "-Didea.plugins.disabled=com.intellij.gradle"
@@ -167,7 +167,7 @@ sourceSets {
             srcDir(generatedDir)
         }
         // No extra resources srcDir here: nothing in the shipped plugin reads anything from
-        // the repo-root `resources/` folder at runtime. That folder is human reference material
+        // the `docs/reference/resources/` folder at runtime. That folder is human reference material
         // (captured samples, a curated function list) and previously leaked a whole vendored
         // third-party repo into the plugin artifact via a blanket srcDir("resources").
     }

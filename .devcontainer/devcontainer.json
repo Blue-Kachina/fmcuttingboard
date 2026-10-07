@@ -13,5 +13,5 @@
 		"source=fmcuttingboard-gradle-cache,target=/home/gradle/.gradle,type=volume"
 	],
 	"remoteUser": "gradle",
-	"postCreateCommand": "./gradlew --version"
+	"postCreateCommand": "cd jetbrains && ./gradlew --version"
 }

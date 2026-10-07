@@ -7,8 +7,11 @@ on:
     branches: [ "**" ]
 
 jobs:
-  build:
+  jetbrains:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: jetbrains
     steps:
       - name: Checkout
         uses: actions/checkout@v7
@@ -29,7 +32,7 @@ jobs:
             ~/.gradle/caches
             ~/.gradle/notifications
             ~/.gradle/native
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          key: ${{ runner.os }}-gradle-${{ hashFiles('jetbrains/**/*.gradle*', 'jetbrains/**/gradle-wrapper.properties') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
 

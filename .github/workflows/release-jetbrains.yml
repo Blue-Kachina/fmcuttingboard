@@ -1,9 +1,12 @@
-name: Release
+name: Release (JetBrains)
+
+# Triggered ONLY by jetbrains-v<version> tags (e.g. jetbrains-v1.0.7). Plain v* tags no longer publish;
+# release-tag-guard.yml fails loudly if one is pushed. See README "Releasing (tag prefixes)".
 
 on:
   push:
     tags:
-      - 'v*'
+      - 'jetbrains-v*'
 
 permissions:
   contents: write
@@ -11,6 +14,9 @@ permissions:
 jobs:
   release:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: jetbrains
     steps:
       - name: Checkout
         uses: actions/checkout@v7
@@ -22,7 +28,7 @@ jobs:
           java-version: '21'
 
       - name: Determine version from tag
-        run: echo "PLUGIN_VERSION=${GITHUB_REF_NAME#v}" >> "$GITHUB_ENV"
+        run: echo "PLUGIN_VERSION=${GITHUB_REF_NAME#jetbrains-v}" >> "$GITHUB_ENV"
 
       - name: Verify tag matches gradle.properties
         run: |
@@ -41,7 +47,7 @@ jobs:
             ~/.gradle/caches
             ~/.gradle/notifications
             ~/.gradle/native
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          key: ${{ runner.os }}-gradle-${{ hashFiles('jetbrains/**/*.gradle*', 'jetbrains/**/gradle-wrapper.properties') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
 
@@ -86,5 +92,5 @@ jobs:
         run: |
           gh release create "$GITHUB_REF_NAME" \
             build/distributions/*-signed.zip \
-            --title "$GITHUB_REF_NAME" \
+            --title "FMCuttingBoard for JetBrains $PLUGIN_VERSION" \
             --notes-file release_notes.md

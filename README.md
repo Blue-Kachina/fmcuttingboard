@@ -56,7 +56,7 @@ If it contains an fmxmlsnippet of script steps, then we'd be able to paste Scrip
 - The plugin creates .fmCuttingBoard/fmclip-{timestamp}.xml in your project.
 
 3) Push XML back into FileMaker
-- Open one of the sample XML files under resources/test-snippets (e.g., ScriptSteps.xml).
+- Open one of the sample XML files under docs/reference/resources/test-snippets (e.g., ScriptSteps.xml).
 - In the IDE: Tools > FMCuttingBoard > Push Clipboard Into FileMaker.
 - Switch to FileMaker and Paste in the appropriate context.
 
@@ -88,13 +88,28 @@ The plugin's icon (small, visible next to "FMCuttingBoard" in the menu above) is
 - Additional validations and quick‑fixes tailored to FileMaker-specific constructs.
 - Deeper integration with FileMaker (e.g., launching scripts, schema diffs, etc.) where feasible.
 - More actions surfaced in context menus and editor toolbars for quicker workflows.
- - Track and prioritize enhancements in FMCuttingBoardPluginRoadmap.md and ROADMAP.md.
+ - Track and prioritize enhancements in docs/reference/FMCuttingBoardPluginRoadmap.md and docs/reference/ROADMAP.md.
 
 ## Development
 
+- The JetBrains plugin lives in the `jetbrains/` folder; run the Gradle commands below from there (open `jetbrains/` as the project in IntelliJ IDEA).
 - Run the plugin in a sandbox IDE: `./gradlew runIde` (or `gradlew.bat runIde` on Windows)
 - Run tests: `./gradlew test`
 - The project uses JUnit 5 for unit tests and a GitHub Actions workflow to build and run tests on pushes/PRs.
+
+### Releasing (tag prefixes)
+
+> [!IMPORTANT]
+> **Plain `v*` tags (e.g. `v1.0.7`) no longer publish anything.** Releases are triggered by a per-plugin tag prefix:
+>
+> | Plugin | Tag format | Must match | Workflow |
+> |---|---|---|---|
+> | JetBrains | `jetbrains-v<version>` (e.g. `jetbrains-v1.0.7`) | `pluginVersion` in `jetbrains/gradle.properties` | `.github/workflows/release-jetbrains.yml` |
+> | VS Code | `vscode-v<version>` (e.g. `vscode-v0.1.0`) | `version` in `vscode/package.json` | `release-vscode.yml` (coming soon) |
+>
+> If you push an old-style `v1.2.3` tag by mistake, the **Release tag guard** workflow fails with a message telling you which tag to push instead. Delete the wrong tag and push the right one.
+>
+> The existing `v1.0.0`–`v1.0.6` tags are historical JetBrains releases from before this repo held more than one plugin.
 
 ### In‑IDE Help
 - Open Settings/Preferences and search for "FMCuttingBoard". A Documentation button links to the online README for quick reference.
@@ -102,15 +117,15 @@ The plugin's icon (small, visible next to "FMCuttingBoard" in the menu above) is
 ### Build & Install from Disk
 - Build a distributable plugin ZIP: `./gradlew buildPlugin` (or `gradlew.bat buildPlugin` on Windows)
 - Or use the convenience alias: `./gradlew releasePlugin`
-- The artifact will be created under: `build/distributions/FMCuttingBoard-<version>.zip`
+- The artifact will be created under: `jetbrains/build/distributions/FMCuttingBoard-<version>.zip`
 - Install it in your IDE via: Settings/Preferences > Plugins > Gear icon > Install Plugin from Disk… and select the generated ZIP.
 
 ### Branding
 - The plugin uses a single SVG icon provided by the project owner; no dark variant is used.
 - Icon asset location used by the IDE:
-  - src/main/resources/META-INF/pluginIcon.svg
+  - jetbrains/src/main/resources/META-INF/pluginIcon.svg
 - Source artwork kept in repo (for editing/exporting):
-  - resources/fmCuttingBoardIcon.svg
+  - docs/reference/resources/fmCuttingBoardIcon.svg
 
 ### Logging and Diagnostics
 - The plugin uses the IDE's built-in logging (idea.log). To view logs:

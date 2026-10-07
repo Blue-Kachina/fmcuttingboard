@@ -1,0 +1,19 @@
+name: Release tag guard
+
+# Safety net: plain `v<version>` tags used to publish the JetBrains plugin, but no longer do.
+# Releases now use per-plugin prefixes (`jetbrains-v*`, `vscode-v*`). See README "Releasing (tag prefixes)".
+# This workflow fails loudly so a mistaken old-style tag doesn't go unnoticed.
+on:
+  push:
+    tags:
+      - 'v[0-9]*'
+
+jobs:
+  wrong-tag-prefix:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Reject old-style release tag
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          echo "::error title=Nothing was published::Tag '$GITHUB_REF_NAME' no longer triggers a release. Use 'jetbrains-v$VERSION' (JetBrains) or 'vscode-v$VERSION' (VS Code). Delete this tag with: git push --delete origin $GITHUB_REF_NAME && git tag -d $GITHUB_REF_NAME"
+          exit 1
