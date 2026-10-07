@@ -27,22 +27,184 @@
     "ui"
   ],
   "main": "./dist/extension.js",
-  "activationEvents": [],
-  "contributes": {},
+  "activationEvents": [
+    "onLanguage:xml"
+  ],
+  "contributes": {
+    "commands": [
+      {
+        "command": "fmcuttingboard.getFileMakerClipboardContent",
+        "title": "Get FileMaker Clipboard Content",
+        "category": "FMCuttingBoard"
+      },
+      {
+        "command": "fmcuttingboard.pushClipboardIntoFileMaker",
+        "title": "Push Clipboard Into FileMaker",
+        "category": "FMCuttingBoard",
+        "icon": "$(clippy)"
+      },
+      {
+        "command": "fmcuttingboard.readClipboardIntoNewXmlFile",
+        "title": "New XML File From FM Clipboard",
+        "category": "FMCuttingBoard"
+      },
+      {
+        "command": "fmcuttingboard.getFileMakerCalculationFromClipboard",
+        "title": "Get FileMaker Calculation From Clipboard",
+        "category": "FMCuttingBoard"
+      },
+      {
+        "command": "fmcuttingboard.convertClipboardToXml",
+        "title": "Convert FM Clipboard To XML Clipboard",
+        "category": "FMCuttingBoard"
+      },
+      {
+        "command": "fmcuttingboard.dumpClipboardFormats",
+        "title": "Diagnostics: Dump Clipboard Formats",
+        "category": "FMCuttingBoard"
+      },
+      {
+        "command": "fmcuttingboard.saveRawClipboardCapture",
+        "title": "Diagnostics: Save Raw Clipboard Capture",
+        "category": "FMCuttingBoard"
+      }
+    ],
+    "menus": {
+      "commandPalette": [
+        {
+          "command": "fmcuttingboard.readClipboardIntoNewXmlFile",
+          "when": "false"
+        },
+        {
+          "command": "fmcuttingboard.getFileMakerCalculationFromClipboard",
+          "when": "false"
+        },
+        {
+          "command": "fmcuttingboard.convertClipboardToXml",
+          "when": "false"
+        },
+        {
+          "command": "fmcuttingboard.pushClipboardIntoFileMaker",
+          "when": "resourceExtname == .xml"
+        },
+        {
+          "command": "fmcuttingboard.dumpClipboardFormats",
+          "when": "config.fmcuttingboard.enableDiagnostics"
+        },
+        {
+          "command": "fmcuttingboard.saveRawClipboardCapture",
+          "when": "config.fmcuttingboard.enableDiagnostics"
+        }
+      ],
+      "editor/context": [
+        {
+          "command": "fmcuttingboard.getFileMakerClipboardContent",
+          "group": "fmcuttingboard@1"
+        },
+        {
+          "command": "fmcuttingboard.pushClipboardIntoFileMaker",
+          "when": "resourceExtname == .xml",
+          "group": "fmcuttingboard@2"
+        },
+        {
+          "command": "fmcuttingboard.dumpClipboardFormats",
+          "when": "config.fmcuttingboard.enableDiagnostics",
+          "group": "fmcuttingboard@3"
+        },
+        {
+          "command": "fmcuttingboard.saveRawClipboardCapture",
+          "when": "config.fmcuttingboard.enableDiagnostics",
+          "group": "fmcuttingboard@4"
+        }
+      ],
+      "explorer/context": [
+        {
+          "command": "fmcuttingboard.getFileMakerClipboardContent",
+          "group": "fmcuttingboard@1"
+        },
+        {
+          "command": "fmcuttingboard.pushClipboardIntoFileMaker",
+          "when": "resourceExtname == .xml",
+          "group": "fmcuttingboard@2"
+        },
+        {
+          "command": "fmcuttingboard.dumpClipboardFormats",
+          "when": "config.fmcuttingboard.enableDiagnostics",
+          "group": "fmcuttingboard@3"
+        },
+        {
+          "command": "fmcuttingboard.saveRawClipboardCapture",
+          "when": "config.fmcuttingboard.enableDiagnostics",
+          "group": "fmcuttingboard@4"
+        }
+      ],
+      "editor/title": [
+        {
+          "command": "fmcuttingboard.pushClipboardIntoFileMaker",
+          "when": "fmcuttingboard.activeEditorIsFmxmlsnippet",
+          "group": "navigation"
+        }
+      ]
+    },
+    "keybindings": [
+      {
+        "command": "fmcuttingboard.getFileMakerClipboardContent",
+        "key": "ctrl+alt+c x"
+      },
+      {
+        "command": "fmcuttingboard.pushClipboardIntoFileMaker",
+        "key": "ctrl+alt+c p",
+        "when": "resourceExtname == .xml"
+      }
+    ],
+    "configuration": {
+      "title": "FMCuttingBoard",
+      "properties": {
+        "fmcuttingboard.baseDirName": {
+          "type": "string",
+          "default": ".fmCuttingBoard",
+          "scope": "resource",
+          "markdownDescription": "Folder (relative to the workspace folder) where clipboard content is saved. A `.gitignore` that ignores everything is created in it when the folder is first created."
+        },
+        "fmcuttingboard.fileNamePattern": {
+          "type": "string",
+          "default": "{timestamp}",
+          "scope": "resource",
+          "markdownDescription": "File name for saved clipboard content, without extension (`.xml` or `.fmcalc` is added). `{timestamp}` is replaced with the current time in milliseconds; `-1`, `-2`, … is added if the name is taken."
+        },
+        "fmcuttingboard.previewBeforeClipboardWrite": {
+          "type": "boolean",
+          "default": false,
+          "scope": "resource",
+          "description": "Show a preview and ask for confirmation before replacing the clipboard."
+        },
+        "fmcuttingboard.enableDiagnostics": {
+          "type": "boolean",
+          "default": false,
+          "scope": "resource",
+          "markdownDescription": "Show the diagnostics commands (**Dump Clipboard Formats**, **Save Raw Clipboard Capture**). For detailed logs, set the **FMCuttingBoard** output channel's log level with **Developer: Set Log Level…**."
+        }
+      }
+    }
+  },
   "scripts": {
     "build": "node esbuild.mjs",
     "watch": "node esbuild.mjs --watch",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "check": "npm run typecheck && npm run test",
-    "vscode:prepublish": "node esbuild.mjs --production"
+    "vscode:prepublish": "node esbuild.mjs --production",
+    "test:integration": "node esbuild.mjs && node esbuild.mjs --integration && vscode-test"
   },
   "dependencies": {
     "@xmldom/xmldom": "0.9.12"
   },
   "devDependencies": {
+    "@types/mocha": "10.0.10",
     "@types/node": "22.15.35",
     "@types/vscode": "1.101.0",
+    "@vscode/test-cli": "0.0.15",
+    "@vscode/test-electron": "3.1.0",
     "esbuild": "0.28.2",
     "typescript": "6.0.3",
     "vitest": "5.0.3"

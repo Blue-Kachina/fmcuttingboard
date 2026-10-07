@@ -20,7 +20,22 @@ const options = {
   logLevel: 'info',
 };
 
-if (watch) {
+// Integration tests (integration/*.test.ts) are bundled separately into out/integration for @vscode/test-cli
+const integrationOptions = {
+  entryPoints: ['integration/*.test.ts'],
+  bundle: true,
+  outdir: 'out/integration',
+  platform: 'node',
+  format: 'cjs',
+  target: 'node22',
+  external: ['vscode', 'mocha'],
+  sourcemap: true,
+  logLevel: 'info',
+};
+
+if (process.argv.includes('--integration')) {
+  await esbuild.build(integrationOptions);
+} else if (watch) {
   const ctx = await esbuild.context(options);
   await ctx.watch();
 } else {

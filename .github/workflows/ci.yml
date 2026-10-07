@@ -104,3 +104,6 @@ jobs:
 
       - name: Bundle
         run: npm run build
+
+      - name: Integration tests in VS Code (oldest supported version)
+        run: xvfb-run -a npm run test:integration

@@ -20,37 +20,37 @@ Shared foundations (both plugins must pass them, see `shared/fixtures/README.md`
 
 | Capability | JetBrains | VS Code | Notes |
 |---|:---:|:---:|---|
-| Get FileMaker clipboard → new `.xml` file (smart action) | ✅ 1.0.0 | ❌ | Falls back to `.fmcalc` when the clipboard isn't an fmxmlsnippet |
-| Plain clipboard text → new `.fmcalc` file | ✅ 1.0.0 | ❌ | |
-| Push active `.xml` editor (incl. unsaved edits) → FileMaker clipboard | ✅ 1.0.0 | ❌ | |
-| Snippet types: script, script steps, fields, tables, custom functions, value lists, layout objects | ✅ 1.0.0 | ❌ | Detection order and format names come from `clipboard-formats.json` |
-| Windows: read FileMaker native formats (`Mac-XM*`) | ✅ 1.0.0 | ❌ | JetBrains: JNA. VS Code: PowerShell/.NET helper (planned) |
-| Windows: write FileMaker native formats + CF_UNICODETEXT | ✅ 1.0.0 | ❌ | |
-| macOS: read clipboard | ⚠️ 1.0.0 | ❌ | Text only |
+| Get FileMaker clipboard → new `.xml` file (smart action) | ✅ 1.0.0 | ✅ Unreleased | Falls back to `.fmcalc` when the clipboard isn't an fmxmlsnippet |
+| Plain clipboard text → new `.fmcalc` file | ✅ 1.0.0 | ✅ Unreleased | |
+| Push active `.xml` editor (incl. unsaved edits) → FileMaker clipboard | ✅ 1.0.0 | ✅ Unreleased | |
+| Snippet types: script, script steps, fields, tables, custom functions, value lists, layout objects | ✅ 1.0.0 | ✅ Unreleased | Detection order and format names come from `clipboard-formats.json` |
+| Windows: read FileMaker native formats (`Mac-XM*`) | ✅ 1.0.0 | ✅ Unreleased | JetBrains: JNA. VS Code: PowerShell/.NET helper (~0.25 s per clipboard operation) |
+| Windows: write FileMaker native formats + CF_UNICODETEXT | ✅ 1.0.0 | ✅ Unreleased | Both fall back to plain text if the native write fails |
+| macOS: read clipboard | ⚠️ 1.0.0 | ⚠️ Unreleased | Text only |
 | macOS: write FileMaker native pasteboard types | ❌ | ❌ | Type names unknown; needs research on a Mac (`docs/MacPasteboardResearch.md`) |
 | Linux | n/a | n/a | FileMaker doesn't run on Linux |
-| Preview before writing the clipboard (setting) | ✅ 1.0.0 | ❌ | |
-| "Send to FileMaker" prompt on fmxmlsnippet `.xml` files | ✅ 1.0.0 | ❌ | JetBrains: editor banner. VS Code: CodeLens + title button (planned) |
-| Keyboard shortcuts `Ctrl+Alt+C, X` / `Ctrl+Alt+C, P` | ✅ 1.0.0 | ❌ | |
-| Editor and project/explorer context menus | ✅ 1.0.0 | ❌ | |
+| Preview before writing the clipboard (setting) | ✅ 1.0.0 | ✅ Unreleased | |
+| "Send to FileMaker" prompt on fmxmlsnippet `.xml` files | ✅ 1.0.0 | ✅ Unreleased | JetBrains: editor banner. VS Code: CodeLens + editor title button |
+| Keyboard shortcuts `Ctrl+Alt+C, X` / `Ctrl+Alt+C, P` | ✅ 1.0.0 | ✅ Unreleased | |
+| Editor and project/explorer context menus | ✅ 1.0.0 | ✅ Unreleased | JetBrains also has a Tools → FMCuttingBoard menu; VS Code uses the Command Palette (category "FMCuttingBoard") |
 
 ## Settings
 
 | Setting | JetBrains | VS Code | Notes |
 |---|:---:|:---:|---|
-| Base directory name (default `.fmCuttingBoard`, auto `.gitignore`) | ✅ 1.0.0 | ❌ | |
-| File name pattern (default `{timestamp}`) | ✅ 1.0.0 | ❌ | |
-| Preview before clipboard write | ✅ 1.0.0 | ❌ | |
-| Enable diagnostics | ✅ 1.0.0 | ❌ | |
+| Base directory name (default `.fmCuttingBoard`, auto `.gitignore`) | ✅ 1.0.0 | ✅ Unreleased | JetBrains: per project. VS Code: per workspace folder (`fmcuttingboard.baseDirName`) |
+| File name pattern (default `{timestamp}`) | ✅ 1.0.0 | ✅ Unreleased | |
+| Preview before clipboard write | ✅ 1.0.0 | ✅ Unreleased | |
+| Enable diagnostics | ✅ 1.0.0 | ✅ Unreleased | |
 
 ## Diagnostics
 
 | Capability | JetBrains | VS Code | Notes |
 |---|:---:|:---:|---|
-| Dump clipboard formats to the log | ✅ 1.0.0 | ❌ | Windows only |
-| Save raw clipboard capture (fixture source) | ✅ Unreleased | ❌ | Windows only. Same folder layout in both plugins |
-| Verbose logging | ✅ 1.0.0 | ❌ | JetBrains: `-Dfmcuttingboard.verbose`. VS Code: output channel log level (planned) |
-| Notifications with "Show details" | ✅ 1.0.0 | ❌ | |
+| Dump clipboard formats to the log | ✅ 1.0.0 | ⚠️ Unreleased | Windows only. JetBrains also appends the report to `<project>/docs/FileMaker-Native-Clipboard-Analysis.md`; VS Code only logs it (writing into a user's `docs/` folder looks like a leftover from early development; consider dropping it from JetBrains too) |
+| Save raw clipboard capture (fixture source) | ✅ Unreleased | ✅ Unreleased | Windows only. Same folder layout in both plugins |
+| Verbose logging | ✅ 1.0.0 | ✅ Unreleased | JetBrains: `-Dfmcuttingboard.verbose`. VS Code: **FMCuttingBoard** output channel log level |
+| Notifications with "Show details" | ✅ 1.0.0 | ✅ Unreleased | Same messages in both plugins |
 
 ## `.fmcalc` language support
 
