@@ -28,10 +28,13 @@ public final class FileMakerFunctionRegistry {
 
     private static final Map<String, FunctionMetadata> BY_NAME;
     private static final Map<String, List<FunctionMetadata>> BY_CATEGORY;
+    private static final boolean COMPLETE;
 
     static {
         Map<String, FunctionMetadata> map = new LinkedHashMap<>();
-        for (FunctionMetadata m : parse(SharedData.readJson(SharedData.FILEMAKER_FUNCTIONS))) {
+        JsonObject root = SharedData.readJson(SharedData.FILEMAKER_FUNCTIONS);
+        COMPLETE = root.get("complete").getAsBoolean();
+        for (FunctionMetadata m : parse(root)) {
             add(map, m);
         }
         BY_NAME = Collections.unmodifiableMap(map);
@@ -73,6 +76,9 @@ public final class FileMakerFunctionRegistry {
     }
 
     public static int size() { return BY_NAME.size(); }
+
+    /** True only when the shared data lists every FileMaker function, so an unknown name is really unknown. */
+    public static boolean isComplete() { return COMPLETE; }
 
     public static @Nullable FunctionMetadata findByName(@NotNull String name) {
         return BY_NAME.get(name.toLowerCase(Locale.ROOT));

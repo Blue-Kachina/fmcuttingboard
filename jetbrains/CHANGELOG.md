@@ -21,6 +21,21 @@ adheres to Semantic Versioning as the plugin matures.
 - The parser now knows every FileMaker operator and Claris's precedence order. `&`, `^`, `xor`, `<>`, `<=` and `>=` no longer stop parsing, and unary minus/plus parse.
 - Brackets or control characters inside strings and comments no longer cause "Unmatched closing" or "Invalid control character" errors. A missing closing quotation mark is now reported.
 - `Get ( … )` arguments and field references are no longer reported as possibly undefined variables.
+- `.fmcalc` error checking now actually runs. A bug meant it never ran in a project, so you may now see:
+  - errors for unmatched closing brackets and unterminated strings;
+  - errors for wrong argument counts in known functions;
+  - a new weak warning when a `Let`/`While` variable is used outside the function that defines it (there it
+    silently means a field).
+- `Let ( [ … ] ; … )` and `While ( [ … ] ; … ; [ … ] ; … )` variable lists, and `Field[n]` repetitions, are now parsed.
+- Binary expressions now include their left operand in the syntax tree.
+- `Substitute` accepts any number of bracketed `[ search ; replace ]` pairs.
+
+### Removed
+- The "Script variable may be undefined" and "Undefined variable (not bound in any Let())" warnings. A plain
+  name in a calculation is usually a field, and `$`/`$$` variables are set by scripts, so neither can be known
+  from the calculation alone.
+- "Unknown function" warnings are off until the shared function list is complete. Today it covers only some
+  functions, so most real functions and every custom function would be flagged.
 
 ### Changed
 - `.fmcalc` color settings: named constants (True, JSON types, text styles) now use the color scheme's

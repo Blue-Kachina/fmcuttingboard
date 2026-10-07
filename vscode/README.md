@@ -1,63 +1,59 @@
 # FMCuttingBoard for VS Code
 
-> **Work in progress — not yet published.** The JetBrains version is available on the
-> [JetBrains Marketplace](https://plugins.jetbrains.com/plugin/33170-fmcuttingboard).
+Move FileMaker objects between FileMaker and your editor as readable XML, and edit FileMaker calculations with
+real language support.
 
-FMCuttingBoard moves FileMaker objects (scripts, script steps, fields, tables, layout objects, custom
-functions and value lists) between FileMaker's clipboard and editable `fmxmlsnippet` XML files, and adds
-editing support for FileMaker calculations (`.fmcalc`).
+FMCuttingBoard handles scripts, script steps, fields, tables, layout objects, custom functions and value lists.
+Copy them in FileMaker, get them as editable `fmxmlsnippet` XML, change them, and push them back to paste into
+FileMaker. Also available [for JetBrains IDEs](https://plugins.jetbrains.com/plugin/33170-fmcuttingboard); both
+are kept in feature parity ([status](https://github.com/Blue-Kachina/fmcuttingboard/blob/master/docs/parity.md)).
 
-This extension is kept in feature parity with the JetBrains plugin; see [`docs/parity.md`](../docs/parity.md)
-for what is done so far.
-
-## Using it
+## Getting started
 
 1. In FileMaker, copy some objects (script steps, fields, a layout selection, …).
 2. In VS Code, run **FMCuttingBoard: Get FileMaker Clipboard Content** (<kbd>Ctrl+Alt+C</kbd> <kbd>X</kbd>). The
    snippet is saved as XML in `.fmCuttingBoard/` in your workspace folder and opened. Anything that isn't a
    FileMaker object (for example a calculation) is saved as a `.fmcalc` file instead.
-3. Edit the XML, then run **Push Clipboard Into FileMaker** (<kbd>Ctrl+Alt+C</kbd> <kbd>P</kbd>, the CodeLens at
-   the top of the file, or the clipboard button in the editor title bar), and paste in FileMaker.
+3. Edit the XML. Then run **Push Clipboard Into FileMaker** (<kbd>Ctrl+Alt+C</kbd> <kbd>P</kbd>, the
+   **Send To FileMaker Clipboard** link at the top of the file, or the clipboard button in the editor title bar),
+   and paste in FileMaker.
 
-`.fmcalc` files (FileMaker calculations) get syntax highlighting, completion (<kbd>Ctrl+Space</kbd>), signature
-help while typing arguments, hovers, and `let`/`if`/`case` snippets.
+The `.fmCuttingBoard` folder gets its own `.gitignore`, so clipboard snippets never end up in your repository.
 
-On Windows, the extension talks to FileMaker's own clipboard formats through a small PowerShell script that
-ships with it (each clipboard operation takes about a quarter of a second). On macOS, only plain text is
-supported for now.
+## FileMaker calculations (`.fmcalc`)
 
-## Development
+- Syntax highlighting: functions, `Get ( … )` constants, `Table::Field` references, `$`/`$$` variables, strings,
+  `¶`, comments and operators
+- Completion of functions, `Get ( … )` constants and named constants (<kbd>Ctrl+Space</kbd>)
+- Signature help while typing arguments, and hovers on functions and constants
+- `let`, `if` and `case` snippets, comment toggling, bracket matching
 
-```sh
-cd vscode
-npm install
-npm run check              # type-check + unit tests + shared golden-fixture tests
-npm run build              # bundle to dist/extension.js
-npm run test:integration   # runs the extension inside VS Code 1.101 (downloaded to .vscode-test/)
-```
+## Settings
 
-Press <kbd>F5</kbd> in VS Code with the `vscode/` folder open to launch an Extension Development Host.
+| Setting | Default | Description |
+|---|---|---|
+| `fmcuttingboard.baseDirName` | `.fmCuttingBoard` | Folder (in the workspace folder) where clipboard content is saved |
+| `fmcuttingboard.fileNamePattern` | `{timestamp}` | File name without extension; `{timestamp}` is the current time in milliseconds |
+| `fmcuttingboard.previewBeforeClipboardWrite` | `false` | Ask for confirmation, with a preview, before replacing the clipboard |
+| `fmcuttingboard.enableDiagnostics` | `false` | Show the **Dump Clipboard Formats** and **Save Raw Clipboard Capture** commands |
 
-To test the PowerShell bridge against the real Windows clipboard (it overwrites the clipboard, then restores
-its text), run `FMCB_CLIPBOARD_TESTS=1 npx vitest run test/powershellBridge.test.ts`.
+For detailed logs, set the **FMCuttingBoard** output channel's level with **Developer: Set Log Level…**.
 
-### How it is structured
+## Requirements and limitations
 
-- `src/actions/` ports the JetBrains actions (same flows and messages) against small interfaces in `ports.ts`;
-  `src/host/` and `src/extension.ts` are the only code that uses the VS Code API.
-- `.fmcalc`: `src/core/CalcLanguage.ts` is the single source of language facts (shared data);
-  `scripts/generate-grammar.mjs` generates `syntaxes/fmcalc.tmLanguage.json` from the same data (run
-  `npm run generate:grammar` after changing `shared/data`; CI fails if it is stale).
-- `src/clipboard/` decides what to read and write; `resources/fmclipboard.ps1` only moves bytes.
-- `src/core/` is a 1:1 TypeScript port of the JetBrains plugin's platform-independent logic. File names
-  match the Java class names (e.g. `FmClipboardCodec.ts` ↔ `FmClipboardCodec.java`), and it must not import
-  `vscode`, so it can be unit-tested in plain Node.
-- Data shared with the JetBrains plugin (`../shared/data/*.json`) is bundled at build time. Edit it there,
-  never in this folder.
-- `test/sharedGoldenFixtures.test.ts` runs the shared fixtures in `../shared/fixtures/`. The JetBrains plugin
-  runs the same files; if either plugin disagrees with them, it fails CI. See
-  [`shared/fixtures/README.md`](../shared/fixtures/README.md).
+- **Windows:** full support. FileMaker's own clipboard formats are read and written through a small PowerShell
+  script that ships with the extension (each clipboard operation takes about a quarter of a second). Policies
+  that block PowerShell scripts make the extension fall back to plain text.
+- **macOS:** plain text only for now. FileMaker's macOS clipboard types are still being researched.
+- **Remote (WSL, SSH, containers):** the extension runs on your local machine, where FileMaker's clipboard is,
+  and saves files into the remote workspace.
+- VS Code 1.101 or newer.
 
-## Releasing
+## Privacy
 
-Releases are triggered by `vscode-v<version>` tags (not plain `v*` tags); see the root README.
+FMCuttingBoard makes no network requests and collects no telemetry. It only reads and writes the clipboard and
+files in your workspace's `.fmCuttingBoard` folder.
+
+## License
+
+[MIT](LICENSE)

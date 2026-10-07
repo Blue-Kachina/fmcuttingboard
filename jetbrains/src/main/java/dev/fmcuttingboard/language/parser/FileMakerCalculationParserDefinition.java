@@ -75,6 +75,8 @@ public class FileMakerCalculationParserDefinition implements ParserDefinition {
         if (type == FileMakerCalculationElementType.LITERAL) return new FileMakerPsiElements.FileMakerLiteralImpl(node);
         if (type == FileMakerCalculationElementType.BINARY_EXPRESSION) return new FileMakerPsiElements.FileMakerBinaryExpressionImpl(node);
         if (type == FileMakerCalculationElementType.UNARY_EXPRESSION) return new FileMakerPsiElements.FileMakerUnaryExpressionImpl(node);
+        if (type == FileMakerCalculationElementType.BRACKET_LIST) return new FileMakerPsiElements.FileMakerBracketListImpl(node);
+        if (type == FileMakerCalculationElementType.REPETITION_EXPRESSION) return new FileMakerPsiElements.FileMakerRepetitionExpressionImpl(node);
         return new ASTWrapperPsiElement(node);
     }
 

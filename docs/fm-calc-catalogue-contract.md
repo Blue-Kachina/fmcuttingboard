@@ -62,6 +62,9 @@ it to also produce a **calculation catalogue**, which FMCuttingBoard (and `fmscr
   (`vscode/scripts/generate-grammar.mjs`). JetBrains reads the same files through `SharedData`.
 - When the catalogue lands, `shared/data/filemaker-functions.json` will be retired, and its baseline
   `shared/fixtures/golden/function-signatures.txt` will be regenerated deliberately.
+- **Unknown-function diagnostics are off until then.** `filemaker-functions.json` has `"complete": false`, and
+  both plugins only report unknown functions when their function source is complete. A full catalogue export
+  counts as complete, so vendoring it switches that warning on.
 
 ## Open questions
 

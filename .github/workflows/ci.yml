@@ -105,6 +105,9 @@ jobs:
       - name: Check generated .fmcalc grammar is up to date
         run: node scripts/generate-grammar.mjs --check
 
+      - name: Check LICENSE matches the repository's
+        run: cmp ../LICENSE LICENSE
+
       - name: Type-check
         run: npm run typecheck
 
@@ -116,3 +119,6 @@ jobs:
 
       - name: Integration tests in VS Code (oldest supported version)
         run: xvfb-run -a npm run test:integration
+
+      - name: Package (.vsix)
+        run: npm run package

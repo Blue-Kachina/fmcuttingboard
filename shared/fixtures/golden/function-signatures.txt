@@ -4,7 +4,7 @@ Let | Logical | Any | Let(bindings; result) | Let(bindings; result) | Let([name 
 Left | Text | Text | Left(text; count) | Left(text; count) | 
 Right | Text | Text | Right(text; count) | Right(text; count) | 
 Middle | Text | Text | Middle(text; start; count) | Middle(text; start; count) | 
-Substitute | Text | Text | Substitute(text; search; replace) | Substitute(text; search; replace) | 
+Substitute | Text | Text | Substitute(text; search; replace...) | Substitute(text; search; replace) | 
 Round | Math | Number | Round(number; numDecimals) | Round(number; numDecimals) | 
 Abs | Math | Number | Abs(number) | Abs(number) | 
 Sum | Aggregate | Number | Sum(field; [field......]) | Sum(field; field...) | 

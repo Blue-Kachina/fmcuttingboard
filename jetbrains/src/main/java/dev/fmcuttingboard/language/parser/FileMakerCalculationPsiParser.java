@@ -87,20 +87,20 @@ public class FileMakerCalculationPsiParser implements PsiParser {
 
     // Pratt/precedence-climbing parser for binary expressions.
     private void parseBinary(PsiBuilder builder, int minPrec) {
-        PsiBuilder.Marker leftMarker = builder.mark();
+        // Each BINARY_EXPRESSION spans left operand, operator and right operand (precede() re-wraps for chains,
+        // so "a + b + c" nests as ((a + b) + c)); all binary operators are left-associative
+        PsiBuilder.Marker left = builder.mark();
         parseUnary(builder);
-        leftMarker.drop(); // we'll wrap as we see operators
 
         while (true) {
             int prec = currentOperatorPrecedence(builder);
             if (prec < minPrec) break;
-            String opText = builder.getTokenText();
-            PsiBuilder.Marker exprMarker = builder.mark();
             builder.advanceLexer(); // consume operator
-            // Right-assoc not needed here; all supported operators left-assoc
             parseBinary(builder, prec + 1);
-            exprMarker.done(FileMakerCalculationElementType.BINARY_EXPRESSION);
+            left.done(FileMakerCalculationElementType.BINARY_EXPRESSION);
+            left = left.precede();
         }
+        left.drop();
     }
 
     private void parseUnary(PsiBuilder builder) {
@@ -115,7 +115,41 @@ public class FileMakerCalculationPsiParser implements PsiParser {
             m.done(FileMakerCalculationElementType.UNARY_EXPRESSION);
             return;
         }
+        parsePostfix(builder);
+    }
+
+    /** A primary expression followed by repetition indexes, e.g. {@code Table::Field[2]} or {@code $var[i]}. */
+    private void parsePostfix(PsiBuilder builder) {
+        boolean isBracketList = builder.getTokenType() == FileMakerCalculationTokenType.LBRACKET;
+        PsiBuilder.Marker marker = builder.mark();
         parsePrimary(builder);
+        if (!isBracketList && builder.getTokenType() == FileMakerCalculationTokenType.LBRACKET) {
+            while (builder.getTokenType() == FileMakerCalculationTokenType.LBRACKET) parseBracketList(builder);
+            marker.done(FileMakerCalculationElementType.REPETITION_EXPRESSION);
+        } else {
+            marker.drop();
+        }
+    }
+
+    /**
+     * {@code [ expr ; expr ; … ]}: the variable definitions of Let ( [ … ] ; … ) and While ( [ … ] ; … ; [ … ] ; … ),
+     * or a repetition index. Each definition ({@code name = expression}) parses as a BINARY_EXPRESSION.
+     */
+    private void parseBracketList(PsiBuilder builder) {
+        PsiBuilder.Marker marker = builder.mark();
+        builder.advanceLexer(); // '['
+        if (builder.getTokenType() != FileMakerCalculationTokenType.RBRACKET) {
+            parseExpression(builder);
+            while (isSemicolon(builder)) {
+                builder.advanceLexer(); // ';'
+                if (builder.getTokenType() == FileMakerCalculationTokenType.RBRACKET) break; // tolerate a trailing ';'
+                parseExpression(builder);
+            }
+        }
+        if (builder.getTokenType() == FileMakerCalculationTokenType.RBRACKET) {
+            builder.advanceLexer();
+        }
+        marker.done(FileMakerCalculationElementType.BRACKET_LIST);
     }
 
     private void parsePrimary(PsiBuilder builder) {
@@ -138,6 +172,11 @@ public class FileMakerCalculationPsiParser implements PsiParser {
                 // standalone identifier expression
                 marker.done(FileMakerCalculationElementType.IDENTIFIER_EXPRESSION);
             }
+            return;
+        }
+
+        if (token == FileMakerCalculationTokenType.LBRACKET) {
+            parseBracketList(builder);
             return;
         }
 

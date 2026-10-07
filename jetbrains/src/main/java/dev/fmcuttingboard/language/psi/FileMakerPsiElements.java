@@ -45,4 +45,12 @@ public final class FileMakerPsiElements {
     public static class FileMakerUnaryExpressionImpl extends ASTWrapperPsiElement {
         public FileMakerUnaryExpressionImpl(@NotNull ASTNode node) { super(node); }
     }
+
+    public static class FileMakerBracketListImpl extends ASTWrapperPsiElement {
+        public FileMakerBracketListImpl(@NotNull ASTNode node) { super(node); }
+    }
+
+    public static class FileMakerRepetitionExpressionImpl extends ASTWrapperPsiElement {
+        public FileMakerRepetitionExpressionImpl(@NotNull ASTNode node) { super(node); }
+    }
 }

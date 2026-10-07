@@ -5,32 +5,77 @@
   "description": "FileMaker calculation functions used for completion, signature help and argument-count validation in both plugins.",
   "type": "object",
   "additionalProperties": false,
-  "required": ["functions"],
+  "required": [
+    "complete",
+    "functions"
+  ],
   "properties": {
-    "$schema": { "type": "string" },
+    "$schema": {
+      "type": "string"
+    },
+    "complete": {
+      "type": "boolean",
+      "description": "true only when every FileMaker function is listed; enables unknown-function diagnostics"
+    },
+    "completeNote": {
+      "type": "string"
+    },
     "functions": {
       "type": "array",
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["name", "category", "returnType", "parameters"],
+        "required": [
+          "name",
+          "category",
+          "returnType",
+          "parameters"
+        ],
         "properties": {
-          "name": { "type": "string", "pattern": "^[A-Za-z][A-Za-z0-9_]*$" },
-          "category": {
-            "enum": ["Logical", "Text", "Math", "Date/Time", "Aggregate", "Data/Fields", "List", "Get()"]
+          "name": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
           },
-          "returnType": { "type": "string", "minLength": 1 },
-          "description": { "type": "string" },
+          "category": {
+            "enum": [
+              "Logical",
+              "Text",
+              "Math",
+              "Date/Time",
+              "Aggregate",
+              "Data/Fields",
+              "List",
+              "Get()"
+            ]
+          },
+          "returnType": {
+            "type": "string",
+            "minLength": 1
+          },
+          "description": {
+            "type": "string"
+          },
           "parameters": {
             "type": "array",
             "items": {
               "type": "object",
               "additionalProperties": false,
-              "required": ["name", "type"],
+              "required": [
+                "name",
+                "type"
+              ],
               "properties": {
-                "name": { "type": "string", "minLength": 1 },
-                "type": { "type": "string", "minLength": 1 },
-                "optional": { "type": "boolean" },
+                "name": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "type": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "optional": {
+                  "type": "boolean"
+                },
                 "repeating": {
                   "type": "boolean",
                   "description": "May appear any number of times (counts as unlimited maximum arguments)."

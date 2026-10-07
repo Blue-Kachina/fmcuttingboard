@@ -4,7 +4,7 @@ This is the definition of "done" for keeping the two plugins in step. **The VS C
 every row that is ✅ for JetBrains is also ✅ for VS Code.** Update this file in any PR that changes
 behavior in either plugin.
 
-Legend: ✅ done · ⚠️ partial (see note) · ❌ not yet · n/a doesn't apply. Versions are the first release
+Legend: ✅ done · ⚠️ partial (see note) · ⏸ deliberately off for now (see note) · ❌ not yet · n/a doesn't apply. Versions are the first release
 that has the feature in that plugin.
 
 Shared foundations (both plugins must pass them, see `shared/fixtures/README.md`):
@@ -65,9 +65,10 @@ Shared foundations (both plugins must pass them, see `shared/fixtures/README.md`
 | Hover documentation | ❌ | ✅ Unreleased | Functions, `Get()` constants, named constants |
 | Snippets / live templates (`let`, `if`, `case`) | ✅ 1.0.0 | ✅ Unreleased | A VS Code test fails if the snippets drift from the JetBrains live templates |
 | Folding of `Let` / `Case` / `If` | ✅ 1.0.0 | ❌ | Post-v1 |
-| Diagnostics: unmatched braces, invalid control characters | ✅ 1.0.0 | ❌ | Post-v1 |
-| Diagnostics: argument-count errors | ✅ 1.0.0 | ❌ | Post-v1. Only as good as `filemaker-functions.json` |
-| Diagnostics: unknown functions, unbound `Let` / `$` variables (weak warnings) | ✅ 1.0.0 | ❌ | Post-v1. Note: the registry has only 22 functions today, so many real functions are flagged as unknown |
+| Diagnostics: unmatched brackets, unterminated strings, invalid control characters | ✅ Unreleased (⚠️ 1.0.x: never ran) | ❌ | Post-v1 for VS Code. Brackets inside strings and comments are ignored |
+| Diagnostics: argument-count errors | ✅ Unreleased (⚠️ 1.0.x: never ran) | ❌ | Post-v1 for VS Code. Only as good as `filemaker-functions.json` |
+| Diagnostics: unknown functions | ⏸ | ❌ | Off in both until `filemaker-functions.json` says `"complete": true` (the fmscriptinventory catalogue) |
+| Diagnostics: `Let`/`While` variable used outside its scope | ✅ Unreleased | ❌ | Post-v1 for VS Code. Follows Claris's scoping rules; unknown names are never reported (they are usually fields) |
 | Formatter + code style options (incl. `DO_NOT_INDENT_TOP_LET_VARIABLES`) | ✅ 1.0.0 | ❌ | Post-v1 |
 | Quick fixes: comma → semicolon, insert missing semicolons | ✅ 1.0.0 | ❌ | Post-v1 |
 
@@ -87,7 +88,12 @@ The same change also fixed the following:
 - **Annotator:** brackets and control characters inside strings and comments no longer cause false errors, and an unterminated string is reported.
 - **No new undefined-variable warnings:** `Get()` arguments, named constants and field references are no longer treated as possible undefined variables.
 
-Remaining parser follow-up: `Let`'s `[ … ]` binding list is not parsed into structure yet. Enabling it would also activate the annotator's undefined-variable check inside `Let` results. That check would need to stop flagging plain field names (which look like variables) before it can be switched on.
+`Let`/`While` follow-up: done too.
+
+- **Parsing:** `[ … ]` variable lists and `Field[n]` repetitions are parsed.
+- **Undefined-variable checks:** these were replaced by a scope check that never reports unknown names (they're
+  usually fields).
+- **The annotator itself:** it had never run in a real project (its run-once guard always returned) and now runs.
 
 ## Manual FileMaker paste checklist
 

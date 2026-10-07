@@ -1,0 +1,111 @@
+name: Release (VS Code)
+
+# Triggered ONLY by vscode-v<version> tags (e.g. vscode-v0.1.0). Plain v* tags publish nothing;
+# release-tag-guard.yml fails loudly if one is pushed. See README "Releasing (tag prefixes)" and vscode/CONTRIBUTING.md.
+# Running it manually (workflow_dispatch) is a rehearsal: every check and the .vsix, but no publishing.
+
+on:
+  push:
+    tags:
+      - 'vscode-v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: vscode
+    env:
+      PUBLISH: ${{ github.event_name == 'push' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set up Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: vscode/package-lock.json
+
+      - name: Determine version
+        run: |
+          PKG_VERSION="$(node -p "require('./package.json').version")"
+          echo "PKG_VERSION=$PKG_VERSION" >> "$GITHUB_ENV"
+          echo "VSIX=fmcuttingboard-$PKG_VERSION.vsix" >> "$GITHUB_ENV"
+          if [ "$PUBLISH" = "true" ]; then
+            TAG_VERSION="${GITHUB_REF_NAME#vscode-v}"
+            if [ "$TAG_VERSION" != "$PKG_VERSION" ]; then
+              echo "::error::Tag $GITHUB_REF_NAME (version $TAG_VERSION) does not match version=$PKG_VERSION in vscode/package.json"
+              exit 1
+            fi
+          fi
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Check generated .fmcalc grammar is up to date
+        run: node scripts/generate-grammar.mjs --check
+
+      - name: Check LICENSE matches the repository's
+        run: cmp ../LICENSE LICENSE
+
+      - name: Type-check
+        run: npm run typecheck
+
+      - name: Unit and shared golden-fixture tests
+        run: npm test
+
+      - name: Integration tests in VS Code (oldest supported version)
+        run: xvfb-run -a npm run test:integration
+
+      - name: Package
+        run: npm run package -- --out "$VSIX"
+
+      - name: Upload .vsix (rehearsal)
+        if: env.PUBLISH != 'true'
+        uses: actions/upload-artifact@v7
+        with:
+          name: ${{ env.VSIX }}
+          path: vscode/${{ env.VSIX }}
+
+      - name: Publish to the VS Code Marketplace
+        if: env.PUBLISH == 'true'
+        env:
+          VSCE_PAT: ${{ secrets.VSCE_PAT }}
+        run: npx vsce publish --packagePath "$VSIX"
+
+      - name: Publish to Open VSX
+        if: env.PUBLISH == 'true'
+        env:
+          OVSX_PAT: ${{ secrets.OVSX_PAT }}
+        run: npx ovsx publish "$VSIX" -p "$OVSX_PAT"
+
+      - name: Extract changelog section for this version
+        if: env.PUBLISH == 'true'
+        run: |
+          awk -v ver="$PKG_VERSION" '
+            /^## \[/ {
+              if (found) exit
+              if (index($0, "[" ver "]") > 0) { found=1; next }
+              next
+            }
+            found { print }
+          ' CHANGELOG.md > release_notes.md
+          if [ ! -s release_notes.md ]; then
+            echo "See vscode/CHANGELOG.md for details." > release_notes.md
+          fi
+
+      - name: Create GitHub Release
+        if: env.PUBLISH == 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" \
+            "$VSIX" \
+            --title "FMCuttingBoard for VS Code $PKG_VERSION" \
+            --notes-file release_notes.md

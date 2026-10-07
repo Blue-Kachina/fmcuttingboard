@@ -23,4 +23,7 @@ public class FileMakerCalculationElementType extends IElementType {
     // Phase 4.3 refinement: basic operator expressions
     public static final IElementType BINARY_EXPRESSION = new FileMakerCalculationElementType("BINARY_EXPRESSION");
     public static final IElementType UNARY_EXPRESSION = new FileMakerCalculationElementType("UNARY_EXPRESSION");
+    // [ … ] lists (Let/While variable definitions) and Field[n] repetitions
+    public static final IElementType BRACKET_LIST = new FileMakerCalculationElementType("BRACKET_LIST");
+    public static final IElementType REPETITION_EXPRESSION = new FileMakerCalculationElementType("REPETITION_EXPRESSION");
 }

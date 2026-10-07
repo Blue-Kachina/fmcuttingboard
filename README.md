@@ -105,7 +105,7 @@ The plugin's icon (small, visible next to "FMCuttingBoard" in the menu above) is
 > | Plugin | Tag format | Must match | Workflow |
 > |---|---|---|---|
 > | JetBrains | `jetbrains-v<version>` (e.g. `jetbrains-v1.0.7`) | `pluginVersion` in `jetbrains/gradle.properties` | `.github/workflows/release-jetbrains.yml` |
-> | VS Code | `vscode-v<version>` (e.g. `vscode-v0.1.0`) | `version` in `vscode/package.json` | `release-vscode.yml` (coming soon) |
+> | VS Code | `vscode-v<version>` (e.g. `vscode-v0.1.0`) | `version` in `vscode/package.json` | `.github/workflows/release-vscode.yml` (steps and one-time setup: `vscode/CONTRIBUTING.md`) |
 >
 > If you push an old-style `v1.2.3` tag by mistake, the **Release tag guard** workflow fails with a message telling you which tag to push instead. Delete the wrong tag and push the right one.
 >

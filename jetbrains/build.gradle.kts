@@ -40,6 +40,9 @@ dependencies {
         )
         // Instrumentation dependencies (e.g., @NotNull assertions) are now resolved
         // automatically by the plugin; instrumentationTools() was removed in 2.x.
+
+        // BasePlatformTestCase & co. for PSI/parser/annotator tests (JUnit 3 style, run by the vintage engine)
+        testFramework(org.jetbrains.intellij.platform.gradle.TestFrameworkType.Platform)
     }
 
     // JNA for Windows native clipboard fallback — rely on IDE-bundled JNA at runtime

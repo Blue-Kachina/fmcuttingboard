@@ -5,7 +5,11 @@
   "version": "0.0.1",
   "publisher": "bluekachina",
   "license": "MIT",
-  "private": true,
+  "icon": "images/icon.png",
+  "homepage": "https://github.com/Blue-Kachina/fmcuttingboard/tree/master/vscode#readme",
+  "bugs": {
+    "url": "https://github.com/Blue-Kachina/fmcuttingboard/issues"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/Blue-Kachina/fmcuttingboard.git",
@@ -16,6 +20,7 @@
   },
   "categories": [
     "Programming Languages",
+    "Snippets",
     "Other"
   ],
   "keywords": [
@@ -222,7 +227,8 @@
     "check": "node scripts/generate-grammar.mjs --check && npm run typecheck && npm run test",
     "vscode:prepublish": "node esbuild.mjs --production",
     "test:integration": "node esbuild.mjs && node esbuild.mjs --integration && vscode-test",
-    "generate:grammar": "node scripts/generate-grammar.mjs"
+    "generate:grammar": "node scripts/generate-grammar.mjs",
+    "package": "vsce package --no-dependencies --baseContentUrl https://github.com/Blue-Kachina/fmcuttingboard/blob/master/vscode --baseImagesUrl https://github.com/Blue-Kachina/fmcuttingboard/raw/master/vscode"
   },
   "dependencies": {
     "@xmldom/xmldom": "0.9.12"
@@ -233,10 +239,16 @@
     "@types/vscode": "1.101.0",
     "@vscode/test-cli": "0.0.15",
     "@vscode/test-electron": "3.1.0",
+    "@vscode/vsce": "4.0.0",
     "esbuild": "0.28.2",
+    "ovsx": "1.2.0",
     "typescript": "6.0.3",
     "vitest": "5.0.3",
     "vscode-oniguruma": "2.0.1",
     "vscode-textmate": "9.3.2"
+  },
+  "galleryBanner": {
+    "color": "#3B2A1A",
+    "theme": "dark"
   }
 }

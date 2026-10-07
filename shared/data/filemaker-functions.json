@@ -1,5 +1,7 @@
 {
   "$schema": "../schemas/filemaker-functions.schema.json",
+  "complete": false,
+  "completeNote": "false while this hand-written list covers only some functions: unknown-function warnings stay off until it is complete (e.g. once fm-calc-catalogue.json is vendored)",
   "functions": [
     {
       "name": "If",
@@ -129,7 +131,8 @@
         },
         {
           "name": "replace",
-          "type": "Text"
+          "type": "Text",
+          "repeating": true
         }
       ]
     },

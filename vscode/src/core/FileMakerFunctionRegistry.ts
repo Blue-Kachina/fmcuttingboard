@@ -69,6 +69,11 @@ export function getAll(): FunctionMetadata[] {
   return [...BY_NAME.values()];
 }
 
+/** True only when the shared data lists every FileMaker function, so an unknown name is really unknown. */
+export function isComplete(): boolean {
+  return data.complete;
+}
+
 export function size(): number {
   return BY_NAME.size;
 }
