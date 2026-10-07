@@ -21,7 +21,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   - comment toggling, bracket matching and auto-closing;
   - `let`/`if`/`case` snippets;
   - function, `Get()` constant and named constant completion;
-  - hover and signature help.
+  - hover and signature help;
+  - problems reported as you type: unmatched brackets, unterminated strings, wrong argument counts, and
+    `Let`/`While` variables used outside their scope (the same checks and messages as the JetBrains plugin).
 - Project scaffold (TypeScript, esbuild, Vitest).
 - Port of the JetBrains plugin's platform-independent core: fmxmlsnippet detection and validation,
   FileMaker clipboard payload encoding/decoding, file naming, and the FileMaker function registry. Verified

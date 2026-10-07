@@ -13,6 +13,10 @@ import dev.fmcuttingboard.fm.FmSnippet;
 import dev.fmcuttingboard.fm.FmXmlParser;
 import dev.fmcuttingboard.fm.ParsedSnippet;
 import dev.fmcuttingboard.fs.ProjectFiles;
+import dev.fmcuttingboard.language.FileMakerCalculationLexerAdapter;
+import dev.fmcuttingboard.language.FileMakerCalculationTokenType;
+import com.intellij.lexer.Lexer;
+import com.intellij.psi.tree.IElementType;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
 
@@ -200,6 +204,11 @@ public class SharedGoldenFixturesTest {
                     assertEquals(strings(c, "expect"),
                             FmSnippet.detectTypes(c.get("xml").getAsString()).stream().map(Enum::name).toList())));
         }
+        for (JsonElement e : cases.getAsJsonArray("lexer")) {
+            JsonObject c = e.getAsJsonObject();
+            tests.add(dynamicTest("lexer: " + c.get("id").getAsString(), () ->
+                    assertEquals(strings(c, "tokens"), lexerTokens(c.get("calc").getAsString()))));
+        }
         for (JsonElement e : cases.getAsJsonArray("fileNaming")) {
             JsonObject c = e.getAsJsonObject();
             tests.add(dynamicTest("fileNaming: " + c.get("id").getAsString(), () -> {
@@ -210,6 +219,29 @@ public class SharedGoldenFixturesTest {
             }));
         }
         return tests.stream();
+    }
+
+    /** Non-whitespace tokens as TYPE:text, with consecutive BLOCK_COMMENT tokens merged (cases.json "lexer"). */
+    private static List<String> lexerTokens(String calc) {
+        Lexer lexer = new FileMakerCalculationLexerAdapter();
+        lexer.start(calc);
+        List<String> types = new ArrayList<>();
+        List<StringBuilder> texts = new ArrayList<>();
+        for (IElementType t = lexer.getTokenType(); t != null; lexer.advance(), t = lexer.getTokenType()) {
+            if (t == FileMakerCalculationTokenType.WHITE_SPACE) continue;
+            String type = t.toString();
+            String text = calc.substring(lexer.getTokenStart(), lexer.getTokenEnd());
+            int last = types.size() - 1;
+            if (type.equals("BLOCK_COMMENT") && last >= 0 && types.get(last).equals("BLOCK_COMMENT")) {
+                texts.get(last).append(text);
+            } else {
+                types.add(type);
+                texts.add(new StringBuilder(text));
+            }
+        }
+        List<String> out = new ArrayList<>();
+        for (int i = 0; i < types.size(); i++) out.add(types.get(i) + ":" + texts.get(i));
+        return out;
     }
 
     private static List<String> strings(JsonObject o, String key) {

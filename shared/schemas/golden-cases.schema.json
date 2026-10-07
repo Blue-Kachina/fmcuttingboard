@@ -4,50 +4,158 @@
   "title": "Hand-written golden cases",
   "type": "object",
   "additionalProperties": false,
-  "required": ["byteVariants", "detection", "normalizeToXmlText", "decodeBytesWithBomHeuristics", "extractFmxmlFromBytes", "parseSnippet", "fmSnippetDetectTypes", "fileNaming"],
+  "required": [
+    "byteVariants",
+    "detection",
+    "normalizeToXmlText",
+    "decodeBytesWithBomHeuristics",
+    "extractFmxmlFromBytes",
+    "parseSnippet",
+    "fmSnippetDetectTypes",
+    "fileNaming",
+    "lexer",
+    "diagnostics"
+  ],
   "definitions": {
-    "nullableString": { "type": ["string", "null"] },
-    "elementType": { "enum": ["FIELDS", "SCRIPTS", "TABLES", "LAYOUTS", "CUSTOM_FUNCTIONS", "VALUE_LISTS", "UNKNOWN"] },
+    "nullableString": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "elementType": {
+      "enum": [
+        "FIELDS",
+        "SCRIPTS",
+        "TABLES",
+        "LAYOUTS",
+        "CUSTOM_FUNCTIONS",
+        "VALUE_LISTS",
+        "UNKNOWN"
+      ]
+    },
     "byteInput": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["id", "expect"],
+      "required": [
+        "id",
+        "expect"
+      ],
       "oneOf": [
-        { "required": ["hex"], "not": { "anyOf": [{ "required": ["text"] }, { "required": ["encoding"] }] } },
-        { "required": ["text", "encoding"], "not": { "required": ["hex"] } }
+        {
+          "required": [
+            "hex"
+          ],
+          "not": {
+            "anyOf": [
+              {
+                "required": [
+                  "text"
+                ]
+              },
+              {
+                "required": [
+                  "encoding"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "required": [
+            "text",
+            "encoding"
+          ],
+          "not": {
+            "required": [
+              "hex"
+            ]
+          }
+        }
       ],
       "properties": {
-        "id": { "type": "string" },
-        "hex": { "type": "string", "pattern": "^([0-9A-Fa-f]{2})*$" },
-        "text": { "type": "string" },
-        "encoding": { "enum": ["utf8", "utf16le", "utf16be"] },
-        "expect": { "$ref": "#/definitions/nullableString" },
-        "note": { "type": "string" }
+        "id": {
+          "type": "string"
+        },
+        "hex": {
+          "type": "string",
+          "pattern": "^([0-9A-Fa-f]{2})*$"
+        },
+        "text": {
+          "type": "string"
+        },
+        "encoding": {
+          "enum": [
+            "utf8",
+            "utf16le",
+            "utf16be"
+          ]
+        },
+        "expect": {
+          "$ref": "#/definitions/nullableString"
+        },
+        "note": {
+          "type": "string"
+        }
       }
     }
   },
   "properties": {
-    "$schema": { "type": "string" },
-    "about": { "type": "string" },
+    "$schema": {
+      "type": "string"
+    },
+    "about": {
+      "type": "string"
+    },
     "byteVariants": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["variants"],
+      "required": [
+        "variants"
+      ],
       "properties": {
-        "about": { "type": "string" },
+        "about": {
+          "type": "string"
+        },
         "variants": {
           "type": "array",
           "items": {
             "type": "object",
             "additionalProperties": false,
-            "required": ["id", "build", "decode", "extract"],
+            "required": [
+              "id",
+              "build",
+              "decode",
+              "extract"
+            ],
             "properties": {
               "id": {
-                "enum": ["utf8", "utf8-bom", "utf16le", "utf16le-bom", "utf16le-nul-terminated", "utf16be", "utf16be-bom", "custom-format-payload"]
+                "enum": [
+                  "utf8",
+                  "utf8-bom",
+                  "utf16le",
+                  "utf16le-bom",
+                  "utf16le-nul-terminated",
+                  "utf16be",
+                  "utf16be-bom",
+                  "custom-format-payload"
+                ]
               },
-              "build": { "type": "string" },
-              "decode": { "enum": ["text", "skip"] },
-              "extract": { "enum": ["snippet", "lf-snippet"] }
+              "build": {
+                "type": "string"
+              },
+              "decode": {
+                "enum": [
+                  "text",
+                  "skip"
+                ]
+              },
+              "extract": {
+                "enum": [
+                  "snippet",
+                  "lf-snippet"
+                ]
+              }
             }
           }
         }
@@ -58,12 +166,29 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["id", "text", "expect"],
+        "required": [
+          "id",
+          "text",
+          "expect"
+        ],
         "properties": {
-          "id": { "type": "string" },
-          "text": { "type": "string" },
+          "id": {
+            "type": "string"
+          },
+          "text": {
+            "type": "string"
+          },
           "expect": {
-            "enum": ["SCRIPT", "SCRIPT_STEPS", "FIELD_DEFINITION", "TABLE_DEFINITION", "CUSTOM_FUNCTION", "VALUE_LIST", "LAYOUT_OBJECTS", "UNKNOWN"]
+            "enum": [
+              "SCRIPT",
+              "SCRIPT_STEPS",
+              "FIELD_DEFINITION",
+              "TABLE_DEFINITION",
+              "CUSTOM_FUNCTION",
+              "VALUE_LIST",
+              "LAYOUT_OBJECTS",
+              "UNKNOWN"
+            ]
           }
         }
       }
@@ -73,46 +198,174 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["id", "input", "expect"],
+        "required": [
+          "id",
+          "input",
+          "expect"
+        ],
         "properties": {
-          "id": { "type": "string" },
-          "input": { "type": "string" },
-          "expect": { "$ref": "#/definitions/nullableString" }
+          "id": {
+            "type": "string"
+          },
+          "input": {
+            "type": "string"
+          },
+          "expect": {
+            "$ref": "#/definitions/nullableString"
+          }
         }
       }
     },
-    "decodeBytesWithBomHeuristics": { "type": "array", "items": { "$ref": "#/definitions/byteInput" } },
-    "extractFmxmlFromBytes": { "type": "array", "items": { "$ref": "#/definitions/byteInput" } },
+    "decodeBytesWithBomHeuristics": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/byteInput"
+      }
+    },
+    "extractFmxmlFromBytes": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/byteInput"
+      }
+    },
     "parseSnippet": {
       "type": "array",
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["id", "xml"],
+        "required": [
+          "id",
+          "xml"
+        ],
         "oneOf": [
-          { "required": ["error"], "not": { "anyOf": [{ "required": ["expect"] }, { "required": ["payload"] }, { "required": ["payloadError"] }] } },
-          { "required": ["expect", "payload"], "not": { "anyOf": [{ "required": ["error"] }, { "required": ["payloadError"] }] } },
-          { "required": ["expect", "payloadError"], "not": { "anyOf": [{ "required": ["error"] }, { "required": ["payload"] }] } }
+          {
+            "required": [
+              "error"
+            ],
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "expect"
+                  ]
+                },
+                {
+                  "required": [
+                    "payload"
+                  ]
+                },
+                {
+                  "required": [
+                    "payloadError"
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "required": [
+              "expect",
+              "payload"
+            ],
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "error"
+                  ]
+                },
+                {
+                  "required": [
+                    "payloadError"
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "required": [
+              "expect",
+              "payloadError"
+            ],
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "error"
+                  ]
+                },
+                {
+                  "required": [
+                    "payload"
+                  ]
+                }
+              ]
+            }
+          }
         ],
         "properties": {
-          "id": { "type": "string" },
-          "xml": { "type": "string" },
-          "error": { "type": "string", "description": "FmXmlParser.parse must fail with exactly this message" },
+          "id": {
+            "type": "string"
+          },
+          "xml": {
+            "type": "string"
+          },
+          "error": {
+            "type": "string",
+            "description": "FmXmlParser.parse must fail with exactly this message"
+          },
           "expect": {
             "type": "object",
             "additionalProperties": false,
-            "required": ["elementTypes", "version", "typeHint", "fieldNames", "layoutNames", "scriptNames"],
+            "required": [
+              "elementTypes",
+              "version",
+              "typeHint",
+              "fieldNames",
+              "layoutNames",
+              "scriptNames"
+            ],
             "properties": {
-              "elementTypes": { "type": "array", "items": { "$ref": "#/definitions/elementType" } },
-              "version": { "$ref": "#/definitions/nullableString" },
-              "typeHint": { "$ref": "#/definitions/nullableString" },
-              "fieldNames": { "type": "array", "items": { "type": "string" } },
-              "layoutNames": { "type": "array", "items": { "type": "string" } },
-              "scriptNames": { "type": "array", "items": { "type": "string" } }
+              "elementTypes": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/definitions/elementType"
+                }
+              },
+              "version": {
+                "$ref": "#/definitions/nullableString"
+              },
+              "typeHint": {
+                "$ref": "#/definitions/nullableString"
+              },
+              "fieldNames": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "layoutNames": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "scriptNames": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
             }
           },
-          "payload": { "type": "string", "description": "DefaultXmlToClipboardConverter result" },
-          "payloadError": { "type": "string", "description": "DefaultXmlToClipboardConverter must fail with exactly this message" }
+          "payload": {
+            "type": "string",
+            "description": "DefaultXmlToClipboardConverter result"
+          },
+          "payloadError": {
+            "type": "string",
+            "description": "DefaultXmlToClipboardConverter must fail with exactly this message"
+          }
         }
       }
     },
@@ -121,11 +374,25 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["id", "xml", "expect"],
+        "required": [
+          "id",
+          "xml",
+          "expect"
+        ],
         "properties": {
-          "id": { "type": "string" },
-          "xml": { "type": "string" },
-          "expect": { "type": "array", "minItems": 1, "items": { "$ref": "#/definitions/elementType" } }
+          "id": {
+            "type": "string"
+          },
+          "xml": {
+            "type": "string"
+          },
+          "expect": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "$ref": "#/definitions/elementType"
+            }
+          }
         }
       }
     },
@@ -134,14 +401,126 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["id", "pattern", "extension", "nowMillis", "existing", "expect"],
+        "required": [
+          "id",
+          "pattern",
+          "extension",
+          "nowMillis",
+          "existing",
+          "expect"
+        ],
         "properties": {
-          "id": { "type": "string" },
-          "pattern": { "$ref": "#/definitions/nullableString" },
-          "extension": { "type": "string", "pattern": "^\\." },
-          "nowMillis": { "type": "integer", "minimum": 0 },
-          "existing": { "type": "array", "items": { "type": "string" } },
-          "expect": { "type": "string" }
+          "id": {
+            "type": "string"
+          },
+          "pattern": {
+            "$ref": "#/definitions/nullableString"
+          },
+          "extension": {
+            "type": "string",
+            "pattern": "^\\."
+          },
+          "nowMillis": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "existing": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "expect": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "lexer": {
+      "type": "array",
+      "description": "Non-whitespace tokens as TYPE:text after identifier classification; consecutive BLOCK_COMMENT tokens merged",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "calc",
+          "tokens"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "calc": {
+            "type": "string"
+          },
+          "note": {
+            "type": "string"
+          },
+          "tokens": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^(WHITE_SPACE|BAD_CHARACTER|IDENTIFIER|NUMBER|STRING|LINE_COMMENT|BLOCK_COMMENT|OPERATOR|LPAREN|RPAREN|LBRACKET|RBRACKET|LBRACE|RBRACE|KEYWORD_LOGICAL|FIELD_REFERENCE|QUOTED_NAME|PARAGRAPH_MARK|KEYWORD_FUNCTION|GET_CONSTANT|CONSTANT):"
+            }
+          }
+        }
+      }
+    },
+    "diagnostics": {
+      "type": "array",
+      "description": "Every diagnostic for the calculation (any order); offsets are UTF-16 code units",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "calc",
+          "expect"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "calc": {
+            "type": "string"
+          },
+          "note": {
+            "type": "string"
+          },
+          "expect": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "severity",
+                "message",
+                "start",
+                "end"
+              ],
+              "properties": {
+                "severity": {
+                  "enum": [
+                    "error",
+                    "warning",
+                    "weak_warning"
+                  ]
+                },
+                "message": {
+                  "type": "string"
+                },
+                "start": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "end": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              }
+            }
+          }
         }
       }
     }

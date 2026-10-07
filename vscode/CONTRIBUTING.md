@@ -23,6 +23,10 @@ text), run `FMCB_CLIPBOARD_TESTS=1 npx vitest run test/powershellBridge.test.ts`
 - `.fmcalc`: `src/core/CalcLanguage.ts` is the single source of language facts (shared data).
   `scripts/generate-grammar.mjs` generates `syntaxes/fmcalc.tmLanguage.json` from the same data. Run
   `npm run generate:grammar` after changing `shared/data`; CI fails if the grammar is stale.
+- `.fmcalc` diagnostics: `src/core/CalcLexer.ts`, `CalcParser.ts` and `CalcDiagnostics.ts` are faithful ports of
+  the JetBrains lexer (+ adapter), parser (including its recovery quirks) and annotator. Argument counts depend on
+  the exact parse, so change them only together with the Java side; the golden `lexer` and `diagnostics` cases in
+  `shared/fixtures/golden/cases.json` fail otherwise.
 - `src/clipboard/` decides what to read and write; `resources/fmclipboard.ps1` only moves bytes.
 - `src/core/` is a 1:1 TypeScript port of the JetBrains plugin's platform-independent logic. File names match the
   Java class names (e.g. `FmClipboardCodec.ts` ↔ `FmClipboardCodec.java`). It must not import `vscode`, so it can

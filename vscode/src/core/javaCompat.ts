@@ -13,6 +13,16 @@ export function javaTrim(s: string): string {
 // Characters for which Java's Character.isWhitespace() is true (no-break spaces are excluded, unlike JS \s)
 const JAVA_BLANK = new RegExp("^[\\u0009-\\u000D\\u001C-\\u0020\\u1680\\u2000-\\u2006\\u2008-\\u200A\\u2028-\\u2029\\u205F\\u3000]*$");
 
+/** Java's Character.isWhitespace() for one UTF-16 code unit. */
+export function isJavaWhitespace(ch: string): boolean {
+  return ch.length === 1 && JAVA_BLANK.test(ch);
+}
+
+/** Java's Character.isLetterOrDigit() for one UTF-16 code unit (surrogate halves are neither). */
+export function isJavaLetterOrDigit(ch: string): boolean {
+  return ch.length === 1 && /^[\p{L}\p{Nd}]$/u.test(ch);
+}
+
 /** Java's String.isBlank(), treating null as blank. */
 export function javaIsBlank(s: string | null | undefined): boolean {
   return s == null || JAVA_BLANK.test(s);

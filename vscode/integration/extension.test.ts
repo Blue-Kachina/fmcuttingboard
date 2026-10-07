@@ -126,6 +126,25 @@ describe('FMCuttingBoard extension', () => {
       assert.match(text, /Left\(text; count\)/);
     });
 
+    it('reports the same diagnostics as the JetBrains annotator', async () => {
+      const uri = vscode.Uri.joinPath(root(), 'problems.fmcalc');
+      const calc = 'Let ( [ total = Left ( x ) ] ; total ) + total';
+      await vscode.workspace.fs.writeFile(uri, new TextEncoder().encode(calc));
+      const problems = await vscode.workspace.openTextDocument(uri);
+      let diagnostics: vscode.Diagnostic[] = [];
+      for (let i = 0; i < 50 && diagnostics.length < 2; i++) {
+        await new Promise((r) => setTimeout(r, 100));
+        diagnostics = vscode.languages.getDiagnostics(problems.uri);
+      }
+      const summary = diagnostics
+        .map((d) => `${vscode.DiagnosticSeverity[d.severity]} ${problems.offsetAt(d.range.start)} ${d.message}`)
+        .sort();
+      assert.deepEqual(summary, [
+        'Error 16 Too few arguments for Left: expected at least 2, got 1',
+        "Information 41 'total' is used outside the Let() that defines it (here it refers to a field)",
+      ]);
+    });
+
     it('shows signature help for the current argument', async () => {
       const help = await vscode.commands.executeCommand<vscode.SignatureHelp>(
         'vscode.executeSignatureHelpProvider', doc.uri, doc.positionAt(source.length));

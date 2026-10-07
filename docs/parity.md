@@ -65,10 +65,10 @@ Shared foundations (both plugins must pass them, see `shared/fixtures/README.md`
 | Hover documentation | ❌ | ✅ Unreleased | Functions, `Get()` constants, named constants |
 | Snippets / live templates (`let`, `if`, `case`) | ✅ 1.0.0 | ✅ Unreleased | A VS Code test fails if the snippets drift from the JetBrains live templates |
 | Folding of `Let` / `Case` / `If` | ✅ 1.0.0 | ❌ | Post-v1 |
-| Diagnostics: unmatched brackets, unterminated strings, invalid control characters | ✅ Unreleased (⚠️ 1.0.x: never ran) | ❌ | Post-v1 for VS Code. Brackets inside strings and comments are ignored |
-| Diagnostics: argument-count errors | ✅ Unreleased (⚠️ 1.0.x: never ran) | ❌ | Post-v1 for VS Code. Only as good as `filemaker-functions.json` |
-| Diagnostics: unknown functions | ⏸ | ❌ | Off in both until `filemaker-functions.json` says `"complete": true` (the fmscriptinventory catalogue) |
-| Diagnostics: `Let`/`While` variable used outside its scope | ✅ Unreleased | ❌ | Post-v1 for VS Code. Follows Claris's scoping rules; unknown names are never reported (they are usually fields) |
+| Diagnostics: unmatched brackets, unterminated strings, invalid control characters | ✅ Unreleased (⚠️ 1.0.x: never ran) | ✅ Unreleased | Brackets inside strings and comments are ignored. Same results in both IDEs (golden "diagnostics" cases) |
+| Diagnostics: argument-count errors | ✅ Unreleased (⚠️ 1.0.x: never ran) | ✅ Unreleased | Only as good as `filemaker-functions.json` |
+| Diagnostics: unknown functions | ⏸ | ⏸ | Off in both until `filemaker-functions.json` says `"complete": true` (the fmscriptinventory catalogue) |
+| Diagnostics: `Let`/`While` variable used outside its scope | ✅ Unreleased | ✅ Unreleased | Follows Claris's scoping rules; unknown names are never reported (they are usually fields). JetBrains weak warning = VS Code Information |
 | Formatter + code style options (incl. `DO_NOT_INDENT_TOP_LET_VARIABLES`) | ✅ 1.0.0 | ❌ | Post-v1 |
 | Quick fixes: comma → semicolon, insert missing semicolons | ✅ 1.0.0 | ❌ | Post-v1 |
 

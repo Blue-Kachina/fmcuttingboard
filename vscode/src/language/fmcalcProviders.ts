@@ -1,6 +1,7 @@
 // .fmcalc completion, hover and signature help: thin adapters from src/core/CalcAssist.ts to the vscode API.
 import * as vscode from 'vscode';
 import { completions, hoverMarkdown, signatureAt, type CompletionKind } from '../core/CalcAssist';
+import { diagnose, type Severity } from '../core/CalcDiagnostics';
 import { cursorContext } from '../core/CallContext';
 
 export const FMCALC: vscode.DocumentSelector = { language: 'fmcalc' };
@@ -13,7 +14,57 @@ const KINDS: Record<CompletionKind, vscode.CompletionItemKind> = {
 
 const WORD = /\$\$?[\p{L}_~][\p{L}\p{N}_.~]*|[\p{L}_][\p{L}\p{N}_]*/u;
 
+// JetBrains severities → VS Code (a weak warning is subtler than a warning)
+const SEVERITY: Record<Severity, vscode.DiagnosticSeverity> = {
+  error: vscode.DiagnosticSeverity.Error,
+  warning: vscode.DiagnosticSeverity.Warning,
+  weak_warning: vscode.DiagnosticSeverity.Information,
+};
+
+/** Same checks as the JetBrains annotator (src/core/CalcDiagnostics.ts), updated as you type. */
+function registerFmcalcDiagnostics(context: vscode.ExtensionContext): void {
+  const collection = vscode.languages.createDiagnosticCollection('fmcalc');
+  const pending = new Map<string, NodeJS.Timeout>();
+
+  const refresh = (doc: vscode.TextDocument) => {
+    if (doc.languageId !== 'fmcalc') return;
+    collection.set(
+      doc.uri,
+      diagnose(doc.getText()).map((d) => {
+        const diagnostic = new vscode.Diagnostic(
+          new vscode.Range(doc.positionAt(d.start), doc.positionAt(d.end)),
+          d.message,
+          SEVERITY[d.severity],
+        );
+        diagnostic.source = 'FMCuttingBoard';
+        return diagnostic;
+      }),
+    );
+  };
+  const refreshSoon = (doc: vscode.TextDocument) => {
+    const key = doc.uri.toString();
+    clearTimeout(pending.get(key));
+    pending.set(key, setTimeout(() => {
+      pending.delete(key);
+      refresh(doc);
+    }, 250));
+  };
+
+  vscode.workspace.textDocuments.forEach(refresh);
+  context.subscriptions.push(
+    collection,
+    vscode.workspace.onDidOpenTextDocument(refresh),
+    vscode.workspace.onDidChangeTextDocument((e) => refreshSoon(e.document)),
+    vscode.workspace.onDidCloseTextDocument((doc) => {
+      clearTimeout(pending.get(doc.uri.toString()));
+      collection.delete(doc.uri);
+    }),
+    { dispose: () => pending.forEach((t) => clearTimeout(t)) },
+  );
+}
+
 export function registerFmcalcProviders(context: vscode.ExtensionContext): void {
+  registerFmcalcDiagnostics(context);
   context.subscriptions.push(
     vscode.languages.registerCompletionItemProvider(FMCALC, {
       provideCompletionItems(doc, position) {

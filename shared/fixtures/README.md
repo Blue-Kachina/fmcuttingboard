@@ -55,6 +55,13 @@ variant's bytes as described in `build`, then:
 
 **`cases.json` → `fmSnippetDetectTypes`**: `FmSnippet.detectTypes(xml)` must equal `expect`, in the same order.
 
+**`cases.json` → `lexer`**: tokenize `calc` (lexer plus identifier classification). The non-whitespace tokens, as
+`TYPE:text` with consecutive `BLOCK_COMMENT` tokens merged, must equal `tokens`.
+
+**`cases.json` → `diagnostics`**: every diagnostic the plugin reports for `calc` (JetBrains: the annotator's
+highlights; VS Code: `diagnose()`) must equal `expect` in any order: severity, message, and start/end offsets in
+UTF-16 code units. The messages are user-facing, so the wording must match exactly.
+
 **`cases.json` → `fileNaming`**: `uniqueFileName(resolveFileName(pattern, extension, nowMillis), name ∈ existing)`
 must equal `expect`. A `null` pattern means the setting is unset.
 

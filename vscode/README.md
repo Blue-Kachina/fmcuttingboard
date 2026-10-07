@@ -26,6 +26,8 @@ The `.fmCuttingBoard` folder gets its own `.gitignore`, so clipboard snippets ne
   `¶`, comments and operators
 - Completion of functions, `Get ( … )` constants and named constants (<kbd>Ctrl+Space</kbd>)
 - Signature help while typing arguments, and hovers on functions and constants
+- Problems as you type: unmatched brackets, unterminated strings, wrong argument counts, and `Let`/`While`
+  variables used outside their scope
 - `let`, `if` and `case` snippets, comment toggling, bracket matching
 
 ## Settings

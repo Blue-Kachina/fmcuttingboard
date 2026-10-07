@@ -1,141 +1,1119 @@
 {
   "$schema": "../../schemas/golden-cases.schema.json",
   "about": "Hand-written golden cases. Both plugins' test suites must run every case here and in snippets.generated.json. See shared/fixtures/README.md for the exact meaning of each section.",
-
   "byteVariants": {
     "about": "For every snippet fixture and both line-ending styles (lf, crlf), build these byte arrays from the text and check decodeBytesWithBomHeuristics and extractFmxmlFromBytes. 'decode' and 'extract' name what each function must return.",
     "variants": [
-      { "id": "utf8",                   "build": "UTF-8 bytes of text",                           "decode": "text",  "extract": "snippet" },
-      { "id": "utf8-bom",               "build": "EF BB BF + UTF-8 bytes of text",                "decode": "text",  "extract": "snippet" },
-      { "id": "utf16le",                "build": "UTF-16LE bytes of text",                        "decode": "text",  "extract": "snippet" },
-      { "id": "utf16le-bom",            "build": "FF FE + UTF-16LE bytes of text",                "decode": "text",  "extract": "snippet" },
-      { "id": "utf16le-nul-terminated", "build": "UTF-16LE bytes of text + 00 00 (CF_UNICODETEXT)", "decode": "text", "extract": "snippet" },
-      { "id": "utf16be",                "build": "UTF-16BE bytes of text",                        "decode": "text",  "extract": "snippet" },
-      { "id": "utf16be-bom",            "build": "FE FF + UTF-16BE bytes of text",                "decode": "text",  "extract": "snippet" },
-      { "id": "custom-format-payload",  "build": "encodeCustomFormatPayload(text)",               "decode": "skip",  "extract": "lf-snippet" }
+      {
+        "id": "utf8",
+        "build": "UTF-8 bytes of text",
+        "decode": "text",
+        "extract": "snippet"
+      },
+      {
+        "id": "utf8-bom",
+        "build": "EF BB BF + UTF-8 bytes of text",
+        "decode": "text",
+        "extract": "snippet"
+      },
+      {
+        "id": "utf16le",
+        "build": "UTF-16LE bytes of text",
+        "decode": "text",
+        "extract": "snippet"
+      },
+      {
+        "id": "utf16le-bom",
+        "build": "FF FE + UTF-16LE bytes of text",
+        "decode": "text",
+        "extract": "snippet"
+      },
+      {
+        "id": "utf16le-nul-terminated",
+        "build": "UTF-16LE bytes of text + 00 00 (CF_UNICODETEXT)",
+        "decode": "text",
+        "extract": "snippet"
+      },
+      {
+        "id": "utf16be",
+        "build": "UTF-16BE bytes of text",
+        "decode": "text",
+        "extract": "snippet"
+      },
+      {
+        "id": "utf16be-bom",
+        "build": "FE FF + UTF-16BE bytes of text",
+        "decode": "text",
+        "extract": "snippet"
+      },
+      {
+        "id": "custom-format-payload",
+        "build": "encodeCustomFormatPayload(text)",
+        "decode": "skip",
+        "extract": "lf-snippet"
+      }
     ]
   },
-
   "detection": [
-    { "id": "empty", "text": "", "expect": "UNKNOWN" },
-    { "id": "plain-text", "text": "Hello, world", "expect": "UNKNOWN" },
-    { "id": "script-steps", "text": "<fmxmlsnippet type=\"FMObjectList\"><Step enable=\"True\" id=\"1\" name=\"Beep\"/></fmxmlsnippet>", "expect": "SCRIPT_STEPS" },
-    { "id": "script-beats-step", "text": "<fmxmlsnippet><Script name=\"S\"><Step id=\"1\"/></Script></fmxmlsnippet>", "expect": "SCRIPT" },
-    { "id": "table-beats-field", "text": "<fmxmlsnippet><BaseTable name=\"T\"><Field name=\"F\"/></BaseTable></fmxmlsnippet>", "expect": "TABLE_DEFINITION" },
-    { "id": "layout-beats-field", "text": "<fmxmlsnippet><Layout><Object type=\"Field\"><Field name=\"F\"/></Object></Layout></fmxmlsnippet>", "expect": "LAYOUT_OBJECTS" },
-    { "id": "layout-object-list", "text": "<fmxmlsnippet><LayoutObjectList/></fmxmlsnippet>", "expect": "LAYOUT_OBJECTS" },
-    { "id": "object-with-space", "text": "<fmxmlsnippet><Object type=\"Text\"/></fmxmlsnippet>", "expect": "LAYOUT_OBJECTS" },
-    { "id": "part", "text": "<fmxmlsnippet><Part type=\"Body\"/></fmxmlsnippet>", "expect": "LAYOUT_OBJECTS" },
-    { "id": "field-definition", "text": "<fmxmlsnippet><FieldDefinition name=\"F\"/></fmxmlsnippet>", "expect": "FIELD_DEFINITION" },
-    { "id": "field-with-space", "text": "<fmxmlsnippet><Field id=\"1\" name=\"F\"/></fmxmlsnippet>", "expect": "FIELD_DEFINITION" },
-    { "id": "field-without-attributes-is-unknown", "text": "<fmxmlsnippet><Field></Field></fmxmlsnippet>", "expect": "UNKNOWN" },
-    { "id": "detection-is-case-sensitive", "text": "<fmxmlsnippet><step id=\"1\"/></fmxmlsnippet>", "expect": "UNKNOWN" },
-    { "id": "custom-function", "text": "<fmxmlsnippet><CustomFunction name=\"CF\"/></fmxmlsnippet>", "expect": "CUSTOM_FUNCTION" },
-    { "id": "value-list", "text": "<fmxmlsnippet><ValueList name=\"VL\"/></fmxmlsnippet>", "expect": "VALUE_LIST" }
+    {
+      "id": "empty",
+      "text": "",
+      "expect": "UNKNOWN"
+    },
+    {
+      "id": "plain-text",
+      "text": "Hello, world",
+      "expect": "UNKNOWN"
+    },
+    {
+      "id": "script-steps",
+      "text": "<fmxmlsnippet type=\"FMObjectList\"><Step enable=\"True\" id=\"1\" name=\"Beep\"/></fmxmlsnippet>",
+      "expect": "SCRIPT_STEPS"
+    },
+    {
+      "id": "script-beats-step",
+      "text": "<fmxmlsnippet><Script name=\"S\"><Step id=\"1\"/></Script></fmxmlsnippet>",
+      "expect": "SCRIPT"
+    },
+    {
+      "id": "table-beats-field",
+      "text": "<fmxmlsnippet><BaseTable name=\"T\"><Field name=\"F\"/></BaseTable></fmxmlsnippet>",
+      "expect": "TABLE_DEFINITION"
+    },
+    {
+      "id": "layout-beats-field",
+      "text": "<fmxmlsnippet><Layout><Object type=\"Field\"><Field name=\"F\"/></Object></Layout></fmxmlsnippet>",
+      "expect": "LAYOUT_OBJECTS"
+    },
+    {
+      "id": "layout-object-list",
+      "text": "<fmxmlsnippet><LayoutObjectList/></fmxmlsnippet>",
+      "expect": "LAYOUT_OBJECTS"
+    },
+    {
+      "id": "object-with-space",
+      "text": "<fmxmlsnippet><Object type=\"Text\"/></fmxmlsnippet>",
+      "expect": "LAYOUT_OBJECTS"
+    },
+    {
+      "id": "part",
+      "text": "<fmxmlsnippet><Part type=\"Body\"/></fmxmlsnippet>",
+      "expect": "LAYOUT_OBJECTS"
+    },
+    {
+      "id": "field-definition",
+      "text": "<fmxmlsnippet><FieldDefinition name=\"F\"/></fmxmlsnippet>",
+      "expect": "FIELD_DEFINITION"
+    },
+    {
+      "id": "field-with-space",
+      "text": "<fmxmlsnippet><Field id=\"1\" name=\"F\"/></fmxmlsnippet>",
+      "expect": "FIELD_DEFINITION"
+    },
+    {
+      "id": "field-without-attributes-is-unknown",
+      "text": "<fmxmlsnippet><Field></Field></fmxmlsnippet>",
+      "expect": "UNKNOWN"
+    },
+    {
+      "id": "detection-is-case-sensitive",
+      "text": "<fmxmlsnippet><step id=\"1\"/></fmxmlsnippet>",
+      "expect": "UNKNOWN"
+    },
+    {
+      "id": "custom-function",
+      "text": "<fmxmlsnippet><CustomFunction name=\"CF\"/></fmxmlsnippet>",
+      "expect": "CUSTOM_FUNCTION"
+    },
+    {
+      "id": "value-list",
+      "text": "<fmxmlsnippet><ValueList name=\"VL\"/></fmxmlsnippet>",
+      "expect": "VALUE_LIST"
+    }
   ],
-
   "normalizeToXmlText": [
-    { "id": "already-clean", "input": "<fmxmlsnippet type=\"FMObjectList\"><Step/></fmxmlsnippet>", "expect": "<fmxmlsnippet type=\"FMObjectList\"><Step/></fmxmlsnippet>" },
-    { "id": "surrounding-junk", "input": "junk before\n<fmxmlsnippet type=\"FMObjectList\"><Step/></fmxmlsnippet>\njunk after", "expect": "<fmxmlsnippet type=\"FMObjectList\"><Step/></fmxmlsnippet>" },
-    { "id": "tags-case-insensitive", "input": "x<FMXMLSNIPPET type=\"FMObjectList\"><Step/></FmXmlSnippet>y", "expect": "<FMXMLSNIPPET type=\"FMObjectList\"><Step/></FmXmlSnippet>" },
-    { "id": "first-snippet-wins", "input": "<fmxmlsnippet a=\"1\"><Step/></fmxmlsnippet><fmxmlsnippet a=\"2\"><Step/></fmxmlsnippet>", "expect": "<fmxmlsnippet a=\"1\"><Step/></fmxmlsnippet>" },
-    { "id": "no-closing-tag", "input": "<fmxmlsnippet type=\"FMObjectList\"><Step/>", "expect": null },
-    { "id": "not-a-snippet", "input": "If ( x > 1 ; \"a\" ; \"b\" )", "expect": null },
-    { "id": "empty", "input": "", "expect": null }
+    {
+      "id": "already-clean",
+      "input": "<fmxmlsnippet type=\"FMObjectList\"><Step/></fmxmlsnippet>",
+      "expect": "<fmxmlsnippet type=\"FMObjectList\"><Step/></fmxmlsnippet>"
+    },
+    {
+      "id": "surrounding-junk",
+      "input": "junk before\n<fmxmlsnippet type=\"FMObjectList\"><Step/></fmxmlsnippet>\njunk after",
+      "expect": "<fmxmlsnippet type=\"FMObjectList\"><Step/></fmxmlsnippet>"
+    },
+    {
+      "id": "tags-case-insensitive",
+      "input": "x<FMXMLSNIPPET type=\"FMObjectList\"><Step/></FmXmlSnippet>y",
+      "expect": "<FMXMLSNIPPET type=\"FMObjectList\"><Step/></FmXmlSnippet>"
+    },
+    {
+      "id": "first-snippet-wins",
+      "input": "<fmxmlsnippet a=\"1\"><Step/></fmxmlsnippet><fmxmlsnippet a=\"2\"><Step/></fmxmlsnippet>",
+      "expect": "<fmxmlsnippet a=\"1\"><Step/></fmxmlsnippet>"
+    },
+    {
+      "id": "no-closing-tag",
+      "input": "<fmxmlsnippet type=\"FMObjectList\"><Step/>",
+      "expect": null
+    },
+    {
+      "id": "not-a-snippet",
+      "input": "If ( x > 1 ; \"a\" ; \"b\" )",
+      "expect": null
+    },
+    {
+      "id": "empty",
+      "input": "",
+      "expect": null
+    }
   ],
-
   "decodeBytesWithBomHeuristics": [
-    { "id": "empty", "hex": "", "expect": "" },
-    { "id": "utf8-no-bom", "hex": "3C613E", "expect": "<a>" },
-    { "id": "utf8-bom", "hex": "EFBBBF3C613E", "expect": "<a>" },
-    { "id": "utf16le-bom", "hex": "FFFE3C0061003E00", "expect": "<a>" },
-    { "id": "utf16be-bom", "hex": "FEFF003C0061003E", "expect": "<a>" },
-    { "id": "utf16le-no-bom", "hex": "3C0061003E00", "expect": "<a>", "note": "Zeros at odd offsets mean UTF-16LE. Plugin 1.0.6 got this backwards." },
-    { "id": "utf16be-no-bom", "hex": "003C0061003E", "expect": "<a>" },
-    { "id": "embedded-nuls-removed", "hex": "3C00613E", "expect": "<a>", "note": "Too few zeros for the UTF-16 guess, so UTF-8 with the NUL removed" }
+    {
+      "id": "empty",
+      "hex": "",
+      "expect": ""
+    },
+    {
+      "id": "utf8-no-bom",
+      "hex": "3C613E",
+      "expect": "<a>"
+    },
+    {
+      "id": "utf8-bom",
+      "hex": "EFBBBF3C613E",
+      "expect": "<a>"
+    },
+    {
+      "id": "utf16le-bom",
+      "hex": "FFFE3C0061003E00",
+      "expect": "<a>"
+    },
+    {
+      "id": "utf16be-bom",
+      "hex": "FEFF003C0061003E",
+      "expect": "<a>"
+    },
+    {
+      "id": "utf16le-no-bom",
+      "hex": "3C0061003E00",
+      "expect": "<a>",
+      "note": "Zeros at odd offsets mean UTF-16LE. Plugin 1.0.6 got this backwards."
+    },
+    {
+      "id": "utf16be-no-bom",
+      "hex": "003C0061003E",
+      "expect": "<a>"
+    },
+    {
+      "id": "embedded-nuls-removed",
+      "hex": "3C00613E",
+      "expect": "<a>",
+      "note": "Too few zeros for the UTF-16 guess, so UTF-8 with the NUL removed"
+    }
   ],
-
   "extractFmxmlFromBytes": [
-    { "id": "empty", "hex": "", "expect": null },
-    { "id": "no-snippet", "hex": "3C613E", "expect": null },
-    { "id": "first-open-to-last-close", "text": "<fmxmlsnippet a=\"1\"/></fmxmlsnippet>x</fmxmlsnippet>", "encoding": "utf8", "expect": "<fmxmlsnippet a=\"1\"/></fmxmlsnippet>x</fmxmlsnippet>", "note": "Unlike normalizeToXmlText, which stops at the first closing tag" },
-    { "id": "utf16be-non-ascii-not-misread-as-le", "text": "<fmxmlsnippet>é</fmxmlsnippet>\n", "encoding": "utf16be", "expect": "<fmxmlsnippet>é</fmxmlsnippet>", "note": "Plugin 1.0.6 matched the UTF-16LE pattern one byte into UTF-16BE data and garbled non-ASCII text" }
+    {
+      "id": "empty",
+      "hex": "",
+      "expect": null
+    },
+    {
+      "id": "no-snippet",
+      "hex": "3C613E",
+      "expect": null
+    },
+    {
+      "id": "first-open-to-last-close",
+      "text": "<fmxmlsnippet a=\"1\"/></fmxmlsnippet>x</fmxmlsnippet>",
+      "encoding": "utf8",
+      "expect": "<fmxmlsnippet a=\"1\"/></fmxmlsnippet>x</fmxmlsnippet>",
+      "note": "Unlike normalizeToXmlText, which stops at the first closing tag"
+    },
+    {
+      "id": "utf16be-non-ascii-not-misread-as-le",
+      "text": "<fmxmlsnippet>é</fmxmlsnippet>\n",
+      "encoding": "utf16be",
+      "expect": "<fmxmlsnippet>é</fmxmlsnippet>",
+      "note": "Plugin 1.0.6 matched the UTF-16LE pattern one byte into UTF-16BE data and garbled non-ASCII text"
+    }
   ],
-
   "parseSnippet": [
-    { "id": "script-steps", "xml": "<fmxmlsnippet type=\"FMObjectList\"><Step enable=\"True\" id=\"1\" name=\"Beep\"/></fmxmlsnippet>",
-      "expect": { "elementTypes": ["SCRIPTS"], "version": null, "typeHint": "FMObjectList", "fieldNames": [], "layoutNames": [], "scriptNames": [] },
-      "payload": "<fmxmlsnippet type=\"FMObjectList\"><Step enable=\"True\" id=\"1\" name=\"Beep\"/></fmxmlsnippet>" },
-    { "id": "named-script", "xml": "<fmxmlsnippet type=\"FMObjectList\"><Script name=\"Main\"><Step id=\"1\"/></Script></fmxmlsnippet>",
-      "expect": { "elementTypes": ["SCRIPTS"], "version": null, "typeHint": "FMObjectList", "fieldNames": [], "layoutNames": [], "scriptNames": ["Main"] },
-      "payload": "<fmxmlsnippet type=\"FMObjectList\"><Script name=\"Main\"><Step id=\"1\"/></Script></fmxmlsnippet>" },
-    { "id": "fields", "xml": "<fmxmlsnippet type=\"FMObjectList\"><Field id=\"1\" name=\"First\"/><Field id=\"2\" name=\"Last\"/><Field id=\"3\"/></fmxmlsnippet>",
-      "expect": { "elementTypes": ["FIELDS"], "version": null, "typeHint": "FMObjectList", "fieldNames": ["First", "Last"], "layoutNames": [], "scriptNames": [] },
-      "payload": "<fmxmlsnippet type=\"FMObjectList\"><Field id=\"1\" name=\"First\"/><Field id=\"2\" name=\"Last\"/><Field id=\"3\"/></fmxmlsnippet>" },
-    { "id": "table-with-field", "xml": "<fmxmlsnippet type=\"FMObjectList\"><BaseTable name=\"People\"><Field name=\"Id\"/></BaseTable></fmxmlsnippet>",
-      "expect": { "elementTypes": ["FIELDS", "TABLES"], "version": null, "typeHint": "FMObjectList", "fieldNames": ["Id"], "layoutNames": [], "scriptNames": [] },
-      "payload": "<fmxmlsnippet type=\"FMObjectList\"><BaseTable name=\"People\"><Field name=\"Id\"/></BaseTable></fmxmlsnippet>" },
-    { "id": "layout-objects", "xml": "<fmxmlsnippet type=\"LayoutObjectList\"><Layout><Object type=\"Field\" name=\"MyField\"/><Part type=\"Body\"/></Layout></fmxmlsnippet>",
-      "expect": { "elementTypes": ["LAYOUTS"], "version": null, "typeHint": "LayoutObjectList", "fieldNames": [], "layoutNames": ["MyField"], "scriptNames": [] },
-      "payload": "<fmxmlsnippet type=\"LayoutObjectList\"><Layout><Object type=\"Field\" name=\"MyField\"/><Part type=\"Body\"/></Layout></fmxmlsnippet>" },
-    { "id": "custom-function-and-value-list", "xml": "<fmxmlsnippet type=\"FMObjectList\"><CustomFunction name=\"CF\"/><ValueList name=\"VL\"/></fmxmlsnippet>",
-      "expect": { "elementTypes": ["CUSTOM_FUNCTIONS", "VALUE_LISTS"], "version": null, "typeHint": "FMObjectList", "fieldNames": [], "layoutNames": [], "scriptNames": [] },
-      "payload": "<fmxmlsnippet type=\"FMObjectList\"><CustomFunction name=\"CF\"/><ValueList name=\"VL\"/></fmxmlsnippet>" },
-    { "id": "version-attribute-and-tag-case", "xml": "<FMXMLSNIPPET version=\"2\"><step/></FMXMLSNIPPET>",
-      "expect": { "elementTypes": ["SCRIPTS"], "version": "2", "typeHint": null, "fieldNames": [], "layoutNames": [], "scriptNames": [] },
-      "payload": "<FMXMLSNIPPET version=\"2\"><step/></FMXMLSNIPPET>" },
-    { "id": "surrounding-whitespace-trimmed", "xml": "\n  <fmxmlsnippet type=\"FMObjectList\"><Step/></fmxmlsnippet>\n ",
-      "expect": { "elementTypes": ["SCRIPTS"], "version": null, "typeHint": "FMObjectList", "fieldNames": [], "layoutNames": [], "scriptNames": [] },
-      "payload": "<fmxmlsnippet type=\"FMObjectList\"><Step/></fmxmlsnippet>" },
-    { "id": "unknown-content", "xml": "<fmxmlsnippet type=\"FMObjectList\"><Theme name=\"T\"/></fmxmlsnippet>",
-      "expect": { "elementTypes": [], "version": null, "typeHint": "FMObjectList", "fieldNames": [], "layoutNames": [], "scriptNames": [] },
-      "payloadError": "Unsupported or unknown fmxmlsnippet type. Supported: Script/Steps, Scripts, Fields, Tables, Custom Functions, Value Lists, Layout Objects." },
-    { "id": "empty", "xml": "", "error": "XML text is empty." },
-    { "id": "blank", "xml": "  \n ", "error": "XML text is empty." },
-    { "id": "wrong-root", "xml": "<root><Step/></root>", "error": "Root element is not <fmxmlsnippet>." },
-    { "id": "no-child-elements", "xml": "<fmxmlsnippet type=\"FMObjectList\">just text</fmxmlsnippet>", "error": "<fmxmlsnippet> has no content elements." },
-    { "id": "malformed-unclosed", "xml": "<fmxmlsnippet><Step></fmxmlsnippet>", "error": "Failed to parse XML." },
-    { "id": "malformed-trailing-element", "xml": "<fmxmlsnippet><Step/></fmxmlsnippet><Extra/>", "error": "Failed to parse XML." },
-    { "id": "malformed-bare-ampersand", "xml": "<fmxmlsnippet><Step name=\"a & b\"/></fmxmlsnippet>", "error": "Failed to parse XML." },
-    { "id": "malformed-bare-ampersand-in-text", "xml": "<fmxmlsnippet><Step>a & b</Step></fmxmlsnippet>", "error": "Failed to parse XML." },
-    { "id": "malformed-unquoted-attribute", "xml": "<fmxmlsnippet><Step name=a/></fmxmlsnippet>", "error": "Failed to parse XML." },
-    { "id": "malformed-cdata-end-in-text", "xml": "<fmxmlsnippet><Step>]]></Step></fmxmlsnippet>", "error": "Failed to parse XML." },
-    { "id": "malformed-control-character", "xml": "<fmxmlsnippet><Step>\u0001</Step></fmxmlsnippet>", "error": "Failed to parse XML." },
-    { "id": "malformed-undefined-entity", "xml": "<fmxmlsnippet><Step>&foo;</Step></fmxmlsnippet>", "error": "Failed to parse XML." },
-    { "id": "malformed-lt-in-attribute", "xml": "<fmxmlsnippet><Step name=\"a < b\"/></fmxmlsnippet>", "error": "Failed to parse XML." },
-    { "id": "cdata-may-contain-ampersand-and-lt", "xml": "<fmxmlsnippet><Step><Calculation><![CDATA[\"a\" & \"b\" < \"c\" ]]]></Calculation></Step></fmxmlsnippet>",
-      "expect": { "elementTypes": ["SCRIPTS"], "version": null, "typeHint": null, "fieldNames": [], "layoutNames": [], "scriptNames": [] },
-      "payload": "<fmxmlsnippet><Step><Calculation><![CDATA[\"a\" & \"b\" < \"c\" ]]]></Calculation></Step></fmxmlsnippet>" },
-    { "id": "escaped-entities-and-gt-allowed", "xml": "<fmxmlsnippet><Step name=\"a &amp; b &#38; c &#x26; d\">x > y &lt; z</Step></fmxmlsnippet>",
-      "expect": { "elementTypes": ["SCRIPTS"], "version": null, "typeHint": null, "fieldNames": [], "layoutNames": [], "scriptNames": [] },
-      "payload": "<fmxmlsnippet><Step name=\"a &amp; b &#38; c &#x26; d\">x > y &lt; z</Step></fmxmlsnippet>" },
-    { "id": "xml-declaration-and-comment-allowed", "xml": "<?xml version=\"1.0\" encoding=\"UTF-8\"?><!-- copied & pasted --><fmxmlsnippet><Step/></fmxmlsnippet>",
-      "expect": { "elementTypes": ["SCRIPTS"], "version": null, "typeHint": null, "fieldNames": [], "layoutNames": [], "scriptNames": [] },
-      "payload": "<?xml version=\"1.0\" encoding=\"UTF-8\"?><!-- copied & pasted --><fmxmlsnippet><Step/></fmxmlsnippet>" },
-    { "id": "doctype-rejected", "xml": "<!DOCTYPE fmxmlsnippet><fmxmlsnippet><Step/></fmxmlsnippet>", "error": "Failed to parse XML." },
-    { "id": "not-xml", "xml": "If ( a ; b ; c )", "error": "Failed to parse XML." }
+    {
+      "id": "script-steps",
+      "xml": "<fmxmlsnippet type=\"FMObjectList\"><Step enable=\"True\" id=\"1\" name=\"Beep\"/></fmxmlsnippet>",
+      "expect": {
+        "elementTypes": [
+          "SCRIPTS"
+        ],
+        "version": null,
+        "typeHint": "FMObjectList",
+        "fieldNames": [],
+        "layoutNames": [],
+        "scriptNames": []
+      },
+      "payload": "<fmxmlsnippet type=\"FMObjectList\"><Step enable=\"True\" id=\"1\" name=\"Beep\"/></fmxmlsnippet>"
+    },
+    {
+      "id": "named-script",
+      "xml": "<fmxmlsnippet type=\"FMObjectList\"><Script name=\"Main\"><Step id=\"1\"/></Script></fmxmlsnippet>",
+      "expect": {
+        "elementTypes": [
+          "SCRIPTS"
+        ],
+        "version": null,
+        "typeHint": "FMObjectList",
+        "fieldNames": [],
+        "layoutNames": [],
+        "scriptNames": [
+          "Main"
+        ]
+      },
+      "payload": "<fmxmlsnippet type=\"FMObjectList\"><Script name=\"Main\"><Step id=\"1\"/></Script></fmxmlsnippet>"
+    },
+    {
+      "id": "fields",
+      "xml": "<fmxmlsnippet type=\"FMObjectList\"><Field id=\"1\" name=\"First\"/><Field id=\"2\" name=\"Last\"/><Field id=\"3\"/></fmxmlsnippet>",
+      "expect": {
+        "elementTypes": [
+          "FIELDS"
+        ],
+        "version": null,
+        "typeHint": "FMObjectList",
+        "fieldNames": [
+          "First",
+          "Last"
+        ],
+        "layoutNames": [],
+        "scriptNames": []
+      },
+      "payload": "<fmxmlsnippet type=\"FMObjectList\"><Field id=\"1\" name=\"First\"/><Field id=\"2\" name=\"Last\"/><Field id=\"3\"/></fmxmlsnippet>"
+    },
+    {
+      "id": "table-with-field",
+      "xml": "<fmxmlsnippet type=\"FMObjectList\"><BaseTable name=\"People\"><Field name=\"Id\"/></BaseTable></fmxmlsnippet>",
+      "expect": {
+        "elementTypes": [
+          "FIELDS",
+          "TABLES"
+        ],
+        "version": null,
+        "typeHint": "FMObjectList",
+        "fieldNames": [
+          "Id"
+        ],
+        "layoutNames": [],
+        "scriptNames": []
+      },
+      "payload": "<fmxmlsnippet type=\"FMObjectList\"><BaseTable name=\"People\"><Field name=\"Id\"/></BaseTable></fmxmlsnippet>"
+    },
+    {
+      "id": "layout-objects",
+      "xml": "<fmxmlsnippet type=\"LayoutObjectList\"><Layout><Object type=\"Field\" name=\"MyField\"/><Part type=\"Body\"/></Layout></fmxmlsnippet>",
+      "expect": {
+        "elementTypes": [
+          "LAYOUTS"
+        ],
+        "version": null,
+        "typeHint": "LayoutObjectList",
+        "fieldNames": [],
+        "layoutNames": [
+          "MyField"
+        ],
+        "scriptNames": []
+      },
+      "payload": "<fmxmlsnippet type=\"LayoutObjectList\"><Layout><Object type=\"Field\" name=\"MyField\"/><Part type=\"Body\"/></Layout></fmxmlsnippet>"
+    },
+    {
+      "id": "custom-function-and-value-list",
+      "xml": "<fmxmlsnippet type=\"FMObjectList\"><CustomFunction name=\"CF\"/><ValueList name=\"VL\"/></fmxmlsnippet>",
+      "expect": {
+        "elementTypes": [
+          "CUSTOM_FUNCTIONS",
+          "VALUE_LISTS"
+        ],
+        "version": null,
+        "typeHint": "FMObjectList",
+        "fieldNames": [],
+        "layoutNames": [],
+        "scriptNames": []
+      },
+      "payload": "<fmxmlsnippet type=\"FMObjectList\"><CustomFunction name=\"CF\"/><ValueList name=\"VL\"/></fmxmlsnippet>"
+    },
+    {
+      "id": "version-attribute-and-tag-case",
+      "xml": "<FMXMLSNIPPET version=\"2\"><step/></FMXMLSNIPPET>",
+      "expect": {
+        "elementTypes": [
+          "SCRIPTS"
+        ],
+        "version": "2",
+        "typeHint": null,
+        "fieldNames": [],
+        "layoutNames": [],
+        "scriptNames": []
+      },
+      "payload": "<FMXMLSNIPPET version=\"2\"><step/></FMXMLSNIPPET>"
+    },
+    {
+      "id": "surrounding-whitespace-trimmed",
+      "xml": "\n  <fmxmlsnippet type=\"FMObjectList\"><Step/></fmxmlsnippet>\n ",
+      "expect": {
+        "elementTypes": [
+          "SCRIPTS"
+        ],
+        "version": null,
+        "typeHint": "FMObjectList",
+        "fieldNames": [],
+        "layoutNames": [],
+        "scriptNames": []
+      },
+      "payload": "<fmxmlsnippet type=\"FMObjectList\"><Step/></fmxmlsnippet>"
+    },
+    {
+      "id": "unknown-content",
+      "xml": "<fmxmlsnippet type=\"FMObjectList\"><Theme name=\"T\"/></fmxmlsnippet>",
+      "expect": {
+        "elementTypes": [],
+        "version": null,
+        "typeHint": "FMObjectList",
+        "fieldNames": [],
+        "layoutNames": [],
+        "scriptNames": []
+      },
+      "payloadError": "Unsupported or unknown fmxmlsnippet type. Supported: Script/Steps, Scripts, Fields, Tables, Custom Functions, Value Lists, Layout Objects."
+    },
+    {
+      "id": "empty",
+      "xml": "",
+      "error": "XML text is empty."
+    },
+    {
+      "id": "blank",
+      "xml": "  \n ",
+      "error": "XML text is empty."
+    },
+    {
+      "id": "wrong-root",
+      "xml": "<root><Step/></root>",
+      "error": "Root element is not <fmxmlsnippet>."
+    },
+    {
+      "id": "no-child-elements",
+      "xml": "<fmxmlsnippet type=\"FMObjectList\">just text</fmxmlsnippet>",
+      "error": "<fmxmlsnippet> has no content elements."
+    },
+    {
+      "id": "malformed-unclosed",
+      "xml": "<fmxmlsnippet><Step></fmxmlsnippet>",
+      "error": "Failed to parse XML."
+    },
+    {
+      "id": "malformed-trailing-element",
+      "xml": "<fmxmlsnippet><Step/></fmxmlsnippet><Extra/>",
+      "error": "Failed to parse XML."
+    },
+    {
+      "id": "malformed-bare-ampersand",
+      "xml": "<fmxmlsnippet><Step name=\"a & b\"/></fmxmlsnippet>",
+      "error": "Failed to parse XML."
+    },
+    {
+      "id": "malformed-bare-ampersand-in-text",
+      "xml": "<fmxmlsnippet><Step>a & b</Step></fmxmlsnippet>",
+      "error": "Failed to parse XML."
+    },
+    {
+      "id": "malformed-unquoted-attribute",
+      "xml": "<fmxmlsnippet><Step name=a/></fmxmlsnippet>",
+      "error": "Failed to parse XML."
+    },
+    {
+      "id": "malformed-cdata-end-in-text",
+      "xml": "<fmxmlsnippet><Step>]]></Step></fmxmlsnippet>",
+      "error": "Failed to parse XML."
+    },
+    {
+      "id": "malformed-control-character",
+      "xml": "<fmxmlsnippet><Step>\u0001</Step></fmxmlsnippet>",
+      "error": "Failed to parse XML."
+    },
+    {
+      "id": "malformed-undefined-entity",
+      "xml": "<fmxmlsnippet><Step>&foo;</Step></fmxmlsnippet>",
+      "error": "Failed to parse XML."
+    },
+    {
+      "id": "malformed-lt-in-attribute",
+      "xml": "<fmxmlsnippet><Step name=\"a < b\"/></fmxmlsnippet>",
+      "error": "Failed to parse XML."
+    },
+    {
+      "id": "cdata-may-contain-ampersand-and-lt",
+      "xml": "<fmxmlsnippet><Step><Calculation><![CDATA[\"a\" & \"b\" < \"c\" ]]]></Calculation></Step></fmxmlsnippet>",
+      "expect": {
+        "elementTypes": [
+          "SCRIPTS"
+        ],
+        "version": null,
+        "typeHint": null,
+        "fieldNames": [],
+        "layoutNames": [],
+        "scriptNames": []
+      },
+      "payload": "<fmxmlsnippet><Step><Calculation><![CDATA[\"a\" & \"b\" < \"c\" ]]]></Calculation></Step></fmxmlsnippet>"
+    },
+    {
+      "id": "escaped-entities-and-gt-allowed",
+      "xml": "<fmxmlsnippet><Step name=\"a &amp; b &#38; c &#x26; d\">x > y &lt; z</Step></fmxmlsnippet>",
+      "expect": {
+        "elementTypes": [
+          "SCRIPTS"
+        ],
+        "version": null,
+        "typeHint": null,
+        "fieldNames": [],
+        "layoutNames": [],
+        "scriptNames": []
+      },
+      "payload": "<fmxmlsnippet><Step name=\"a &amp; b &#38; c &#x26; d\">x > y &lt; z</Step></fmxmlsnippet>"
+    },
+    {
+      "id": "xml-declaration-and-comment-allowed",
+      "xml": "<?xml version=\"1.0\" encoding=\"UTF-8\"?><!-- copied & pasted --><fmxmlsnippet><Step/></fmxmlsnippet>",
+      "expect": {
+        "elementTypes": [
+          "SCRIPTS"
+        ],
+        "version": null,
+        "typeHint": null,
+        "fieldNames": [],
+        "layoutNames": [],
+        "scriptNames": []
+      },
+      "payload": "<?xml version=\"1.0\" encoding=\"UTF-8\"?><!-- copied & pasted --><fmxmlsnippet><Step/></fmxmlsnippet>"
+    },
+    {
+      "id": "doctype-rejected",
+      "xml": "<!DOCTYPE fmxmlsnippet><fmxmlsnippet><Step/></fmxmlsnippet>",
+      "error": "Failed to parse XML."
+    },
+    {
+      "id": "not-xml",
+      "xml": "If ( a ; b ; c )",
+      "error": "Failed to parse XML."
+    }
   ],
-
   "fmSnippetDetectTypes": [
-    { "id": "empty", "xml": "", "expect": ["UNKNOWN"] },
-    { "id": "steps", "xml": "<fmxmlsnippet><Step/></fmxmlsnippet>", "expect": ["SCRIPTS"] },
-    { "id": "fields", "xml": "<fmxmlsnippet><Field name=\"a\"/></fmxmlsnippet>", "expect": ["FIELDS"] },
-    { "id": "table-reports-fields-only", "xml": "<fmxmlsnippet><BaseTable><Field/></BaseTable></fmxmlsnippet>", "expect": ["FIELDS"] },
-    { "id": "layout-object-list", "xml": "<fmxmlsnippet><LayoutObjectList/></fmxmlsnippet>", "expect": ["LAYOUTS"] },
-    { "id": "custom-function-is-unknown", "xml": "<fmxmlsnippet><CustomFunction/></fmxmlsnippet>", "expect": ["UNKNOWN"] },
-    { "id": "mixed", "xml": "<fmxmlsnippet><Script><Step/></Script><Object/></fmxmlsnippet>", "expect": ["SCRIPTS", "LAYOUTS"] }
+    {
+      "id": "empty",
+      "xml": "",
+      "expect": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "id": "steps",
+      "xml": "<fmxmlsnippet><Step/></fmxmlsnippet>",
+      "expect": [
+        "SCRIPTS"
+      ]
+    },
+    {
+      "id": "fields",
+      "xml": "<fmxmlsnippet><Field name=\"a\"/></fmxmlsnippet>",
+      "expect": [
+        "FIELDS"
+      ]
+    },
+    {
+      "id": "table-reports-fields-only",
+      "xml": "<fmxmlsnippet><BaseTable><Field/></BaseTable></fmxmlsnippet>",
+      "expect": [
+        "FIELDS"
+      ]
+    },
+    {
+      "id": "layout-object-list",
+      "xml": "<fmxmlsnippet><LayoutObjectList/></fmxmlsnippet>",
+      "expect": [
+        "LAYOUTS"
+      ]
+    },
+    {
+      "id": "custom-function-is-unknown",
+      "xml": "<fmxmlsnippet><CustomFunction/></fmxmlsnippet>",
+      "expect": [
+        "UNKNOWN"
+      ]
+    },
+    {
+      "id": "mixed",
+      "xml": "<fmxmlsnippet><Script><Step/></Script><Object/></fmxmlsnippet>",
+      "expect": [
+        "SCRIPTS",
+        "LAYOUTS"
+      ]
+    }
   ],
-
   "fileNaming": [
-    { "id": "default-timestamp", "pattern": "{timestamp}", "extension": ".xml", "nowMillis": 1700000000000, "existing": [], "expect": "1700000000000.xml" },
-    { "id": "blank-pattern-means-timestamp", "pattern": "  ", "extension": ".xml", "nowMillis": 1700000000000, "existing": [], "expect": "1700000000000.xml" },
-    { "id": "null-pattern-means-timestamp", "pattern": null, "extension": ".fmcalc", "nowMillis": 1700000000000, "existing": [], "expect": "1700000000000.fmcalc" },
-    { "id": "prefix", "pattern": "clip-{timestamp}", "extension": ".xml", "nowMillis": 1700000000000, "existing": [], "expect": "clip-1700000000000.xml" },
-    { "id": "extension-not-doubled", "pattern": "{timestamp}.xml", "extension": ".xml", "nowMillis": 1700000000000, "existing": [], "expect": "1700000000000.xml" },
-    { "id": "other-extension-kept", "pattern": "{timestamp}.xml", "extension": ".fmcalc", "nowMillis": 1700000000000, "existing": [], "expect": "1700000000000.xml.fmcalc" },
-    { "id": "every-token-replaced", "pattern": "{timestamp}_{timestamp}", "extension": ".xml", "nowMillis": 5, "existing": [], "expect": "5_5.xml" },
-    { "id": "collision", "pattern": "static", "extension": ".xml", "nowMillis": 1, "existing": ["static.xml"], "expect": "static-1.xml" },
-    { "id": "second-collision", "pattern": "static", "extension": ".xml", "nowMillis": 1, "existing": ["static.xml", "static-1.xml"], "expect": "static-2.xml" },
-    { "id": "suffix-before-last-dot", "pattern": "my.clip", "extension": ".fmcalc", "nowMillis": 1, "existing": ["my.clip.fmcalc"], "expect": "my.clip-1.fmcalc" }
+    {
+      "id": "default-timestamp",
+      "pattern": "{timestamp}",
+      "extension": ".xml",
+      "nowMillis": 1700000000000,
+      "existing": [],
+      "expect": "1700000000000.xml"
+    },
+    {
+      "id": "blank-pattern-means-timestamp",
+      "pattern": "  ",
+      "extension": ".xml",
+      "nowMillis": 1700000000000,
+      "existing": [],
+      "expect": "1700000000000.xml"
+    },
+    {
+      "id": "null-pattern-means-timestamp",
+      "pattern": null,
+      "extension": ".fmcalc",
+      "nowMillis": 1700000000000,
+      "existing": [],
+      "expect": "1700000000000.fmcalc"
+    },
+    {
+      "id": "prefix",
+      "pattern": "clip-{timestamp}",
+      "extension": ".xml",
+      "nowMillis": 1700000000000,
+      "existing": [],
+      "expect": "clip-1700000000000.xml"
+    },
+    {
+      "id": "extension-not-doubled",
+      "pattern": "{timestamp}.xml",
+      "extension": ".xml",
+      "nowMillis": 1700000000000,
+      "existing": [],
+      "expect": "1700000000000.xml"
+    },
+    {
+      "id": "other-extension-kept",
+      "pattern": "{timestamp}.xml",
+      "extension": ".fmcalc",
+      "nowMillis": 1700000000000,
+      "existing": [],
+      "expect": "1700000000000.xml.fmcalc"
+    },
+    {
+      "id": "every-token-replaced",
+      "pattern": "{timestamp}_{timestamp}",
+      "extension": ".xml",
+      "nowMillis": 5,
+      "existing": [],
+      "expect": "5_5.xml"
+    },
+    {
+      "id": "collision",
+      "pattern": "static",
+      "extension": ".xml",
+      "nowMillis": 1,
+      "existing": [
+        "static.xml"
+      ],
+      "expect": "static-1.xml"
+    },
+    {
+      "id": "second-collision",
+      "pattern": "static",
+      "extension": ".xml",
+      "nowMillis": 1,
+      "existing": [
+        "static.xml",
+        "static-1.xml"
+      ],
+      "expect": "static-2.xml"
+    },
+    {
+      "id": "suffix-before-last-dot",
+      "pattern": "my.clip",
+      "extension": ".fmcalc",
+      "nowMillis": 1,
+      "existing": [
+        "my.clip.fmcalc"
+      ],
+      "expect": "my.clip-1.fmcalc"
+    }
+  ],
+  "diagnostics": [
+    {
+      "id": "clean-let",
+      "calc": "Let ( [ a = 1 ; b = a + 1 ] ; a + b )",
+      "expect": []
+    },
+    {
+      "id": "empty",
+      "calc": "",
+      "expect": []
+    },
+    {
+      "id": "too-few-arguments",
+      "calc": "Left ( x )",
+      "expect": [
+        {
+          "severity": "error",
+          "message": "Too few arguments for Left: expected at least 2, got 1",
+          "start": 0,
+          "end": 10
+        }
+      ]
+    },
+    {
+      "id": "too-many-arguments",
+      "calc": "If ( a ; b ; c ; d )",
+      "expect": [
+        {
+          "severity": "error",
+          "message": "Too many arguments for If: expected 3, got 4",
+          "start": 0,
+          "end": 20
+        }
+      ]
+    },
+    {
+      "id": "repeating-parameters",
+      "calc": "Case ( a ; 1 ; b ; 2 ; 3 ) & List ( 1 ; 2 ; 3 ; 4 )",
+      "expect": []
+    },
+    {
+      "id": "empty-argument-list",
+      "calc": "Sum ( )",
+      "expect": [
+        {
+          "severity": "error",
+          "message": "Too few arguments for Sum: expected at least 1, got 0",
+          "start": 0,
+          "end": 7
+        }
+      ]
+    },
+    {
+      "id": "let-missing-calculation",
+      "calc": "Let ( [ a = 1 ] )",
+      "expect": [
+        {
+          "severity": "error",
+          "message": "Too few arguments for Let: expected at least 2, got 1",
+          "start": 0,
+          "end": 17
+        }
+      ]
+    },
+    {
+      "id": "substitute-bracketed-pairs",
+      "calc": "Substitute ( t ; [ \"a\" ; \"A\" ] ; [ \"b\" ; \"B\" ] ) & Substitute ( t ; \"a\" ; \"b\" )",
+      "expect": []
+    },
+    {
+      "id": "unknown-functions-not-reported-while-incomplete",
+      "calc": "PatternCount ( t ; \"a\" ) + MyCustomFunction ( 1 )",
+      "expect": []
+    },
+    {
+      "id": "nested-call",
+      "calc": "If ( Left ( x ) ; 1 ; 2 )",
+      "expect": [
+        {
+          "severity": "error",
+          "message": "Too few arguments for Left: expected at least 2, got 1",
+          "start": 5,
+          "end": 15
+        }
+      ]
+    },
+    {
+      "id": "comma-ends-the-argument-list",
+      "calc": "If ( a , b )",
+      "expect": [
+        {
+          "severity": "error",
+          "message": "Too few arguments for If: expected at least 2, got 1",
+          "start": 0,
+          "end": 6
+        }
+      ],
+      "note": "A comma is not a separator: the call ends before it (the comma-to-semicolon intention offers the fix)"
+    },
+    {
+      "id": "get-constant",
+      "calc": "Get ( AccountName ) & Get ( SomeFutureConstant )",
+      "expect": []
+    },
+    {
+      "id": "repetitions",
+      "calc": "Contacts::Phone[2] & $list[i]",
+      "expect": []
+    },
+    {
+      "id": "unmatched-closing-paren",
+      "calc": "1 )",
+      "expect": [
+        {
+          "severity": "error",
+          "message": "Unmatched closing )",
+          "start": 2,
+          "end": 3
+        }
+      ]
+    },
+    {
+      "id": "lexical-error-stops-further-checks",
+      "calc": "1 ] + Left ( x )",
+      "expect": [
+        {
+          "severity": "error",
+          "message": "Unmatched closing ]",
+          "start": 2,
+          "end": 3
+        }
+      ],
+      "note": "Like the JetBrains annotator: after the first lexical error nothing else is reported"
+    },
+    {
+      "id": "brackets-in-strings-and-comments",
+      "calc": "\"a)\" & \"]\" // )\n& /* ] */ 1",
+      "expect": []
+    },
+    {
+      "id": "unterminated-string",
+      "calc": "Left ( \"abc ; 1 )",
+      "expect": [
+        {
+          "severity": "error",
+          "message": "Unterminated text constant (missing closing quotation mark)",
+          "start": 7,
+          "end": 8
+        }
+      ]
+    },
+    {
+      "id": "control-character",
+      "calc": "1 \u0001",
+      "expect": [
+        {
+          "severity": "error",
+          "message": "Invalid control character",
+          "start": 2,
+          "end": 3
+        }
+      ]
+    },
+    {
+      "id": "let-variable-after-let",
+      "calc": "Let ( [ total = 1 ] ; total ) + total",
+      "expect": [
+        {
+          "severity": "weak_warning",
+          "message": "'total' is used outside the Let() that defines it (here it refers to a field)",
+          "start": 32,
+          "end": 37
+        }
+      ]
+    },
+    {
+      "id": "let-variable-before-definition",
+      "calc": "Let ( [ a = b ; b = 1 ] ; a )",
+      "expect": [
+        {
+          "severity": "weak_warning",
+          "message": "'b' is used outside the Let() that defines it (here it refers to a field)",
+          "start": 12,
+          "end": 13
+        }
+      ]
+    },
+    {
+      "id": "let-single-definition",
+      "calc": "Let ( x = 1 ; x ) & x",
+      "expect": [
+        {
+          "severity": "weak_warning",
+          "message": "'x' is used outside the Let() that defines it (here it refers to a field)",
+          "start": 20,
+          "end": 21
+        }
+      ]
+    },
+    {
+      "id": "let-nested",
+      "calc": "Let ( [ x = 1 ] ; Let ( [ y = x ] ; x + y ) )",
+      "expect": []
+    },
+    {
+      "id": "let-case-insensitive",
+      "calc": "Let ( [ Total = 1 ] ; total )",
+      "expect": []
+    },
+    {
+      "id": "script-variables-ignored",
+      "calc": "Let ( [ $x = 1 ; $$y = 2 ] ; $x ) & $x & $$y",
+      "expect": []
+    },
+    {
+      "id": "while-in-scope",
+      "calc": "While ( [ i = 0 ; total = 0 ] ; i < 3 ; [ i = i + 1 ; total = total + i ] ; total )",
+      "expect": []
+    },
+    {
+      "id": "while-logic-visible-in-condition",
+      "calc": "While ( [ i = 0 ] ; step < 3 ; [ step = i ; i = i + 1 ] ; i )",
+      "expect": []
+    },
+    {
+      "id": "while-variable-after-while",
+      "calc": "While ( [ i = 0 ] ; i < 3 ; [ i = i + 1 ] ; i ) + i",
+      "expect": [
+        {
+          "severity": "weak_warning",
+          "message": "'i' is used outside the While() that defines it (here it refers to a field)",
+          "start": 50,
+          "end": 51
+        }
+      ]
+    }
+  ],
+  "lexer": [
+    {
+      "id": "field-references",
+      "calc": "Contacts::FirstName & Contacts :: Last_Name",
+      "tokens": [
+        "FIELD_REFERENCE:Contacts::FirstName",
+        "OPERATOR:&",
+        "FIELD_REFERENCE:Contacts :: Last_Name"
+      ]
+    },
+    {
+      "id": "paragraph-mark",
+      "calc": "\"a\" & ¶ & \"b\"",
+      "tokens": [
+        "STRING:\"a\"",
+        "OPERATOR:&",
+        "PARAGRAPH_MARK:¶",
+        "OPERATOR:&",
+        "STRING:\"b\""
+      ]
+    },
+    {
+      "id": "quoted-names",
+      "calc": "${Table::If} + 1",
+      "tokens": [
+        "QUOTED_NAME:${Table::If}",
+        "OPERATOR:+",
+        "NUMBER:1"
+      ]
+    },
+    {
+      "id": "no-java-keywords",
+      "calc": "boolean + int + void",
+      "tokens": [
+        "IDENTIFIER:boolean",
+        "OPERATOR:+",
+        "IDENTIFIER:int",
+        "OPERATOR:+",
+        "IDENTIFIER:void"
+      ]
+    },
+    {
+      "id": "single-quotes-are-not-strings",
+      "calc": "'lo'",
+      "tokens": [
+        "BAD_CHARACTER:'",
+        "IDENTIFIER:lo",
+        "BAD_CHARACTER:'"
+      ]
+    },
+    {
+      "id": "strings-span-lines-and-escape",
+      "calc": "\"multi\nline \\\"quoted\\\" ¶\"",
+      "tokens": [
+        "STRING:\"multi\nline \\\"quoted\\\" ¶\""
+      ]
+    },
+    {
+      "id": "unterminated-string-runs-to-end",
+      "calc": "\"abc ; Left ( x ; 1 )",
+      "tokens": [
+        "STRING:\"abc ; Left ( x ; 1 )"
+      ]
+    },
+    {
+      "id": "calls-in-any-case",
+      "calc": "substitute(x) + MyCustomFunction ()",
+      "tokens": [
+        "KEYWORD_FUNCTION:substitute",
+        "LPAREN:(",
+        "IDENTIFIER:x",
+        "RPAREN:)",
+        "OPERATOR:+",
+        "KEYWORD_FUNCTION:MyCustomFunction",
+        "LPAREN:(",
+        "RPAREN:)"
+      ]
+    },
+    {
+      "id": "get-constants",
+      "calc": "Get ( AccountName ) & get(SomeFutureConstant) & Left ( x ; 1 )",
+      "tokens": [
+        "KEYWORD_FUNCTION:Get",
+        "LPAREN:(",
+        "GET_CONSTANT:AccountName",
+        "RPAREN:)",
+        "OPERATOR:&",
+        "KEYWORD_FUNCTION:get",
+        "LPAREN:(",
+        "GET_CONSTANT:SomeFutureConstant",
+        "RPAREN:)",
+        "OPERATOR:&",
+        "KEYWORD_FUNCTION:Left",
+        "LPAREN:(",
+        "IDENTIFIER:x",
+        "OPERATOR:;",
+        "NUMBER:1",
+        "RPAREN:)"
+      ]
+    },
+    {
+      "id": "named-constants",
+      "calc": "True and jsonstring or Bold xor Trueness",
+      "tokens": [
+        "CONSTANT:True",
+        "KEYWORD_LOGICAL:and",
+        "CONSTANT:jsonstring",
+        "KEYWORD_LOGICAL:or",
+        "CONSTANT:Bold",
+        "KEYWORD_LOGICAL:xor",
+        "IDENTIFIER:Trueness"
+      ]
+    },
+    {
+      "id": "logical-keywords-any-case",
+      "calc": "AnD OR Not",
+      "tokens": [
+        "KEYWORD_LOGICAL:AnD",
+        "KEYWORD_LOGICAL:OR",
+        "KEYWORD_LOGICAL:Not"
+      ]
+    },
+    {
+      "id": "variables",
+      "calc": "$local & $$global & $~x & $",
+      "tokens": [
+        "IDENTIFIER:$local",
+        "OPERATOR:&",
+        "IDENTIFIER:$$global",
+        "OPERATOR:&",
+        "IDENTIFIER:$~x",
+        "OPERATOR:&",
+        "BAD_CHARACTER:$"
+      ]
+    },
+    {
+      "id": "unicode-names",
+      "calc": "顧客::名前 & 自作関数 ( 1 )",
+      "tokens": [
+        "FIELD_REFERENCE:顧客::名前",
+        "OPERATOR:&",
+        "KEYWORD_FUNCTION:自作関数",
+        "LPAREN:(",
+        "NUMBER:1",
+        "RPAREN:)"
+      ]
+    },
+    {
+      "id": "words-containing-keywords",
+      "calc": "android + notes",
+      "tokens": [
+        "IDENTIFIER:android",
+        "OPERATOR:+",
+        "IDENTIFIER:notes"
+      ]
+    },
+    {
+      "id": "numbers",
+      "calc": "1 + 2.5 - .5e3 * 3E-2",
+      "tokens": [
+        "NUMBER:1",
+        "OPERATOR:+",
+        "NUMBER:2.5",
+        "OPERATOR:-",
+        "NUMBER:.5e3",
+        "OPERATOR:*",
+        "NUMBER:3E-2"
+      ]
+    },
+    {
+      "id": "operators",
+      "calc": "a <> b ≠ c <= d ≤ e >= f ≥ g = h ^ i , j",
+      "tokens": [
+        "IDENTIFIER:a",
+        "OPERATOR:<>",
+        "IDENTIFIER:b",
+        "OPERATOR:≠",
+        "IDENTIFIER:c",
+        "OPERATOR:<=",
+        "IDENTIFIER:d",
+        "OPERATOR:≤",
+        "IDENTIFIER:e",
+        "OPERATOR:>=",
+        "IDENTIFIER:f",
+        "OPERATOR:≥",
+        "IDENTIFIER:g",
+        "OPERATOR:=",
+        "IDENTIFIER:h",
+        "OPERATOR:^",
+        "IDENTIFIER:i",
+        "OPERATOR:,",
+        "IDENTIFIER:j"
+      ]
+    },
+    {
+      "id": "comments",
+      "calc": "1 // line\n/* block\n ( */ 2",
+      "tokens": [
+        "NUMBER:1",
+        "LINE_COMMENT:// line",
+        "BLOCK_COMMENT:/* block\n ( */",
+        "NUMBER:2"
+      ],
+      "note": "Consecutive BLOCK_COMMENT tokens are merged (the JFlex lexer emits one per character)"
+    },
+    {
+      "id": "brackets-and-repetitions",
+      "calc": "Let ( [ a = 1 ] ; Table::F[2] )",
+      "tokens": [
+        "KEYWORD_FUNCTION:Let",
+        "LPAREN:(",
+        "LBRACKET:[",
+        "IDENTIFIER:a",
+        "OPERATOR:=",
+        "NUMBER:1",
+        "RBRACKET:]",
+        "OPERATOR:;",
+        "FIELD_REFERENCE:Table::F",
+        "LBRACKET:[",
+        "NUMBER:2",
+        "RBRACKET:]",
+        "RPAREN:)"
+      ]
+    },
+    {
+      "id": "dotted-names",
+      "calc": "a.b + Table.X::Field.Y",
+      "tokens": [
+        "IDENTIFIER:a.b",
+        "OPERATOR:+",
+        "FIELD_REFERENCE:Table.X::Field.Y"
+      ]
+    }
   ]
 }
