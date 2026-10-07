@@ -12,9 +12,21 @@ adheres to Semantic Versioning as the plugin matures.
 ### Fixed
 - Clipboard data in UTF-16 without a byte-order mark could come out garbled: UTF-16LE was misdetected as UTF-16BE, and non-ASCII characters in UTF-16BE data could be misread.
 - On macOS, reading byte-based clipboard flavors now uses the same, more robust decoding as on Windows.
+- `.fmcalc` highlighting now follows FileMaker's syntax:
+  - `Table::Field`, `¶` and `${ }` quoted names are recognized (previously shown as bad characters);
+  - Java keywords such as `boolean`, `class`, `int` and `void` are no longer highlighted;
+  - only double-quoted strings are accepted, and they may span lines;
+  - logical operators (`and`, `OR`, `Xor`, `not`) are recognized in any case.
+- Every function call is highlighted as a function in any case (`substitute(…)`, custom functions), and the argument of `Get ( … )` is highlighted as a constant.
+- The parser now knows every FileMaker operator and Claris's precedence order. `&`, `^`, `xor`, `<>`, `<=` and `>=` no longer stop parsing, and unary minus/plus parse.
+- Brackets or control characters inside strings and comments no longer cause "Unmatched closing" or "Invalid control character" errors. A missing closing quotation mark is now reported.
+- `Get ( … )` arguments and field references are no longer reported as possibly undefined variables.
 
 ### Changed
-- The FileMaker function list and clipboard format rules now load from data files shared with the upcoming VS Code extension, so both stay in sync. No behavior change.
+- `.fmcalc` color settings: named constants (True, JSON types, text styles) now use the color scheme's
+  *Constant* color (key `FM_CALC_CONSTANT`) instead of the keyword color. New keys: `FM_CALC_GET_CONSTANT`,
+  `FM_CALC_FIELD` and `FM_CALC_PARAGRAPH_MARK`. `FM_CALC_KEYWORD_CONTROL_FLOW` and `FM_CALC_KEYWORD_TYPE` are removed.
+- The FileMaker function list, the `Get()` completion constants and the clipboard format rules now load from data files shared with the upcoming VS Code extension, so both stay in sync. No behavior change.
 
 ## [1.0.6] - 2026-07-27
 ### Fixed

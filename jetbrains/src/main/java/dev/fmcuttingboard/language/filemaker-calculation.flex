@@ -1,5 +1,10 @@
 /*
- * JFlex lexer for FileMaker Calculation language (Phase 2)
+ * JFlex lexer for the FileMaker calculation language.
+ *
+ * Deliberately generic: it knows FileMaker's syntax (strings, comments, operators, Table::Field, ${ }, ¶, variables),
+ * but no function or constant names. FileMakerCalculationLexerAdapter classifies identifiers afterwards (calls,
+ * Get ( X ) constants, named constants) from shared/data, mirroring the VS Code grammar
+ * (vscode/scripts/generate-grammar.mjs), so both IDEs improve when the shared data grows.
  */
 package dev.fmcuttingboard.language;
 
@@ -20,164 +25,66 @@ import com.intellij.psi.tree.IElementType;
 %eof}
 %state COMMENT
 
+NAME_START = [:letter:] | "_"
+NAME_PART  = [:letter:] | [:digit:] | [_.]
+NAME       = {NAME_START} {NAME_PART}*
+WS         = [ \t\f\r\n]
+
 %%
 
 <YYINITIAL>{
-  [ \t\f\r\n]+            { return FileMakerCalculationTokenType.WHITE_SPACE; }
+  {WS}+                       { return FileMakerCalculationTokenType.WHITE_SPACE; }
 
   // Comments
-  "//"[^\n\r]*              { return FileMakerCalculationTokenType.LINE_COMMENT; }
-  "/\*"                      { yybegin(COMMENT); return FileMakerCalculationTokenType.BLOCK_COMMENT; }
+  "//"[^\n\r]*                { return FileMakerCalculationTokenType.LINE_COMMENT; }
+  "/*"                        { yybegin(COMMENT); return FileMakerCalculationTokenType.BLOCK_COMMENT; }
 
-  // Strings
-  [\"]([^\\\r\n\"]|\\.)*[\"] { return FileMakerCalculationTokenType.STRING; }
-  [']([^\\\r\n\']|\\.)*[']     { return FileMakerCalculationTokenType.STRING; }
+  // Text constants: double quotes only, may span lines, \x escapes any character (\" \\ \¶).
+  // An unterminated string runs to the end of the file (the annotator reports it).
+  \"([^\\\"]|\\[^])*\"?      { return FileMakerCalculationTokenType.STRING; }
 
-  // Numbers (integers, decimals with optional exponent)
+  // Numbers (integers, decimals, optional exponent)
   ([0-9]+(\.[0-9]+)?([eE][+-]?[0-9]+)?|\.[0-9]+([eE][+-]?[0-9]+)?)
-                               { return FileMakerCalculationTokenType.NUMBER; }
+                              { return FileMakerCalculationTokenType.NUMBER; }
 
-  // Keywords Group 1 - Control Flow
-  "if"                        { return FileMakerCalculationTokenType.KEYWORD_CONTROL; }
-  "case"                      { return FileMakerCalculationTokenType.KEYWORD_CONTROL; }
+  // ${ } quotes reserved names used as field or table names
+  "${" [^}]* "}"?             { return FileMakerCalculationTokenType.QUOTED_NAME; }
 
-  // Keywords Group 2 - Logical Operators
-  "and"                       { return FileMakerCalculationTokenType.KEYWORD_LOGICAL; }
-  "or"                        { return FileMakerCalculationTokenType.KEYWORD_LOGICAL; }
-  "not"                       { return FileMakerCalculationTokenType.KEYWORD_LOGICAL; }
-  "xor"                       { return FileMakerCalculationTokenType.KEYWORD_LOGICAL; }
+  // Table::Field (one token, so "::" is never a bad character)
+  {NAME} [ \t]* "::" [ \t]* {NAME}
+                              { return FileMakerCalculationTokenType.FIELD_REFERENCE; }
 
-  // Keywords Group 3 - Type Keywords
-  "boolean"                   { return FileMakerCalculationTokenType.KEYWORD_TYPE; }
-  "byte"                      { return FileMakerCalculationTokenType.KEYWORD_TYPE; }
-  "char"                      { return FileMakerCalculationTokenType.KEYWORD_TYPE; }
-  "class"                     { return FileMakerCalculationTokenType.KEYWORD_TYPE; }
-  "double"                    { return FileMakerCalculationTokenType.KEYWORD_TYPE; }
-  "float"                     { return FileMakerCalculationTokenType.KEYWORD_TYPE; }
-  "int"                       { return FileMakerCalculationTokenType.KEYWORD_TYPE; }
-  "interface"                 { return FileMakerCalculationTokenType.KEYWORD_TYPE; }
-  "long"                      { return FileMakerCalculationTokenType.KEYWORD_TYPE; }
-  "short"                     { return FileMakerCalculationTokenType.KEYWORD_TYPE; }
-  "void"                      { return FileMakerCalculationTokenType.KEYWORD_TYPE; }
+  // Logical word operators, case-insensitive (Claris documents them as AND, OR, XOR, NOT)
+  [aA][nN][dD] | [oO][rR] | [xX][oO][rR] | [nN][oO][tT]
+                              { return FileMakerCalculationTokenType.KEYWORD_LOGICAL; }
 
-  // Keywords Group 4 - Functions (partial groups as per roadmap)
-  // Mathematical functions
-  "Abs"|"Acos"|"Asin"|"Atan"|"Ceiling"|"Cos"|"Degrees"|"Div"|"Exp"|"Floor"|"Int"|"Lg"|"Ln"|"Log"|"Max"|"Min"|"Mod"|"Pi"|"Radians"|"Round"|"Sign"|"Sin"|"Sqrt"|"Tan"|"Truncate"
-                               { return FileMakerCalculationTokenType.KEYWORD_FUNCTION; }
-  // Statistical functions
-  "Average"|"Count"|"StDev"|"StDevP"|"Sum"|"Variance"|"VarianceP"
-                               { return FileMakerCalculationTokenType.KEYWORD_FUNCTION; }
-  // Text functions
-  "Char"|"Code"|"Exact"|"Filter"|"FilterValues"|"Left"|"LeftValues"|"LeftWords"|"Length"|"Lower"|"Middle"|"MiddleValues"|"MiddleWords"|"Position"|"Proper"|"Quote"|"Replace"|"Right"|"RightValues"|"RightWords"|"Substitute"|"TextColor"|"TextColorRemove"|"TextFont"|"TextFontRemove"|"TextFormatRemove"|"TextSize"|"TextSizeRemove"|"TextStyleAdd"|"TextStyleRemove"|"Trim"|"TrimAll"|"Upper"|"WordCount"
-                               { return FileMakerCalculationTokenType.KEYWORD_FUNCTION; }
-  // Date/time functions
-  "Date"|"Day"|"DayName"|"DayNameJ"|"DayOfWeek"|"DayOfYear"|"Hour"|"Minute"|"Month"|"MonthName"|"MonthNameJ"|"Seconds"|"Time"|"Timestamp"|"WeekOfYear"|"WeekOfYearFiscal"|"Year"|"YearName"
-                               { return FileMakerCalculationTokenType.KEYWORD_FUNCTION; }
-  // Conversion functions
-  "GetAsBoolean"|"GetAsCSS"|"GetAsDate"|"GetAsNumber"|"GetAsSVG"|"GetAsText"|"GetAsTime"|"GetAsTimestamp"|"GetAsURLEncoded"
-                               { return FileMakerCalculationTokenType.KEYWORD_FUNCTION; }
-  // Generic Get() family — highlight core function name
-  "Get"                        { return FileMakerCalculationTokenType.KEYWORD_FUNCTION; }
-  /*
-   * Note: The FileMaker platform defines 100+ Get() variants (from the Notepad++ XML Words4 list).
-   * We purposefully highlight only the function identifier "Get" as a KEYWORD_FUNCTION so that
-   * the argument token (e.g., AccountName) remains a normal IDENTIFIER token. This preserves
-   * consistent operator/identifier highlighting across the language while still marking function calls.
-   *
-   * Authoritative list captured in resources/FileMakerCalcs_InNotepadPlusPlus.xml (Words4), including:
-   *   Get(AccountExtendedPrivileges), Get(AccountName), Get(AccountPrivilegeSetName),
-   *   Get(ActiveFieldContents), Get(ActiveFieldName), Get(ActiveFieldTableName),
-   *   Get(ActiveLayoutObjectName), Get(ActiveModifierKeys), Get(ActivePortalRowNumber),
-   *   Get(ActiveRepetitionNumber), Get(ActiveSelectionSize), Get(ActiveSelectionStart),
-   *   Get(AllowAbortState), Get(AllowToolbarState), Get(ApplicationLanguage), Get(ApplicationVersion),
-   *   Get(CalculationRepetitionNumber), Get(CurrentDate), Get(CurrentExtendedPrivileges),
-   *   Get(CurrentHostTimestamp), Get(CurrentPrivilegeSetName), Get(CurrentTime), Get(CurrentTimestamp),
-   *   Get(CustomMenuSetName), Get(DesktopPath), Get(DocumentsPath), Get(DocumentsPathListing),
-   *   Get(ErrorCaptureState), Get(FileMakerPath), Get(FileName), Get(FilePath), Get(FileSize),
-   *   Get(FoundCount), Get(HighContrastColor), Get(HighContrastState), Get(HostApplicationVersion),
-   *   Get(HostIPAddress), Get(HostName), Get(LastError), Get(LastMessageChoice), Get(LastODBCError),
-   *   Get(LayoutAccess), Get(LayoutCount), Get(LayoutName), Get(LayoutNumber), Get(LayoutTableName),
-   *   Get(LayoutViewState), Get(MultiUserState), Get(NetworkProtocol), Get(PageNumber),
-   *   Get(PreferencesPath), Get(PrinterName), Get(QuickFindText), Get(RecordAccess), Get(RecordID),
-   *   Get(RecordModificationCount), Get(RecordNumber), Get(RecordOpenCount), Get(RecordOpenState),
-   *   Get(RequestCount), Get(RequestOmitState), Get(ScreenDepth), Get(ScreenHeight), Get(ScreenWidth),
-   *   Get(ScriptName), Get(ScriptParameter), Get(ScriptResult), Get(SortState), Get(StatusAreaState),
-   *   Get(SystemDrive), Get(SystemIPAddress), Get(SystemLanguage), Get(SystemNICAddress),
-   *   Get(SystemPlatform), Get(SystemVersion), Get(TemporaryPath), Get(TextRulerVisible),
-   *   Get(TotalRecordCount), Get(TriggerKeystroke), Get(TriggerModifierKeys), Get(UserCount),
-   *   Get(UserName), Get(UseSystemFormatsState), Get(WindowContentHeight), Get(WindowContentWidth),
-   *   Get(WindowDesktopHeight), Get(WindowDesktopWidth), Get(WindowHeight), Get(WindowLeft),
-   *   Get(WindowMode), Get(WindowName), Get(WindowTop), Get(WindowVisible), Get(WindowWidth),
-   *   Get(WindowZoomLevel)
-   */
-   // FileMaker constants
-   "True"|"true"|"False"|"false" { return FileMakerCalculationTokenType.KEYWORD_TYPE; }
-   "JSONArray"|"JSONBoolean"|"JSONNull"|"JSONNumber"|"JSONObject"|"JSONRaw"|"JSONString"
-                                { return FileMakerCalculationTokenType.KEYWORD_TYPE; }
-   // Text style constants (subset)
-   "Plain"|"Bold"|"Italic"|"Underline"|"HighlightYellow"|"Condense"|"Extend"|"Strikethrough"|"SmallCaps"|"Superscript"|"Subscript"|"Uppercase"|"Lowercase"|"Titlecase"|"WordUnderline"|"DoubleUnderline"|"AllStyles"
-                                { return FileMakerCalculationTokenType.KEYWORD_TYPE; }
-   // Layout object attribute constants (subset)
-   "objectType"|"hasFocus"|"objectName"|"containsFocus"|"isFrontPanel"|"isActive"|"isObjectHidden"|"bounds"|"left"|"right"|"top"|"bottom"|"width"|"height"|"rotation"|"startPoint"|"endPoint"|"source"|"content"|"enclosingObject"|"containedObjects"
-                                { return FileMakerCalculationTokenType.KEYWORD_TYPE; }
+  // Script variables ($local, $$global)
+  ("$$"|"$") ({NAME_START}|"~") ({NAME_PART}|"~")*
+                              { return FileMakerCalculationTokenType.IDENTIFIER; }
 
-   // Script variables ($local, $$global)
-   ("$$"|"$")[A-Za-z_][A-Za-z0-9_]* { return FileMakerCalculationTokenType.IDENTIFIER; }
-  // Field/database functions
-  "DatabaseNames"|"FieldBounds"|"FieldComment"|"FieldIDs"|"FieldNames"|"FieldRepetitions"|"FieldStyle"|"FieldType"|"GetField"|"GetFieldName"|"GetNthRecord"|"GetRepetition"|"GetSummary"|"GetValue"|"Lookup"|"LookupNext"
-                               { return FileMakerCalculationTokenType.KEYWORD_FUNCTION; }
-  // Japanese text functions
-  "Hiragana"|"KanaHankaku"|"KanaZenkaku"|"KanjiNumeral"|"Katakana"|"NumToJText"|"RomanHankaku"|"RomanZenkaku"
-                               { return FileMakerCalculationTokenType.KEYWORD_FUNCTION; }
-  // Layout/window functions
-  "GetLayoutObjectAttribute"|"LayoutIDs"|"LayoutNames"|"LayoutObjectNames"|"WindowNames"
-                               { return FileMakerCalculationTokenType.KEYWORD_FUNCTION; }
-  // List functions
-  "List"|"ValueCount"|"ValueListIDs"|"ValueListItems"|"ValueListNames"
-                               { return FileMakerCalculationTokenType.KEYWORD_FUNCTION; }
-  // Script/relation functions
-  "RelationInfo"|"ScriptIDs"|"ScriptNames"
-                               { return FileMakerCalculationTokenType.KEYWORD_FUNCTION; }
-  // Table functions
-  "TableIDs"|"TableNames"
-                               { return FileMakerCalculationTokenType.KEYWORD_FUNCTION; }
-  // Financial functions
-  "FV"|"NPV"|"PMT"|"PV"
-                               { return FileMakerCalculationTokenType.KEYWORD_FUNCTION; }
-  // Logical/special functions
-  "Case"|"Choose"|"Evaluate"|"EvaluationError"|"If"|"IsEmpty"|"IsValid"|"IsValidExpression"|"Combination"|"Extend"|"External"|"Factorial"|"GetNextSerialValue"|"Last"|"Let"|"PatternCount"|"Random"|"RGB"|"Self"|"SerialIncrement"|"SetPrecision"
-                               { return FileMakerCalculationTokenType.KEYWORD_FUNCTION; }
+  // Paragraph mark (a return) outside strings
+  "¶"                         { return FileMakerCalculationTokenType.PARAGRAPH_MARK; }
 
-  // Additional core functions (Phase 1.3 – expanded coverage)
-  // JSON functions
-  "JSONSetElement"|"JSONGetElement"|"JSONDeleteElement"|"JSONListKeys"|"JSONListValues"|"JSONFormatElements"
-                               { return FileMakerCalculationTokenType.KEYWORD_FUNCTION; }
-  // Data conversion and encoding
-  "Base64Encode"|"Base64Decode"|"TextEncode"|"TextDecode"
-                               { return FileMakerCalculationTokenType.KEYWORD_FUNCTION; }
-  // Query and iteration
-  "ExecuteSQL"|"While"
-                               { return FileMakerCalculationTokenType.KEYWORD_FUNCTION; }
+  // Operators (";" separates arguments; "," is kept so the comma-to-semicolon intention can find it)
+  "<=" | ">=" | "<>" | "≠" | "≤" | "≥" | "::"
+                              { return FileMakerCalculationTokenType.OPERATOR; }
+  [\+\-\*\/=\^<>&;,]          { return FileMakerCalculationTokenType.OPERATOR; }
 
-  // Operators
-  "<="|">="|"<>"     { return FileMakerCalculationTokenType.OPERATOR; }
-  [\+\-\*\/=\^<>&;,] { return FileMakerCalculationTokenType.OPERATOR; }
   // Braces and parentheses as distinct tokens (for brace matcher/folding)
-  "(" { return FileMakerCalculationTokenType.LPAREN; }
-  ")" { return FileMakerCalculationTokenType.RPAREN; }
-  "[" { return FileMakerCalculationTokenType.LBRACKET; }
-  "]" { return FileMakerCalculationTokenType.RBRACKET; }
-  "{" { return FileMakerCalculationTokenType.LBRACE; }
-  "}" { return FileMakerCalculationTokenType.RBRACE; }
-  "\u2260"|"\u2264"|"\u2265" { return FileMakerCalculationTokenType.OPERATOR; }
+  "("                         { return FileMakerCalculationTokenType.LPAREN; }
+  ")"                         { return FileMakerCalculationTokenType.RPAREN; }
+  "["                         { return FileMakerCalculationTokenType.LBRACKET; }
+  "]"                         { return FileMakerCalculationTokenType.RBRACKET; }
+  "{"                         { return FileMakerCalculationTokenType.LBRACE; }
+  "}"                         { return FileMakerCalculationTokenType.RBRACE; }
 
-  // Identifier
-  [A-Za-z_][A-Za-z0-9_]*      { return FileMakerCalculationTokenType.IDENTIFIER; }
+  // Names: fields, Let variables, function names (classified by FileMakerCalculationLexerAdapter)
+  {NAME}                      { return FileMakerCalculationTokenType.IDENTIFIER; }
 
-  .                            { return TokenType.BAD_CHARACTER; }
+  [^]                         { return TokenType.BAD_CHARACTER; }
 }
 
 <COMMENT>{
-  "\*/"                      { yybegin(YYINITIAL); return FileMakerCalculationTokenType.BLOCK_COMMENT; }
+  "*/"                        { yybegin(YYINITIAL); return FileMakerCalculationTokenType.BLOCK_COMMENT; }
   [^]                         { return FileMakerCalculationTokenType.BLOCK_COMMENT; }
 }

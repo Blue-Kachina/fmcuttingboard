@@ -1,0 +1,117 @@
+{
+  "$schema": "../../schemas/fm-calc-catalogue.schema.json",
+  "schemaVersion": "fm-calc-catalogue/v1",
+  "generatedAt": "2026-10-07T00:00:00Z",
+  "generator": { "repo": "Blue-Kachina/fmscriptinventory", "commit": "0000000", "dirty": false },
+  "locale": "en",
+  "documentedFileMakerVersion": "22.0",
+  "categories": [
+    { "key": "text", "label": "Text functions", "helpUrl": "https://help.claris.com/en/pro-help/content/text-functions.html" },
+    { "key": "logical", "label": "Logical functions", "helpUrl": "https://help.claris.com/en/pro-help/content/logical-functions.html" },
+    { "key": "json", "label": "JSON functions", "helpUrl": "https://help.claris.com/en/pro-help/content/json-functions.html" },
+    { "key": "get", "label": "Get functions", "helpUrl": "https://help.claris.com/en/pro-help/content/get-functions.html" }
+  ],
+  "functions": [
+    {
+      "name": "Left",
+      "category": "text",
+      "returnType": "text",
+      "parameters": [
+        { "name": "text", "type": "text", "optional": false, "repeatable": false },
+        { "name": "numberOfCharacters", "type": "number", "optional": false, "repeatable": false }
+      ],
+      "minArgs": 2,
+      "maxArgs": 2,
+      "signature": "Left ( text ; numberOfCharacters )",
+      "lifecycle": { "since": "6.0", "sinceRaw": "6.0 or earlier" },
+      "compatibility": { "FileMaker Pro": "Yes", "FileMaker Go": "Yes", "FileMaker WebDirect": "Yes" },
+      "helpUrl": "https://help.claris.com/en/pro-help/content/left.html",
+      "summary": "The first N characters of a text value.",
+      "related": ["Right", "Middle"],
+      "verified": { "fileMakerVersion": "22.0", "minArgs": true, "maxArgs": true }
+    },
+    {
+      "name": "Case",
+      "category": "logical",
+      "returnType": "any",
+      "parameters": [
+        { "name": "test", "type": "boolean", "optional": false, "repeatable": true, "group": "pair" },
+        { "name": "result", "type": "any", "optional": false, "repeatable": true, "group": "pair" },
+        { "name": "defaultResult", "type": "any", "optional": true, "repeatable": false }
+      ],
+      "minArgs": 2,
+      "maxArgs": null,
+      "signature": "Case ( test1 ; result1 { ; test2 ; result2 ; ... ; defaultResult } )",
+      "lifecycle": { "since": "6.0", "sinceRaw": "6.0 or earlier" },
+      "helpUrl": "https://help.claris.com/en/pro-help/content/case.html",
+      "summary": "The result paired with the first test that is true, else the optional default."
+    },
+    {
+      "name": "JSONSetElement",
+      "category": "json",
+      "returnType": "json",
+      "parameters": [
+        { "name": "json", "type": "json", "optional": false, "repeatable": false },
+        { "name": "keyOrIndexOrPath", "type": "text", "optional": false, "repeatable": true, "group": "element" },
+        { "name": "value", "type": "any", "optional": false, "repeatable": true, "group": "element" },
+        {
+          "name": "type",
+          "type": "number",
+          "optional": false,
+          "repeatable": true,
+          "group": "element",
+          "allowedConstants": ["JSONString", "JSONNumber", "JSONObject", "JSONArray", "JSONBoolean", "JSONNull", "JSONRaw"]
+        }
+      ],
+      "minArgs": 4,
+      "maxArgs": null,
+      "signature": "JSONSetElement ( json ; keyOrIndexOrPath ; value ; type )",
+      "lifecycle": { "since": "16.0" },
+      "helpUrl": "https://help.claris.com/en/pro-help/content/jsonsetelement.html",
+      "summary": "Adds or replaces elements in JSON data."
+    }
+  ],
+  "getConstants": [
+    {
+      "name": "AccountName",
+      "returnType": "text",
+      "lifecycle": { "since": "7.0" },
+      "helpUrl": "https://help.claris.com/en/pro-help/content/get-accountname.html",
+      "summary": "The name of the account that opened the file."
+    }
+  ],
+  "constants": [
+    { "name": "True", "group": "boolean", "value": 1 },
+    { "name": "False", "group": "boolean", "value": 0 },
+    { "name": "JSONString", "group": "json-type", "value": null, "lifecycle": { "since": "16.0" } }
+  ],
+  "operators": [
+    { "symbol": "&", "name": "concatenation", "kind": "text", "arity": 2, "precedence": 2, "associativity": "left" },
+    { "symbol": "≠", "alternates": ["<>"], "name": "not equal", "kind": "comparison", "arity": 2, "precedence": 3, "associativity": "left" },
+    { "symbol": "and", "name": "logical and", "kind": "logical", "arity": 2, "precedence": 1, "associativity": "left" }
+  ],
+  "syntax": {
+    "argumentSeparator": ";",
+    "stringDelimiter": "\"",
+    "stringEscapes": [
+      { "sequence": "\\\"", "meaning": "quotation mark" },
+      { "sequence": "\\\\", "meaning": "backslash" },
+      { "sequence": "\\¶", "meaning": "literal pilcrow" }
+    ],
+    "paragraphMark": "¶",
+    "lineComment": "//",
+    "blockComment": ["/*", "*/"],
+    "fieldReference": "Table::Field",
+    "repetitionBrackets": ["[", "]"],
+    "variablePrefixes": [
+      { "prefix": "$", "scope": "script (local)" },
+      { "prefix": "$$", "scope": "file (global)" }
+    ],
+    "caseSensitive": { "functionNames": false, "variables": false, "fieldNames": false },
+    "notes": ["Illustrative example only: values here are placeholders until fmscriptinventory produces the real export."]
+  },
+  "errorCodes": [
+    { "code": 0, "label": "No error" },
+    { "code": 401, "label": "No records match the request" }
+  ]
+}

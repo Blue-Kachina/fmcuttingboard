@@ -14,5 +14,5 @@
     "skipLibCheck": true,
     "noEmit": true
   },
-  "include": ["src", "test", "integration"]
+  "include": ["src", "test", "integration", "vitest.config.mts"]
 }

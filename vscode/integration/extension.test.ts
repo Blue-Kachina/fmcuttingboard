@@ -89,6 +89,51 @@ describe('FMCuttingBoard extension', () => {
     assert.equal(await vscode.env.clipboard.readText(), STEPS, 'clipboard replaced with the XML');
   });
 
+  describe('.fmcalc language support', () => {
+    let doc: vscode.TextDocument;
+    const source = 'If ( Left ( $name ; 1 ) = "A" ; Get ( AccountName ) ; ';
+
+    before(async () => {
+      const uri = vscode.Uri.joinPath(root(), 'calc.fmcalc');
+      await vscode.workspace.fs.writeFile(uri, new TextEncoder().encode(source));
+      doc = await vscode.workspace.openTextDocument(uri);
+      await vscode.window.showTextDocument(doc);
+    });
+
+    it('recognizes .fmcalc files', () => {
+      assert.equal(doc.languageId, 'fmcalc');
+    });
+
+    it('completes functions with the JetBrains-style template', async () => {
+      const list = await vscode.commands.executeCommand<vscode.CompletionList>(
+        'vscode.executeCompletionItemProvider', doc.uri, doc.positionAt(source.length));
+      const left = list.items.find((i) => (typeof i.label === 'string' ? i.label : i.label.label) === 'Left');
+      assert.ok(left, 'Left offered');
+      assert.equal((left.insertText as vscode.SnippetString).value, 'Left(${1:text}; ${2:count})');
+    });
+
+    it('offers Get() constants inside Get ( … )', async () => {
+      const offset = source.indexOf('AccountName');
+      const list = await vscode.commands.executeCommand<vscode.CompletionList>(
+        'vscode.executeCompletionItemProvider', doc.uri, doc.positionAt(offset));
+      assert.ok(list.items.some((i) => (typeof i.label === 'string' ? i.label : i.label.label) === 'LastError'));
+    });
+
+    it('shows a hover with the signature', async () => {
+      const hovers = await vscode.commands.executeCommand<vscode.Hover[]>(
+        'vscode.executeHoverProvider', doc.uri, doc.positionAt(source.indexOf('Left') + 1));
+      const text = hovers.flatMap((h) => h.contents.map((c) => (c as vscode.MarkdownString).value)).join('\n');
+      assert.match(text, /Left\(text; count\)/);
+    });
+
+    it('shows signature help for the current argument', async () => {
+      const help = await vscode.commands.executeCommand<vscode.SignatureHelp>(
+        'vscode.executeSignatureHelpProvider', doc.uri, doc.positionAt(source.length));
+      assert.equal(help.signatures[0].label, 'If(test; resultTrue; [resultFalse])');
+      assert.equal(help.activeParameter, 2);
+    });
+  });
+
   it('Get saves other text as a .fmcalc file', async () => {
     const before = await listCuttingBoard();
     await vscode.env.clipboard.writeText('Let ( x = 1 ; x + 1 )');

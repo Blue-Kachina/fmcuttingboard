@@ -71,8 +71,7 @@ public class Phase5ManualSamplesTest {
         List<IElementType> tokens = tokenize(text);
 
         // Expect both control/logical keywords and functions
-        assertTrue(tokens.stream().anyMatch(t -> t == FileMakerCalculationTokenType.KEYWORD_LOGICAL
-                || t == FileMakerCalculationTokenType.KEYWORD_CONTROL), "Should contain control/logical keywords");
+        assertTrue(tokens.stream().anyMatch(t -> t == FileMakerCalculationTokenType.KEYWORD_LOGICAL), "Should contain logical keywords");
         // Ensure parentheses and semicolons recognized as operators
         assertTrue(tokens.stream().anyMatch(t -> t == FileMakerCalculationTokenType.OPERATOR), "Should contain punctuation operators");
     }

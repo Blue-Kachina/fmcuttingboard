@@ -16,6 +16,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   `.xml` files.
 - Settings: `fmcuttingboard.baseDirName`, `fileNamePattern`, `previewBeforeClipboardWrite`, `enableDiagnostics`.
 - Diagnostics (when enabled): **Dump Clipboard Formats** and **Save Raw Clipboard Capture**.
+- `.fmcalc` (FileMaker calculation) language support:
+  - syntax highlighting, generated from shared data;
+  - comment toggling, bracket matching and auto-closing;
+  - `let`/`if`/`case` snippets;
+  - function, `Get()` constant and named constant completion;
+  - hover and signature help.
 - Project scaffold (TypeScript, esbuild, Vitest).
 - Port of the JetBrains plugin's platform-independent core: fmxmlsnippet detection and validation,
   FileMaker clipboard payload encoding/decoding, file naming, and the FileMaker function registry. Verified

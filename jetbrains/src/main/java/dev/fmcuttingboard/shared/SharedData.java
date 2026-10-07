@@ -21,6 +21,7 @@ public final class SharedData {
 
     public static final String FILEMAKER_FUNCTIONS = "filemaker-functions.json";
     public static final String CLIPBOARD_FORMATS = "clipboard-formats.json";
+    public static final String CALC_LANGUAGE = "calc-language.json";
 
     private SharedData() {}
 

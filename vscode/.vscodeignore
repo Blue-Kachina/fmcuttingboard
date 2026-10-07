@@ -5,3 +5,6 @@
 !README.md
 !CHANGELOG.md
 !LICENSE
+!syntaxes/fmcalc.tmLanguage.json
+!snippets/fmcalc.json
+!language-configuration.json

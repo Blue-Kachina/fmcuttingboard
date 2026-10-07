@@ -1,0 +1,17 @@
+{
+  "let": {
+    "prefix": "let",
+    "description": "Let() block",
+    "body": ["Let( [", "  ${1:name} = ${2}", "];", "  ${3}", ")"]
+  },
+  "if": {
+    "prefix": "if",
+    "description": "If() expression",
+    "body": ["If( ${1} ; ${2} ; ${3} )"]
+  },
+  "case": {
+    "prefix": "case",
+    "description": "Case() expression",
+    "body": ["Case( ${1} ; ${2} ; ${3} )"]
+  }
+}

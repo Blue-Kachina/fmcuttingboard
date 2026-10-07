@@ -66,8 +66,7 @@ public class FileMakerCalculationFormattingModelBuilder implements FormattingMod
                 common.SPACE_BEFORE_SWITCH_PARENTHESES; // map 'case' to 'switch'
 
         int ctrlParenSpaces = wantSpaceBeforeParens ? 1 : 0;
-        builder = builder.between(FileMakerCalculationTokenType.KEYWORD_CONTROL, FileMakerCalculationTokenType.LPAREN).spaces(ctrlParenSpaces)
-                         .between(FileMakerCalculationTokenType.KEYWORD_FUNCTION, FileMakerCalculationTokenType.LPAREN).spaces(ctrlParenSpaces);
+        builder = builder.between(FileMakerCalculationTokenType.KEYWORD_FUNCTION, FileMakerCalculationTokenType.LPAREN).spaces(ctrlParenSpaces);
 
         return builder;
     }

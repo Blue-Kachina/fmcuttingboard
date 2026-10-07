@@ -25,11 +25,11 @@ public class Phase5EdgeCasesTest {
     }
 
     @Test
-    public void mixed_case_keywords_should_not_match_lowercase_keywords() {
-        List<IElementType> tokens = tokenize("AnD OR Not and or not");
-        // lower case should be recognized as logical; mixed case should be identifiers
-        assertTrue(tokens.contains(FileMakerCalculationTokenType.KEYWORD_LOGICAL), "lowercase logical keywords should be recognized");
-        assertTrue(tokens.contains(FileMakerCalculationTokenType.IDENTIFIER), "mixed-case variants should be identifiers");
+    public void logical_keywords_are_case_insensitive() {
+        // FileMaker accepts any case (Claris documents them as AND, OR, XOR, NOT)
+        List<IElementType> tokens = tokenize("AnD OR Not and or not XOR xor");
+        assertTrue(tokens.stream().filter(t -> t != FileMakerCalculationTokenType.WHITE_SPACE)
+                .allMatch(t -> t == FileMakerCalculationTokenType.KEYWORD_LOGICAL), "every case variant is a logical keyword");
     }
 
     @Test
@@ -50,16 +50,16 @@ public class Phase5EdgeCasesTest {
 
     @Test
     public void unicode_in_strings_supported() {
-        List<IElementType> tokens = tokenize("\"カタカナ ひらがな 漢字\"; Hiragana('あいう')");
+        List<IElementType> tokens = tokenize("\"カタカナ ひらがな 漢字\"; Hiragana(\"あいう\")");
         assertTrue(tokens.stream().anyMatch(t -> t == FileMakerCalculationTokenType.STRING), "Unicode strings should be tokenized as STRING");
         assertTrue(tokens.stream().anyMatch(t -> t == FileMakerCalculationTokenType.KEYWORD_FUNCTION), "Hiragana should be recognized as function");
     }
 
     @Test
-    public void unterminated_string_results_in_bad_character() {
-        List<IElementType> tokens = tokenize("\"unterminated");
-        // Expect at least one bad character token due to missing closing quote
-        assertTrue(tokens.stream().anyMatch(t -> t == FileMakerCalculationTokenType.BAD_CHARACTER), "Unterminated string should emit BAD_CHARACTER");
+    public void unterminated_string_runs_to_the_end_as_a_string() {
+        // The lexer keeps it a STRING (so typing doesn't flash errors); the annotator reports the missing quote
+        List<IElementType> tokens = tokenize("\"unterminated ; Left ( x ; 1 )");
+        assertEquals(List.of(FileMakerCalculationTokenType.STRING), tokens);
     }
 
     @Test

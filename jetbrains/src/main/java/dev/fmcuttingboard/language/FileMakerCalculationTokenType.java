@@ -32,11 +32,16 @@ public final class FileMakerCalculationTokenType {
     public static final IElementType LBRACE = token("LBRACE");
     public static final IElementType RBRACE = token("RBRACE");
 
-    // Keyword groups (Phase 2.1)
-    public static final IElementType KEYWORD_CONTROL = token("KEYWORD_CONTROL"); // if, case
-    public static final IElementType KEYWORD_LOGICAL = token("KEYWORD_LOGICAL"); // and, or, not
-    public static final IElementType KEYWORD_TYPE = token("KEYWORD_TYPE"); // boolean, int, etc
-    public static final IElementType KEYWORD_FUNCTION = token("KEYWORD_FUNCTION"); // functions like Abs, Date, Get(), etc
+    // Syntax-level tokens from the lexer
+    public static final IElementType KEYWORD_LOGICAL = token("KEYWORD_LOGICAL"); // and, or, xor, not (any case)
+    public static final IElementType FIELD_REFERENCE = token("FIELD_REFERENCE"); // Table::Field
+    public static final IElementType QUOTED_NAME = token("QUOTED_NAME"); // ${ reserved name }
+    public static final IElementType PARAGRAPH_MARK = token("PARAGRAPH_MARK"); // ¶ outside strings
+
+    // Identifier classifications made by FileMakerCalculationLexerAdapter (from shared data)
+    public static final IElementType KEYWORD_FUNCTION = token("KEYWORD_FUNCTION"); // any name followed by "("
+    public static final IElementType GET_CONSTANT = token("GET_CONSTANT"); // X in Get ( X )
+    public static final IElementType CONSTANT = token("CONSTANT"); // True, JSONString, Bold, ...
 
     @NotNull
     private static IElementType token(@NonNls @NotNull String debugName) {

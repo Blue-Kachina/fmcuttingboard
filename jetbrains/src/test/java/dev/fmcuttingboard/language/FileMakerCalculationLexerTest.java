@@ -29,7 +29,7 @@ public class FileMakerCalculationLexerTest {
 
     @Test
     public void smoke_sampleCalculation_tokensRecognized() {
-        String sample = "Let( [ a = Abs(-3.2); b = 5 ], If(a > b and not IsEmpty(Get(AccountName)); \"hi\"; 'lo') ); JSONSetElement('{}'; 'a'; 1); While ( i < 10 ; i = i + 1 ; i ) // end";
+        String sample = "Let( [ a = Abs(-3.2); b = 5 ]; If(a > b and not IsEmpty(Get(AccountName)); \"hi\"; \"lo\") ) & JSONSetElement(\"{}\"; \"a\"; 1; JSONNumber) & While ( [ i = 0 ] ; i < 10 ; [ i = i + 1 ] ; i ) // end";
 
         List<IElementType> tokens = tokenize(sample);
 
@@ -48,7 +48,7 @@ public class FileMakerCalculationLexerTest {
 
         // Expect numbers and strings
         assertTrue(names.contains("NUMBER"), "Should recognize numeric literals");
-        assertTrue(names.contains("STRING"), "Should recognize string literals for both \"...\" and '...'");
+        assertTrue(names.contains("STRING"), "Should recognize double-quoted text constants");
 
         // Expect operators and identifiers
         assertTrue(names.contains("OPERATOR"), "Should recognize operators like ( ) ; = >");

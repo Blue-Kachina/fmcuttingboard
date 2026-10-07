@@ -1,12 +1,19 @@
 package dev.fmcuttingboard.language.parser;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.intellij.lang.ASTNode;
 import com.intellij.lang.PsiBuilder;
 import com.intellij.lang.PsiParser;
 import com.intellij.psi.tree.IElementType;
-import org.jetbrains.annotations.NotNull;
 import dev.fmcuttingboard.language.FileMakerCalculationElementType;
 import dev.fmcuttingboard.language.FileMakerCalculationTokenType;
+import dev.fmcuttingboard.shared.SharedData;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 
 /**
  * Lightweight recursive-descent parser creating a minimal PSI structure for FileMaker calculations.
@@ -16,6 +23,29 @@ import dev.fmcuttingboard.language.FileMakerCalculationTokenType;
  * Phase 4.3 (refinement): Add basic unary/binary expression parsing with simple precedence.
  */
 public class FileMakerCalculationPsiParser implements PsiParser {
+
+    /**
+     * Binary operator precedence (higher binds tighter) from shared/data/calc-language.json, which follows Claris's
+     * "Using operators in formulas" order. Keys are lowercase symbols, including alternates such as {@code <>}.
+     */
+    private static final class Precedence {
+        static final Map<String, Integer> BINARY = load();
+
+        private static Map<String, Integer> load() {
+            Map<String, Integer> map = new HashMap<>();
+            for (JsonElement e : SharedData.readJson(SharedData.CALC_LANGUAGE).getAsJsonArray("operators")) {
+                JsonObject op = e.getAsJsonObject();
+                if (op.get("arity").getAsInt() != 2) continue;
+                int prec = op.get("precedence").getAsInt();
+                map.put(op.get("symbol").getAsString().toLowerCase(Locale.ROOT), prec);
+                if (op.has("alternates")) {
+                    for (JsonElement alt : op.getAsJsonArray("alternates")) map.put(alt.getAsString().toLowerCase(Locale.ROOT), prec);
+                }
+            }
+            return map;
+        }
+    }
+
     @Override
     public @NotNull ASTNode parse(@NotNull IElementType root, @NotNull PsiBuilder builder) {
         PsiBuilder.Marker rootMarker = builder.mark();
@@ -74,9 +104,11 @@ public class FileMakerCalculationPsiParser implements PsiParser {
     }
 
     private void parseUnary(PsiBuilder builder) {
-        // Unary NOT
-        if (builder.getTokenType() == FileMakerCalculationTokenType.KEYWORD_LOGICAL
-                && tokenTextIs(builder, "not")) {
+        // Unary NOT, minus and plus
+        boolean isNot = builder.getTokenType() == FileMakerCalculationTokenType.KEYWORD_LOGICAL && tokenTextIs(builder, "not");
+        boolean isSign = builder.getTokenType() == FileMakerCalculationTokenType.OPERATOR
+                && (tokenTextIs(builder, "-") || tokenTextIs(builder, "+"));
+        if (isNot || isSign) {
             PsiBuilder.Marker m = builder.mark();
             builder.advanceLexer();
             parseUnary(builder);
@@ -137,8 +169,15 @@ public class FileMakerCalculationPsiParser implements PsiParser {
     }
 
     private boolean isLiteral(IElementType type) {
+        // Constants, Get ( X ) arguments, field references and ¶ are values, not variables, so they must not become
+        // IDENTIFIER_EXPRESSIONs (the annotator checks those for undefined Let variables)
         return type == FileMakerCalculationTokenType.NUMBER
-                || type == FileMakerCalculationTokenType.STRING;
+                || type == FileMakerCalculationTokenType.STRING
+                || type == FileMakerCalculationTokenType.CONSTANT
+                || type == FileMakerCalculationTokenType.GET_CONSTANT
+                || type == FileMakerCalculationTokenType.FIELD_REFERENCE
+                || type == FileMakerCalculationTokenType.QUOTED_NAME
+                || type == FileMakerCalculationTokenType.PARAGRAPH_MARK;
     }
 
     private boolean isSemicolon(PsiBuilder builder) {
@@ -148,27 +187,19 @@ public class FileMakerCalculationPsiParser implements PsiParser {
         return ";".equals(text);
     }
 
+    /** Binary precedence of an operator symbol or word (case-insensitive), or -1 if it is not a binary operator. */
+    static int binaryPrecedence(String symbol) {
+        Integer prec = Precedence.BINARY.get(symbol.toLowerCase(Locale.ROOT));
+        return prec == null ? -1 : prec;
+    }
+
     private int currentOperatorPrecedence(PsiBuilder builder) {
         IElementType t = builder.getTokenType();
-        if (t == null) return -1;
-        // Do not treat semicolon as operator here; it's an argument separator
-        if (t == FileMakerCalculationTokenType.OPERATOR) {
-            String s = builder.getTokenText();
-            if (s == null) return -1;
-            if (";".equals(s)) return -1;
-            // Arithmetic
-            if ("*".equals(s) || "/".equals(s)) return 40;
-            if ("+".equals(s) || "-".equals(s)) return 30;
-            // Comparison
-            if ("=".equals(s) || "≠".equals(s) || ">".equals(s) || "<".equals(s)
-                    || "≥".equals(s) || "≤".equals(s)) return 20;
-        }
-        if (t == FileMakerCalculationTokenType.KEYWORD_LOGICAL) {
-            // logical and/or
-            if (tokenTextIs(builder, "and")) return 10;
-            if (tokenTextIs(builder, "or")) return 5;
-        }
-        return -1;
+        if (t != FileMakerCalculationTokenType.OPERATOR && t != FileMakerCalculationTokenType.KEYWORD_LOGICAL) return -1;
+        String s = builder.getTokenText();
+        if (s == null) return -1;
+        // ";" separates arguments and "not" is unary, so neither is a binary operator here
+        return binaryPrecedence(s);
     }
 
     private boolean tokenTextIs(PsiBuilder builder, String expectedLowercase) {

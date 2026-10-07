@@ -184,7 +184,7 @@ sourceSets {
 // ===== Shared data (shared/ at the repo root, also consumed by the VS Code extension) =====
 // Packaged into the jar under /shared/ and loaded at runtime by dev.fmcuttingboard.shared.SharedData.
 val sharedDataDir = layout.projectDirectory.dir("../shared/data")
-val sharedDataFiles = listOf("filemaker-functions.json", "clipboard-formats.json")
+val sharedDataFiles = listOf("filemaker-functions.json", "clipboard-formats.json", "calc-language.json")
 
 tasks.processResources {
     from(sharedDataDir) {

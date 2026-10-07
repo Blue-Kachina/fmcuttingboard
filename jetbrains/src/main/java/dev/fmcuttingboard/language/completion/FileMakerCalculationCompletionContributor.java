@@ -1,5 +1,6 @@
 package dev.fmcuttingboard.language.completion;
 
+import com.google.gson.JsonElement;
 import com.intellij.codeInsight.completion.*;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.codeInsight.template.Template;
@@ -15,9 +16,10 @@ import dev.fmcuttingboard.language.FileMakerFunctionRegistry;
 import dev.fmcuttingboard.language.FunctionMetadata;
 import dev.fmcuttingboard.language.FunctionParameter;
 import dev.fmcuttingboard.language.psi.FileMakerPsiUtil;
+import dev.fmcuttingboard.shared.SharedData;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -27,14 +29,16 @@ import java.util.List;
  */
 public class FileMakerCalculationCompletionContributor extends CompletionContributor {
 
-    // Representative subset of Get() parameter constants (Phase 2.1 requirement)
-    private static final List<String> GET_CONSTANTS = Arrays.asList(
-            "AccountName", "ApplicationLanguage", "CurrentTimeUTCMilliseconds",
-            "Device", "DocumentsPath", "FileName", "HostName", "LastError",
-            "LayoutName", "ModelName", "ModifiedFields", "NetworkProtocol",
-            "PersistentID", "PreferencesPath", "ScreenScale", "ScriptName",
-            "SystemLanguage", "TotalRecordCount", "UserName", "WindowName"
-    );
+    // Get() parameter constants, from shared/data/calc-language.json (shared with the VS Code extension)
+    private static final List<String> GET_CONSTANTS = loadGetConstants();
+
+    static List<String> loadGetConstants() {
+        List<String> names = new ArrayList<>();
+        for (JsonElement e : SharedData.readJson(SharedData.CALC_LANGUAGE).getAsJsonArray("getConstants")) {
+            names.add(e.getAsJsonObject().get("name").getAsString());
+        }
+        return List.copyOf(names);
+    }
 
     public FileMakerCalculationCompletionContributor() {
         extend(CompletionType.BASIC,

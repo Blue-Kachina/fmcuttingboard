@@ -19,6 +19,9 @@ for what is done so far.
 3. Edit the XML, then run **Push Clipboard Into FileMaker** (<kbd>Ctrl+Alt+C</kbd> <kbd>P</kbd>, the CodeLens at
    the top of the file, or the clipboard button in the editor title bar), and paste in FileMaker.
 
+`.fmcalc` files (FileMaker calculations) get syntax highlighting, completion (<kbd>Ctrl+Space</kbd>), signature
+help while typing arguments, hovers, and `let`/`if`/`case` snippets.
+
 On Windows, the extension talks to FileMaker's own clipboard formats through a small PowerShell script that
 ships with it (each clipboard operation takes about a quarter of a second). On macOS, only plain text is
 supported for now.
@@ -42,6 +45,9 @@ its text), run `FMCB_CLIPBOARD_TESTS=1 npx vitest run test/powershellBridge.test
 
 - `src/actions/` ports the JetBrains actions (same flows and messages) against small interfaces in `ports.ts`;
   `src/host/` and `src/extension.ts` are the only code that uses the VS Code API.
+- `.fmcalc`: `src/core/CalcLanguage.ts` is the single source of language facts (shared data);
+  `scripts/generate-grammar.mjs` generates `syntaxes/fmcalc.tmLanguage.json` from the same data (run
+  `npm run generate:grammar` after changing `shared/data`; CI fails if it is stale).
 - `src/clipboard/` decides what to read and write; `resources/fmclipboard.ps1` only moves bytes.
 - `src/core/` is a 1:1 TypeScript port of the JetBrains plugin's platform-independent logic. File names
   match the Java class names (e.g. `FmClipboardCodec.ts` ↔ `FmClipboardCodec.java`), and it must not import

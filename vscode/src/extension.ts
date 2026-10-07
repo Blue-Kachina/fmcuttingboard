@@ -11,6 +11,7 @@ import type { ActionContext } from './actions/ports';
 import { DefaultClipboardService, messageOf } from './clipboard/DefaultClipboardService';
 import { PowerShellClipboardBridge, type NativeClipboardBridge } from './clipboard/PowerShellClipboardBridge';
 import { analyzeBytesSection } from './core/ClipboardFormatAnalysis';
+import { registerFmcalcProviders } from './language/fmcalcProviders';
 import { buildCapture } from './core/RawClipboardCapture';
 import {
   ensureBaseDir,
@@ -69,6 +70,8 @@ export function activate(context: vscode.ExtensionContext): void {
     command('dumpClipboardFormats', () => dumpClipboardFormats(bridge, log, notifier)),
     command('saveRawClipboardCapture', () => saveRawClipboardCapture(bridge, log, notifier)),
   );
+
+  registerFmcalcProviders(context);
 
   // "FileMaker XML Detected" prompt (the JetBrains editor banner): a CodeLens plus an editor title button
   context.subscriptions.push(

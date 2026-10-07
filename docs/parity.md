@@ -56,20 +56,38 @@ Shared foundations (both plugins must pass them, see `shared/fixtures/README.md`
 
 | Capability | JetBrains | VS Code | Notes |
 |---|:---:|:---:|---|
-| File type / language registration | ✅ 1.0.0 | ❌ | |
-| Syntax highlighting | ✅ 1.0.0 | ❌ | VS Code: TextMate grammar (planned for v1) |
-| Comment toggling (`//`, `/* */`) | ✅ 1.0.0 | ❌ | VS Code v1 |
-| Brace matching / auto-closing | ✅ 1.0.0 | ❌ | VS Code v1 |
-| Function completion | ✅ 1.0.0 | ❌ | From `filemaker-functions.json`. VS Code v1 |
-| Signature help / parameter info | ❌ | ❌ | JetBrains handler exists but is disabled in `plugin.xml`. VS Code v1 plans it. If VS Code ships it first, mark JetBrains ⚠️ |
-| Hover documentation | ❌ | ❌ | VS Code v1 plans it |
-| Snippets / live templates (`let`, `if`, `case`) | ✅ 1.0.0 | ❌ | VS Code v1 |
+| File type / language registration | ✅ 1.0.0 | ✅ Unreleased | |
+| Syntax highlighting | ✅ Unreleased (⚠️ 1.0.0) | ✅ Unreleased | Same rules in both, driven by shared data: any call is a function (case-insensitive), `Get ( X )` for any X, constants from `calc-language.json`, `Table::Field`, `${ }`, `¶`, `$`/`$$` variables, Unicode names. Only difference: VS Code also colors `\"` escapes inside strings |
+| Comment toggling (`//`, `/* */`) | ✅ 1.0.0 | ✅ Unreleased | |
+| Brace matching / auto-closing | ✅ 1.0.0 | ✅ Unreleased | |
+| Function completion | ✅ 1.0.0 | ✅ Unreleased | Same items, type text and `Name(p1; p2)` template. `Get()` constants come from `calc-language.json` in both. VS Code also completes named constants (`JSONString`, `Bold`, …): JetBrains ⚠️ for that part |
+| Signature help / parameter info | ❌ | ✅ Unreleased | JetBrains handler exists but is disabled in `plugin.xml` |
+| Hover documentation | ❌ | ✅ Unreleased | Functions, `Get()` constants, named constants |
+| Snippets / live templates (`let`, `if`, `case`) | ✅ 1.0.0 | ✅ Unreleased | A VS Code test fails if the snippets drift from the JetBrains live templates |
 | Folding of `Let` / `Case` / `If` | ✅ 1.0.0 | ❌ | Post-v1 |
 | Diagnostics: unmatched braces, invalid control characters | ✅ 1.0.0 | ❌ | Post-v1 |
 | Diagnostics: argument-count errors | ✅ 1.0.0 | ❌ | Post-v1. Only as good as `filemaker-functions.json` |
 | Diagnostics: unknown functions, unbound `Let` / `$` variables (weak warnings) | ✅ 1.0.0 | ❌ | Post-v1. Note: the registry has only 22 functions today, so many real functions are flagged as unknown |
 | Formatter + code style options (incl. `DO_NOT_INDENT_TOP_LET_VARIABLES`) | ✅ 1.0.0 | ❌ | Post-v1 |
 | Quick fixes: comma → semicolon, insert missing semicolons | ✅ 1.0.0 | ❌ | Post-v1 |
+
+### JetBrains lexer follow-ups: done (Unreleased)
+
+All of the gaps found while building the VS Code grammar are fixed:
+
+- `::`, `¶` and `${ }` are proper tokens.
+- The Java keywords are gone.
+- Strings are double-quoted only, and may span lines.
+- Calls and named constants are classified case-insensitively, from shared data.
+- `Get ( X )` is highlighted for any X.
+
+The same change also fixed the following:
+
+- **Parser precedence:** it now comes from `calc-language.json` (Claris's order). `&`, `^`, `xor`, `<>`, `<=` and `>=` no longer stop the parser, and unary `-`/`+` parse.
+- **Annotator:** brackets and control characters inside strings and comments no longer cause false errors, and an unterminated string is reported.
+- **No new undefined-variable warnings:** `Get()` arguments, named constants and field references are no longer treated as possible undefined variables.
+
+Remaining parser follow-up: `Let`'s `[ … ]` binding list is not parsed into structure yet. Enabling it would also activate the annotator's undefined-variable check inside `Let` results. That check would need to stop flagging plain field names (which look like variables) before it can be switched on.
 
 ## Manual FileMaker paste checklist
 

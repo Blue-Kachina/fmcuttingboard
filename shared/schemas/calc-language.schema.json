@@ -1,0 +1,25 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "calc-language.schema.json",
+  "title": "Interim FileMaker calculation language facts",
+  "description": "Reuses the shapes of fm-calc-catalogue/v1 so consumers can switch to the full catalogue mechanically. Validate with: ajv validate -s calc-language.schema.json -r fm-calc-catalogue.schema.json -d ...",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["getConstants", "constants", "operators", "syntax"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "about": { "type": "string" },
+    "getConstants": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name"],
+        "properties": { "name": { "type": "string", "pattern": "^[A-Za-z][A-Za-z0-9]*$" } }
+      }
+    },
+    "constants": { "$ref": "fm-calc-catalogue.schema.json#/properties/constants" },
+    "operators": { "$ref": "fm-calc-catalogue.schema.json#/properties/operators" },
+    "syntax": { "$ref": "fm-calc-catalogue.schema.json#/properties/syntax" }
+  }
+}

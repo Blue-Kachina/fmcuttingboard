@@ -4,5 +4,5 @@
   multiple lines
 */
 "Quoted \"double\" string"
-'Single quoted string with \'escape\''
-Let(x; 1)
+"Escapes: a backslash \ and a literal pilcrow \¶" & ¶ & "next line"
+Let(x = 1; x)

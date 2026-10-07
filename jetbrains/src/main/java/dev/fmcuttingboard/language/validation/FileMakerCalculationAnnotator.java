@@ -1,5 +1,9 @@
 package dev.fmcuttingboard.language.validation;
 
+import com.intellij.lexer.Lexer;
+import com.intellij.psi.TokenType;
+import dev.fmcuttingboard.language.FileMakerCalculationLexerAdapter;
+import dev.fmcuttingboard.language.FileMakerCalculationTokenType;
 import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.lang.annotation.Annotator;
 import com.intellij.lang.annotation.HighlightSeverity;
@@ -31,25 +35,29 @@ public class FileMakerCalculationAnnotator implements Annotator {
 
         CharSequence text = element.getContainingFile().getViewProvider().getContents();
 
-        // Detect unmatched closing delimiters using a simple stack counter
+        // Token-based checks, so brackets and control characters inside strings and comments are ignored
+        Lexer lexer = new FileMakerCalculationLexerAdapter();
+        lexer.start(text);
         int round = 0, square = 0, curly = 0;
-        for (int i = 0; i < text.length(); i++) {
-            char c = text.charAt(i);
-            switch (c) {
-                case '(': round++; break;
-                case ')': round--; if (round < 0) { annotateUnmatched(holder, i, ")"); return; } break;
-                case '[': square++; break;
-                case ']': square--; if (square < 0) { annotateUnmatched(holder, i, "]"); return; } break;
-                case '{': curly++; break;
-                case '}': curly--; if (curly < 0) { annotateUnmatched(holder, i, "}"); return; } break;
-                default:
-                    // Flag control chars except common whitespace (\t,\r,\n)
-                    if (c < 32 && c != '\t' && c != '\r' && c != '\n') {
-                        holder.newAnnotation(HighlightSeverity.ERROR, "Invalid control character")
-                                .range(new TextRange(i, i + 1))
-                                .create();
-                        return;
-                    }
+        for (IElementType t = lexer.getTokenType(); t != null; lexer.advance(), t = lexer.getTokenType()) {
+            int start = lexer.getTokenStart();
+            if (t == FileMakerCalculationTokenType.LPAREN) round++;
+            else if (t == FileMakerCalculationTokenType.LBRACKET) square++;
+            else if (t == FileMakerCalculationTokenType.LBRACE) curly++;
+            else if (t == FileMakerCalculationTokenType.RPAREN && --round < 0) { annotateUnmatched(holder, start, ")"); return; }
+            else if (t == FileMakerCalculationTokenType.RBRACKET && --square < 0) { annotateUnmatched(holder, start, "]"); return; }
+            else if (t == FileMakerCalculationTokenType.RBRACE && --curly < 0) { annotateUnmatched(holder, start, "}"); return; }
+            else if (t == FileMakerCalculationTokenType.STRING && !isTerminatedString(text, start, lexer.getTokenEnd())) {
+                holder.newAnnotation(HighlightSeverity.ERROR, "Unterminated text constant (missing closing quotation mark)")
+                        .range(new TextRange(start, start + 1))
+                        .create();
+                return;
+            } else if (t == TokenType.BAD_CHARACTER && text.charAt(start) < 32) {
+                // Tab, CR and LF are whitespace tokens, so any control character here is invalid
+                holder.newAnnotation(HighlightSeverity.ERROR, "Invalid control character")
+                        .range(new TextRange(start, start + 1))
+                        .create();
+                return;
             }
         }
         // Do not flag unmatched opening here to reduce noise; IDE brace matcher highlights it already.
@@ -59,6 +67,14 @@ public class FileMakerCalculationAnnotator implements Annotator {
 
         // Undefined variable checks (Let() local variables and $/$$ script variables)
         validateUndefinedVariables(element, holder);
+    }
+
+    /** A string token ends with a closing quote that is not escaped by an odd run of backslashes. */
+    static boolean isTerminatedString(CharSequence text, int start, int end) {
+        if (end - start < 2 || text.charAt(end - 1) != '"') return false;
+        int backslashes = 0;
+        for (int i = end - 2; i > start && text.charAt(i) == '\\'; i--) backslashes++;
+        return backslashes % 2 == 0;
     }
 
     private static void annotateUnmatched(AnnotationHolder holder, int offset, String brace) {
@@ -166,7 +182,7 @@ public class FileMakerCalculationAnnotator implements Annotator {
         java.util.Set<String> names = new java.util.LinkedHashSet<>();
         if (text == null || text.isEmpty()) return names;
         // Heuristic: find tokens that look like identifiers or $/$$ vars immediately followed by '='
-        java.util.regex.Pattern p = java.util.regex.Pattern.compile("(?m)(?:^|\\[|;|\\s)\\s*([\u0024]{0,2}[A-Za-z_][A-Za-z0-9_]*)\\s*=");
+        java.util.regex.Pattern p = java.util.regex.Pattern.compile("(?m)(?:^|\\[|;|\\s)\\s*([\u0024]{0,2}[A-Za-z_~][A-Za-z0-9_.~]*)\\s*=");
         java.util.regex.Matcher m = p.matcher(text);
         while (m.find()) {
             String name = m.group(1);

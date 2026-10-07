@@ -28,9 +28,36 @@
   ],
   "main": "./dist/extension.js",
   "activationEvents": [
-    "onLanguage:xml"
+    "onLanguage:xml",
+    "onLanguage:fmcalc"
   ],
   "contributes": {
+    "languages": [
+      {
+        "id": "fmcalc",
+        "aliases": [
+          "FileMaker Calculation",
+          "fmcalc"
+        ],
+        "extensions": [
+          ".fmcalc"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "fmcalc",
+        "scopeName": "source.fmcalc",
+        "path": "./syntaxes/fmcalc.tmLanguage.json"
+      }
+    ],
+    "snippets": [
+      {
+        "language": "fmcalc",
+        "path": "./snippets/fmcalc.json"
+      }
+    ],
     "commands": [
       {
         "command": "fmcuttingboard.getFileMakerClipboardContent",
@@ -192,9 +219,10 @@
     "watch": "node esbuild.mjs --watch",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "check": "npm run typecheck && npm run test",
+    "check": "node scripts/generate-grammar.mjs --check && npm run typecheck && npm run test",
     "vscode:prepublish": "node esbuild.mjs --production",
-    "test:integration": "node esbuild.mjs && node esbuild.mjs --integration && vscode-test"
+    "test:integration": "node esbuild.mjs && node esbuild.mjs --integration && vscode-test",
+    "generate:grammar": "node scripts/generate-grammar.mjs"
   },
   "dependencies": {
     "@xmldom/xmldom": "0.9.12"
@@ -207,6 +235,8 @@
     "@vscode/test-electron": "3.1.0",
     "esbuild": "0.28.2",
     "typescript": "6.0.3",
-    "vitest": "5.0.3"
+    "vitest": "5.0.3",
+    "vscode-oniguruma": "2.0.1",
+    "vscode-textmate": "9.3.2"
   }
 }
