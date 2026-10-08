@@ -21,6 +21,10 @@ jobs:
         working-directory: vscode
     env:
       PUBLISH: ${{ github.event_name == 'push' }}
+      # A registry whose token secret isn't set is skipped (with a warning) rather than failing the release,
+      # so a tag still produces the GitHub Release and the .vsix can be uploaded by hand.
+      HAS_VSCE_PAT: ${{ secrets.VSCE_PAT != '' }}
+      HAS_OVSX_PAT: ${{ secrets.OVSX_PAT != '' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v7
@@ -74,16 +78,24 @@ jobs:
           path: vscode/${{ env.VSIX }}
 
       - name: Publish to the VS Code Marketplace
-        if: env.PUBLISH == 'true'
+        if: env.PUBLISH == 'true' && env.HAS_VSCE_PAT == 'true'
         env:
           VSCE_PAT: ${{ secrets.VSCE_PAT }}
         run: npx vsce publish --packagePath "$VSIX"
 
+      - name: Skip the VS Code Marketplace (no VSCE_PAT)
+        if: env.PUBLISH == 'true' && env.HAS_VSCE_PAT != 'true'
+        run: echo "::warning::VSCE_PAT is not set, so nothing was published to the VS Code Marketplace. Upload $VSIX from the GitHub Release at https://marketplace.visualstudio.com/manage."
+
       - name: Publish to Open VSX
-        if: env.PUBLISH == 'true'
+        if: env.PUBLISH == 'true' && env.HAS_OVSX_PAT == 'true'
         env:
           OVSX_PAT: ${{ secrets.OVSX_PAT }}
         run: npx ovsx publish "$VSIX" -p "$OVSX_PAT"
+
+      - name: Skip Open VSX (no OVSX_PAT)
+        if: env.PUBLISH == 'true' && env.HAS_OVSX_PAT != 'true'
+        run: echo "::warning::OVSX_PAT is not set, so nothing was published to Open VSX. Upload $VSIX from the GitHub Release at https://open-vsx.org/user-settings/extensions."
 
       - name: Extract changelog section for this version
         if: env.PUBLISH == 'true'

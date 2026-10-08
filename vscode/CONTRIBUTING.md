@@ -52,8 +52,13 @@ Releases are triggered by **`vscode-v<version>` tags** (plain `v*` tags publish 
    1. checks that the tag matches `package.json`;
    2. runs every check (including the integration tests);
    3. packages the `.vsix`;
-   4. publishes it to the VS Code Marketplace and Open VSX;
+   4. publishes it to the VS Code Marketplace and Open VSX, skipping (with a warning) any registry whose token
+      secret isn't set;
    5. creates a GitHub Release with the `.vsix` and the changelog section.
+
+   For a skipped registry, upload the `.vsix` from the GitHub Release by hand: **New extension → Visual Studio
+   Code** at <https://marketplace.visualstudio.com/manage>, or **Publish** at
+   <https://open-vsx.org/user-settings/extensions>.
 
 To rehearse without publishing, run the **Release (VS Code)** workflow manually from the Actions tab
 (`workflow_dispatch`). It does everything except publishing and the GitHub Release, and uploads the `.vsix` as
@@ -64,8 +69,11 @@ a workflow artifact.
 1. **VS Code Marketplace publisher:** create the publisher `bluekachina` at
    <https://marketplace.visualstudio.com/manage> (or change `publisher` in `package.json` to the one you
    create; it is part of the extension ID and can't change after publishing).
-2. **Marketplace token:** in Azure DevOps, create a Personal Access Token with **Organization: All accessible
-   organizations** and scope **Marketplace → Manage**. Save it as the repository secret `VSCE_PAT`.
+2. **Marketplace token (optional; without it, upload by hand):** in an Azure DevOps organization (create a free
+   one at <https://aex.dev.azure.com> if needed), open **User settings** (person-with-gear icon, top right) →
+   **Personal access tokens**, and create one with **Organization: All accessible organizations** and scope
+   **Marketplace → Manage**. Save it as the repository secret `VSCE_PAT`. These global tokens are retired on
+   2026-12-01; after that, use Microsoft Entra ID or `vsce publish --oidc` once the Marketplace supports it.
 3. **Open VSX** (used by VSCodium, Cursor and others): sign in at <https://open-vsx.org> with GitHub, sign the
    publisher agreement, and create an access token. Save it as the repository secret `OVSX_PAT`. Then create the
    namespace once: `npx ovsx create-namespace bluekachina -p <token>`.

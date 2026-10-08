@@ -6,6 +6,10 @@ own changelog in `jetbrains/CHANGELOG.md`.)
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
+
+## [0.0.1] - 2026-10-08
+First release.
+
 ### Added
 - Commands (same names and behavior as the JetBrains plugin): **Get FileMaker Clipboard Content**
   (`Ctrl+Alt+C X`) and **Push Clipboard Into FileMaker** (`Ctrl+Alt+C P`), plus the hidden helper commands, in
