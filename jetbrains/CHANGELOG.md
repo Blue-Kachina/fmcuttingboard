@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 adheres to Semantic Versioning as the plugin matures.
 
 ## [Unreleased]
+
+## [1.1.0] - 2026-10-08
 ### Added
 - `.fmcalc` now knows every FileMaker function (231), `Get ( … )` constant (138) and named constant (46), from the calculation catalogue built from Claris's help by fmscriptinventory. Completion lists them all, and argument counts are checked for every function.
 - `.fmcalc`: calls to functions that are not FileMaker built-ins (custom functions, plug-in functions, typos) get an "Unknown function" weak warning.
@@ -23,6 +25,8 @@ adheres to Semantic Versioning as the plugin matures.
 - The parser now knows every FileMaker operator and Claris's precedence order. `&`, `^`, `xor`, `<>`, `<=` and `>=` no longer stop parsing, and unary minus/plus parse.
 - Brackets or control characters inside strings and comments no longer cause "Unmatched closing" or "Invalid control character" errors. A missing closing quotation mark is now reported.
 - `Get ( … )` arguments and field references are no longer reported as possibly undefined variables.
+- `Let` variables written with a leading `~` (`~total`, a common convention for calculation-local names) are now
+  recognized as variables instead of bad characters.
 - `.fmcalc` error checking now actually runs. A bug meant it never ran in a project, so you may now see:
   - errors for unmatched closing brackets and unterminated strings;
   - errors for wrong argument counts in known functions;

@@ -10,15 +10,30 @@
     <!-- Compatibility configured via Gradle's patchPluginXml -->
 
     <description><![CDATA[
-        Work with FileMaker clipboard content as XML (fmxmlsnippet) directly from your JetBrains IDE.
+        <p>Work with FileMaker clipboard content as XML (fmxmlsnippet) and edit FileMaker calculations,
+        directly from your JetBrains IDE.</p>
 
-        The plugin adds a "FMCuttingBoard" submenu under the Tools menu with actions to:
-        - Convert FM Clipboard To XML Clipboard
-        - New XML File From FM Clipboard
-        - Push Clipboard Into FileMaker
+        <h3>Clipboard round-tripping</h3>
+        <p>Actions in the <b>Tools &gt; FMCuttingBoard</b> submenu and the editor/project context menus:</p>
+        <ul>
+            <li><b>Get FileMaker Clipboard Content</b> (<code>Ctrl+Alt+C, X</code>): saves copied fields,
+                tables, scripts, script steps, custom functions, value lists or layout objects as an XML file,
+                or copied calculation text as a <code>.fmcalc</code> file.</li>
+            <li><b>Push Clipboard Into FileMaker</b> (<code>Ctrl+Alt+C, P</code>): puts XML back on the
+                clipboard in FileMaker's format, ready to paste.</li>
+        </ul>
+        <p>Use it to inspect, edit and version-control FileMaker objects as plain text.</p>
 
-        Use it to inspect and version-control fmxmlsnippet payloads, and to reconstruct clipboard
-        content from XML for pasting back into FileMaker (fields, scripts, etc.).
+        <h3>FileMaker calculations (<code>.fmcalc</code>)</h3>
+        <ul>
+            <li>Syntax highlighting, completion and parameter hints for every FileMaker function,
+                <code>Get ( … )</code> constant and named constant.</li>
+            <li>Error checking: unmatched brackets, unterminated strings, wrong argument counts, unknown
+                functions, and <code>Let</code>/<code>While</code> variables used out of scope.</li>
+            <li>Reformat Code with Claris-style spacing, folding, brace matching and quick fixes.</li>
+        </ul>
+
+        <p>No telemetry and no network access.</p>
     ]]></description>
 
     <!-- Notifications group for user-facing balloon messages (registered via extensions) -->
