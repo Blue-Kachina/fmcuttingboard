@@ -1,7 +1,7 @@
 // Port of jetbrains/.../language/validation/FileMakerCalculationAnnotator.java and FunctionVariableScopes.java.
 // Same checks, messages, ranges and order; pinned by shared/fixtures/golden/cases.json "diagnostics".
 import { parse, findAll, type CalcNode, type ParsedCalc } from './CalcParser';
-import { findByName, isComplete } from './FileMakerFunctionRegistry';
+import { findByName } from './FileMakerFunctionRegistry';
 
 export type Severity = 'error' | 'warning' | 'weak_warning';
 
@@ -23,7 +23,7 @@ export function diagnose(text: string): CalcDiagnostic[] {
   return out;
 }
 
-function lexicalError({ text, tokens }: ParsedCalc): CalcDiagnostic | undefined {
+export function lexicalError({ text, tokens }: ParsedCalc): CalcDiagnostic | undefined {
   let round = 0;
   let square = 0;
   let curly = 0;
@@ -68,24 +68,17 @@ function validateFunctions(parsed: ParsedCalc, out: CalcDiagnostic[]): void {
     if (!name) continue;
     const meta = findByName(name);
     if (!meta) {
-      // Only claim "unknown" when the function list is complete
-      if (isComplete()) out.push({ severity: 'weak_warning', message: `Unknown function '${name}'`, start: call.start, end: call.end });
+      // The catalogue lists every built-in, so this is a custom function, a plug-in function or a typo
+      out.push({ severity: 'weak_warning', message: `Unknown function '${name}'`, start: call.start, end: call.end });
       continue;
     }
     const argCount = argumentsOf(call).length;
-    let min = 0;
-    let max = 0;
-    let hasRepeating = false;
-    for (const p of meta.parameters) {
-      if (!p.optional && !p.repeating) min++;
-      if (p.repeating) hasRepeating = true;
-      else max++;
-    }
-    if (hasRepeating) max = Number.MAX_SAFE_INTEGER;
+    const min = meta.minArgs;
+    const max = meta.maxArgs ?? Number.MAX_SAFE_INTEGER;
     if (argCount < min) {
       out.push({ severity: 'error', message: `Too few arguments for ${meta.name}: expected at least ${min}, got ${argCount}`, start: call.start, end: call.end });
     } else if (argCount > max) {
-      const expected = hasRepeating ? `${min}+` : String(max);
+      const expected = meta.maxArgs === null ? `${min}+` : String(max);
       out.push({ severity: 'error', message: `Too many arguments for ${meta.name}: expected ${expected}, got ${argCount}`, start: call.start, end: call.end });
     }
   }

@@ -80,11 +80,18 @@ function identifierBefore(text: string, parenIndex: number): string | undefined 
 
 /**
  * Maps an argument index onto the parameter to highlight. Arguments past a repeating parameter keep
- * pointing at it (e.g. Sum's "field..."), and the last parameter absorbs any extra arguments.
+ * pointing at it (e.g. Sum's "field..."), cycling through a repeating group (Case's test, result, test, ...),
+ * and the last parameter absorbs any extra arguments. Mirrors FileMakerCalculationParameterInfoHandler.java.
  */
-export function activeParameterIndex(parameters: readonly { repeating: boolean }[], argIndex: number): number {
+export function activeParameterIndex(parameters: readonly { repeating: boolean; group?: string }[], argIndex: number): number {
   for (let p = 0; p < parameters.length; p++) {
-    if (p === argIndex || (parameters[p].repeating && argIndex > p)) return p;
+    if (p === argIndex) return p;
+    if (parameters[p].repeating && argIndex > p) {
+      let size = 1;
+      const group = parameters[p].group;
+      while (group && p + size < parameters.length && parameters[p + size].repeating && parameters[p + size].group === group) size++;
+      return p + ((argIndex - p) % size);
+    }
   }
   return Math.max(0, parameters.length - 1);
 }

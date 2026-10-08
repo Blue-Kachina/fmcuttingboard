@@ -29,12 +29,12 @@ import java.util.List;
  */
 public class FileMakerCalculationCompletionContributor extends CompletionContributor {
 
-    // Get() parameter constants, from shared/data/calc-language.json (shared with the VS Code extension)
+    // Get() parameter constants, from shared/data/fm-calc-catalogue.json (shared with the VS Code extension)
     private static final List<String> GET_CONSTANTS = loadGetConstants();
 
     static List<String> loadGetConstants() {
         List<String> names = new ArrayList<>();
-        for (JsonElement e : SharedData.readJson(SharedData.CALC_LANGUAGE).getAsJsonArray("getConstants")) {
+        for (JsonElement e : SharedData.readJson(SharedData.CALC_CATALOGUE).getAsJsonArray("getConstants")) {
             names.add(e.getAsJsonObject().get("name").getAsString());
         }
         return List.copyOf(names);

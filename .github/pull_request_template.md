@@ -7,7 +7,7 @@
 - [ ] Implemented in both plugins, **or** the gap is recorded in `docs/parity.md`
 - [ ] Shared behavior lives in `shared/` (data or golden fixtures), not hardcoded in one plugin
 - [ ] Changed `shared/data`? Regenerated what depends on it (`node shared/tools/generate-golden.mjs`,
-      `npm run generate:grammar` in `vscode/`) and updated `shared/fixtures/golden/function-signatures.txt` if needed
+      `node shared/tools/generate-function-signatures.mjs`, `npm run generate:grammar` in `vscode/`)
 - [ ] User-facing change? Entry under `## [Unreleased]` in the affected `CHANGELOG.md`
       (`jetbrains/CHANGELOG.md` feeds the JetBrains Marketplace notes; keep VS Code entries out of it)
 

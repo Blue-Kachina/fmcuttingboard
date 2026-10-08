@@ -2,147 +2,173 @@ package dev.fmcuttingboard.language.format;
 
 import com.intellij.formatting.*;
 import com.intellij.lang.ASTNode;
-import com.intellij.lang.Language;
-import com.intellij.openapi.util.TextRange;
-import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.codeStyle.CodeStyleSettings;
 import com.intellij.psi.codeStyle.CommonCodeStyleSettings;
 import com.intellij.psi.formatter.common.AbstractBlock;
-import com.intellij.psi.tree.IElementType;
-import com.intellij.psi.tree.TokenSet;
+import dev.fmcuttingboard.language.FileMakerCalculationFileType;
 import dev.fmcuttingboard.language.FileMakerCalculationLanguage;
 import dev.fmcuttingboard.language.FileMakerCalculationTokenType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.ArrayList;
 
 /**
- * Phase 5 – Initial intelligent formatting for FileMaker calculations.
- *
- * Scope (minimal, safe defaults):
- * - Keep one space around operators when appropriate
- * - No space just inside parentheses
- * - Ensure a space after semicolons when used as parameter separators
- * - Indent nested argument lists (e.g., Let/If/Case bodies)
- *
- * Note: This is the initial implementation for Phase 5.2 and is intentionally
- * conservative to avoid surprising rewrites. Future phases may introduce
- * configurable code style options and more granular rules.
- *
- * Implements Phase 5.2 by providing AST-backed blocks and spacing rules.
+ * Formats .fmcalc files with {@link FmCalcFormatter} (shared rules with the VS Code extension, pinned by the golden
+ * "formatting" cases). The formatted text is expressed to the IDE as a flat list of token blocks with exact spacing,
+ * line feeds and indentation between them, so Reformat Code, formatting a selection, and the indent settings work as
+ * usual. A calculation that isn't well-formed is left untouched.
  */
 public class FileMakerCalculationFormattingModelBuilder implements FormattingModelBuilder {
 
     @Override
     public @NotNull FormattingModel createModel(@NotNull FormattingContext formattingContext) {
-        PsiElement element = formattingContext.getPsiElement();
+        PsiFile file = formattingContext.getContainingFile();
         CodeStyleSettings settings = formattingContext.getCodeStyleSettings();
-        PsiFile file = element.getContainingFile();
-        SpacingBuilder spacing = createSpacingBuilder(FileMakerCalculationLanguage.INSTANCE, settings);
-        Block rootBlock = new FmBlock(file.getNode(), null, null, spacing, Indent.getNoneIndent());
-        return FormattingModelProvider.createFormattingModelForPsiFile(file, rootBlock, settings);
+        FmCalcFormatter.Options options = optionsFor(settings);
+        String formatted = FmCalcFormatter.format(file, options);
+        List<ASTNode> leaves = new ArrayList<>();
+        collectLeaves(file.getNode(), leaves);
+        Layout layout = formatted == null ? null : Layout.of(leaves, formatted, options);
+        Block root = new RootBlock(file.getNode(), leaves, layout, options);
+        return FormattingModelProvider.createFormattingModelForPsiFile(file, root, settings);
     }
 
-    private static SpacingBuilder createSpacingBuilder(Language language, CodeStyleSettings settings) {
-        CommonCodeStyleSettings common = settings.getCommonSettings(language);
+    static FmCalcFormatter.Options optionsFor(CodeStyleSettings settings) {
+        CommonCodeStyleSettings.IndentOptions indent = settings.getIndentOptions(FileMakerCalculationFileType.INSTANCE);
         FileMakerCustomCodeStyleSettings custom = settings.getCustomSettings(FileMakerCustomCodeStyleSettings.class);
-
-        SpacingBuilder builder = new SpacingBuilder(settings, language)
-                // No space just inside parentheses: (expr) → "(" no space, and before ")" no space
-                .after(FileMakerCalculationTokenType.LPAREN).spaces(0)
-                .before(FileMakerCalculationTokenType.RPAREN).spaces(0)
-
-                // Space around generic operators (includes punctuation; keep conservative):
-                .around(FileMakerCalculationTokenType.OPERATOR).spaces(1);
-
-        // Space before parentheses for control keywords / common functions (If/Case/While)
-        boolean wantSpaceBeforeParens =
-                common.SPACE_BEFORE_IF_PARENTHESES ||
-                common.SPACE_BEFORE_WHILE_PARENTHESES ||
-                common.SPACE_BEFORE_SWITCH_PARENTHESES; // map 'case' to 'switch'
-
-        int ctrlParenSpaces = wantSpaceBeforeParens ? 1 : 0;
-        builder = builder.between(FileMakerCalculationTokenType.KEYWORD_FUNCTION, FileMakerCalculationTokenType.LPAREN).spaces(ctrlParenSpaces);
-
-        return builder;
+        boolean tabs = indent.USE_TAB_CHARACTER;
+        return new FmCalcFormatter.Options(
+                tabs ? "\t" : " ".repeat(indent.INDENT_SIZE),
+                tabs ? indent.TAB_SIZE : indent.INDENT_SIZE,
+                settings.getRightMargin(FileMakerCalculationLanguage.INSTANCE),
+                custom.DO_NOT_INDENT_TOP_LET_VARIABLES);
     }
 
-    private static final TokenSet WHITES = TokenSet.create(FileMakerCalculationTokenType.WHITE_SPACE);
+    /** Every non-whitespace leaf, in document order. */
+    private static void collectLeaves(ASTNode node, List<ASTNode> out) {
+        ASTNode child = node.getFirstChildNode();
+        if (child == null) {
+            if (node.getTextLength() > 0 && node.getElementType() != FileMakerCalculationTokenType.WHITE_SPACE) out.add(node);
+            return;
+        }
+        for (; child != null; child = child.getTreeNext()) collectLeaves(child, out);
+    }
 
-    /**
-     * Simple AST-based block that builds children for all non-whitespace leaf nodes
-     * and applies a SpacingBuilder for spacing decisions. Indentation is increased
-     * one level inside parentheses to improve readability of multi-line argument lists.
-     */
-    private static class FmBlock extends AbstractBlock {
-        private final SpacingBuilder spacingBuilder;
-        private final Indent myIndent;
+    /** For each leaf, the whitespace the formatted text puts before it (only whitespace differs from the original). */
+    private record Layout(List<String> gapsBefore, int indentWidth) {
 
-        protected FmBlock(@NotNull ASTNode node,
-                          @Nullable Wrap wrap,
-                          @Nullable Alignment alignment,
-                          @NotNull SpacingBuilder spacingBuilder,
-                          @NotNull Indent indent) {
-            super(node, wrap, alignment);
-            this.spacingBuilder = spacingBuilder;
-            this.myIndent = indent;
+        static @Nullable Layout of(List<ASTNode> leaves, String formatted, FmCalcFormatter.Options options) {
+            List<String> gaps = new ArrayList<>(leaves.size());
+            int pos = 0;
+            for (ASTNode leaf : leaves) {
+                int start = pos;
+                while (pos < formatted.length() && Character.isWhitespace(formatted.charAt(pos))) pos++;
+                String text = leaf.getText();
+                if (!formatted.startsWith(text, pos)) return null; // should not happen: formatting only changes whitespace
+                gaps.add(formatted.substring(start, pos));
+                pos += text.length();
+            }
+            return new Layout(gaps, options.indentWidth());
+        }
+
+        Spacing spacingBefore(int index) {
+            String gap = gapsBefore.get(index);
+            int lineFeeds = (int) gap.chars().filter(c -> c == '\n').count();
+            if (lineFeeds > 0) return Spacing.createSpacing(0, 0, lineFeeds, false, 0);
+            return Spacing.createSpacing(gap.length(), gap.length(), 0, false, 0);
+        }
+
+        Indent indentOf(int index) {
+            String gap = gapsBefore.get(index);
+            int nl = gap.lastIndexOf('\n');
+            if (index == 0 || nl < 0) return Indent.getNoneIndent();
+            int columns = 0;
+            for (char c : gap.substring(nl + 1).toCharArray()) columns += c == '\t' ? indentWidth : 1;
+            return Indent.getSpaceIndent(columns);
+        }
+    }
+
+    private static final class RootBlock extends AbstractBlock {
+        private final List<ASTNode> leaves;
+        private final @Nullable Layout layout;
+        private final FmCalcFormatter.Options options;
+
+        RootBlock(ASTNode node, List<ASTNode> leaves, @Nullable Layout layout, FmCalcFormatter.Options options) {
+            super(node, null, null);
+            this.leaves = leaves;
+            this.layout = layout;
+            this.options = options;
         }
 
         @Override
         protected List<Block> buildChildren() {
-            ASTNode child = myNode.getFirstChildNode();
-            if (child == null) return Collections.emptyList();
-            List<Block> result = new ArrayList<>();
-            while (child != null) {
-                IElementType type = child.getElementType();
-                if (!WHITES.contains(type) && child.getTextRange().getLength() > 0) {
-                    // Indent one level when inside parentheses content
-                    Indent indent = computeChildIndent(type);
-                    result.add(new FmBlock(child, null, null, spacingBuilder, indent));
-                }
-                child = child.getTreeNext();
-            }
-            return result;
-        }
-
-        private Indent computeChildIndent(IElementType type) {
-            // If this block is the content between parentheses, increase indent.
-            ASTNode parent = myNode.getTreeParent();
-            if (parent != null) {
-                IElementType pType = parent.getElementType();
-                // Heuristic: if parent is an ARG_LIST or we are a sibling between LPAREN/RPAREN, indent
-                if ("ARG_LIST".equals(pType.toString())) return Indent.getNormalIndent();
-            }
-            // Also indent for top-level children inside a parenthesized expression
-            if (myNode.getElementType() == FileMakerCalculationTokenType.LPAREN) {
-                return Indent.getNormalIndent();
-            }
-            return myIndent;
-        }
-
-        @Override
-        public Indent getIndent() {
-            return myIndent;
-        }
-
-        @Override
-        public boolean isLeaf() {
-            return myNode.getFirstChildNode() == null;
+            if (layout == null) return Collections.emptyList();
+            List<Block> blocks = new ArrayList<>(leaves.size());
+            for (int i = 0; i < leaves.size(); i++) blocks.add(new LeafBlock(leaves.get(i), layout.indentOf(i), i));
+            return blocks;
         }
 
         @Override
         public @Nullable Spacing getSpacing(@Nullable Block child1, @NotNull Block child2) {
-            return this.spacingBuilder.getSpacing(this, child1, child2);
+            if (layout == null || !(child2 instanceof LeafBlock leaf)) return null;
+            return leaf.index > 0 ? layout.spacingBefore(leaf.index) : null;
+        }
+
+        /** Enter: indent one level per bracket still open before the caret. */
+        @Override
+        public @NotNull ChildAttributes getChildAttributes(int newChildIndex) {
+            int depth = 0;
+            for (int i = 0; i < Math.min(newChildIndex, leaves.size()); i++) {
+                var type = leaves.get(i).getElementType();
+                if (type == FileMakerCalculationTokenType.LPAREN || type == FileMakerCalculationTokenType.LBRACKET) depth++;
+                else if (type == FileMakerCalculationTokenType.RPAREN || type == FileMakerCalculationTokenType.RBRACKET) depth--;
+            }
+            return new ChildAttributes(Indent.getSpaceIndent(Math.max(0, depth) * options.indentWidth()), null);
         }
 
         @Override
-        public @NotNull ChildAttributes getChildAttributes(int newChildIndex) {
-            // New children within this block are indented normally if we are inside parentheses or argument lists
-            return new ChildAttributes(Indent.getNormalIndent(), null);
+        public boolean isLeaf() {
+            return layout == null;
+        }
+
+        @Override
+        public Indent getIndent() {
+            return Indent.getNoneIndent();
+        }
+    }
+
+    private static final class LeafBlock extends AbstractBlock {
+        private final Indent indent;
+        final int index;
+
+        LeafBlock(ASTNode node, Indent indent, int index) {
+            super(node, null, null);
+            this.indent = indent;
+            this.index = index;
+        }
+
+        @Override
+        protected List<Block> buildChildren() {
+            return Collections.emptyList();
+        }
+
+        @Override
+        public @Nullable Spacing getSpacing(@Nullable Block child1, @NotNull Block child2) {
+            return null;
+        }
+
+        @Override
+        public boolean isLeaf() {
+            return true;
+        }
+
+        @Override
+        public Indent getIndent() {
+            return indent;
         }
     }
 }

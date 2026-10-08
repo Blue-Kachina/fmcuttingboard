@@ -13,13 +13,25 @@ public class FunctionMetadata {
     private final String category;
     private final String returnType;
     private final String description;
+    private final int minArgs;
+    private final Integer maxArgs;
+    private final String helpUrl;
 
-    public FunctionMetadata(String name, List<FunctionParameter> parameters, String category, String returnType, String description) {
+    /** @param maxArgs null = unlimited */
+    public FunctionMetadata(String name, List<FunctionParameter> parameters, String category, String returnType, String description,
+                            int minArgs, Integer maxArgs, String helpUrl) {
         this.name = name;
         this.parameters = parameters != null ? Collections.unmodifiableList(parameters) : Collections.emptyList();
         this.category = category;
         this.returnType = returnType;
         this.description = description;
+        this.minArgs = minArgs;
+        this.maxArgs = maxArgs;
+        this.helpUrl = helpUrl;
+    }
+
+    public FunctionMetadata(String name, List<FunctionParameter> parameters, String category, String returnType, String description) {
+        this(name, parameters, category, returnType, description, 0, null, null);
     }
 
     public FunctionMetadata(String name, List<FunctionParameter> parameters, String category) {
@@ -44,6 +56,42 @@ public class FunctionMetadata {
 
     public String getDescription() {
         return description;
+    }
+
+    public int getMinArgs() {
+        return minArgs;
+    }
+
+    /** null = unlimited */
+    public Integer getMaxArgs() {
+        return maxArgs;
+    }
+
+    /** Claris help page, or null */
+    public String getHelpUrl() {
+        return helpUrl;
+    }
+
+    /**
+     * Maps an argument index onto the parameter to highlight. Arguments past a repeating parameter keep pointing
+     * at it (Sum's "field..."), cycling through a repeating group (Case's test, result, test, ...), and the last
+     * parameter absorbs any extra arguments. Mirrors activeParameterIndex in vscode/src/core/CallContext.ts.
+     */
+    public int activeParameterIndex(int argIndex) {
+        for (int p = 0; p < parameters.size(); p++) {
+            if (p == argIndex) return p;
+            FunctionParameter param = parameters.get(p);
+            if (param.isRepeating() && argIndex > p) {
+                int size = 1;
+                String group = param.getGroup();
+                while (group != null && p + size < parameters.size() && parameters.get(p + size).isRepeating()
+                        && group.equals(parameters.get(p + size).getGroup())) {
+                    size++;
+                }
+                return p + (argIndex - p) % size;
+            }
+        }
+        return Math.max(0, parameters.size() - 1);
     }
 
     /**
@@ -88,6 +136,9 @@ public class FunctionMetadata {
         private String category;
         private String returnType = "Any";
         private String description = "";
+        private int minArgs;
+        private Integer maxArgs;
+        private String helpUrl;
 
         public Builder(String name) {
             this.name = name;
@@ -118,8 +169,20 @@ public class FunctionMetadata {
             return this;
         }
 
+        /** @param maxArgs null = unlimited */
+        public Builder argumentCounts(int minArgs, Integer maxArgs) {
+            this.minArgs = minArgs;
+            this.maxArgs = maxArgs;
+            return this;
+        }
+
+        public Builder helpUrl(String helpUrl) {
+            this.helpUrl = helpUrl;
+            return this;
+        }
+
         public FunctionMetadata build() {
-            return new FunctionMetadata(name, parameters, category, returnType, description);
+            return new FunctionMetadata(name, parameters, category, returnType, description, minArgs, maxArgs, helpUrl);
         }
     }
 }

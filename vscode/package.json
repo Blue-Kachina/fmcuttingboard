@@ -215,6 +215,19 @@
           "default": false,
           "scope": "resource",
           "markdownDescription": "Show the diagnostics commands (**Dump Clipboard Formats**, **Save Raw Clipboard Capture**). For detailed logs, set the **FMCuttingBoard** output channel's log level with **Developer: Set Log Level…**."
+        },
+        "fmcuttingboard.format.maxLineLength": {
+          "type": "integer",
+          "default": 120,
+          "minimum": 20,
+          "scope": "resource",
+          "markdownDescription": "`.fmcalc` formatting: a function call that fits within this many columns stays on one line; longer ones get one argument per line. (JetBrains: *Hard wrap at*.)"
+        },
+        "fmcuttingboard.format.doNotIndentTopLetVariables": {
+          "type": "boolean",
+          "default": true,
+          "scope": "resource",
+          "markdownDescription": "`.fmcalc` formatting: leave the variables of the outermost `Let ( [ … ] ; … )` flush with the `Let`, so a calculation wrapped in a Let isn't indented."
         }
       }
     }

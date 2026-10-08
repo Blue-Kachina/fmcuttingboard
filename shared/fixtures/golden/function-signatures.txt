@@ -1,22 +1,231 @@
-If | Logical | Any | If(test; resultTrue; [resultFalse]) | If(test; resultTrue; resultFalse) | If(test; resultTrue; [resultFalse])
-Case | Logical | Any | Case(test1; result1; [testN; resultN...]; [default]) | Case(test1; result1; testN; resultN; default) | Case(test1; result1; [test2; result2; …]; [default])
-Let | Logical | Any | Let(bindings; result) | Let(bindings; result) | Let([name = expr; …]; result)
-Left | Text | Text | Left(text; count) | Left(text; count) | 
-Right | Text | Text | Right(text; count) | Right(text; count) | 
-Middle | Text | Text | Middle(text; start; count) | Middle(text; start; count) | 
-Substitute | Text | Text | Substitute(text; search; replace...) | Substitute(text; search; replace) | 
-Round | Math | Number | Round(number; numDecimals) | Round(number; numDecimals) | 
-Abs | Math | Number | Abs(number) | Abs(number) | 
-Sum | Aggregate | Number | Sum(field; [field......]) | Sum(field; field...) | 
-Average | Aggregate | Number | Average(field; [field......]) | Average(field; field...) | 
-Date | Date/Time | Date | Date(month; day; year) | Date(month; day; year) | 
-Time | Date/Time | Time | Time(hour; minute; second) | Time(hour; minute; second) | 
-Timestamp | Date/Time | Timestamp | Timestamp(date; time) | Timestamp(date; time) | 
-Year | Date/Time | Number | Year(date) | Year(date) | 
-Month | Date/Time | Number | Month(date) | Month(date) | 
-Day | Date/Time | Number | Day(date) | Day(date) | 
-List | List | Text | List(value1; [valueN...]) | List(value1; valueN) | 
-ValueCount | List | Number | ValueCount(values) | ValueCount(values) | 
-GetField | Data/Fields | Any | GetField(fieldName) | GetField(fieldName) | 
-GetValue | List | Text | GetValue(values; index) | GetValue(values; index) | 
-Get | Get() | Any | Get(name) | Get(name) | Get(name) — name is one of the FileMaker environment constants, e.g., AccountName, HostName, LastError, …
+Abs | Number | Any | Abs(number) | Abs(number) | 
+Acos | Trigonometric | Number | Acos(number) | Acos(number) | 
+AddEmbeddings | Artificial intelligence | Any | AddEmbeddings(v1; v2) | AddEmbeddings(v1; v2) | 
+Asin | Trigonometric | Number | Asin(number) | Asin(number) | 
+Atan | Trigonometric | Number | Atan(number) | Atan(number) | 
+Average | Aggregate | Number | Average(field...) | Average(field) | 
+Base64Decode | Container | Any | Base64Decode(text; [fileNameWithExtension]) | Base64Decode(text; fileNameWithExtension) | 
+Base64Encode | Container | Text | Base64Encode(data) | Base64Encode(data) | 
+Base64EncodeRFC | Container | Text | Base64EncodeRFC(RFCNumber; data) | Base64EncodeRFC(RFCNumber; data) | 
+BaseTableComment | Design | Text | BaseTableComment(fileName; baseTableName) | BaseTableComment(fileName; baseTableName) | 
+BaseTableIDs | Design | Text | BaseTableIDs(fileName) | BaseTableIDs(fileName) | 
+BaseTableNames | Design | Text | BaseTableNames(fileName) | BaseTableNames(fileName) | 
+Case | Logical | Any | Case(test...; result...; [defaultResult]) | Case(test; result; defaultResult) | 
+Ceiling | Number | Number | Ceiling(number) | Ceiling(number) | 
+Char | Text | Text | Char(number) | Char(number) | 
+Choose | Logical | Any | Choose(test; result...) | Choose(test; result) | 
+Code | Text | Number | Code(text) | Code(text) | 
+Combination | Number | Number | Combination(setSize; numberOfChoices) | Combination(setSize; numberOfChoices) | 
+ComputeModel | Artificial intelligence | Text | ComputeModel(modelName; parameterName...; value...) | ComputeModel(modelName; parameterName; value) | 
+ConvertFromFileMakerPath | Miscellaneous | Text | ConvertFromFileMakerPath(filemakerPath; format) | ConvertFromFileMakerPath(filemakerPath; format) | 
+ConvertToFileMakerPath | Miscellaneous | Text | ConvertToFileMakerPath(standardPath; format) | ConvertToFileMakerPath(standardPath; format) | 
+Cos | Trigonometric | Number | Cos(angleInRadians) | Cos(angleInRadians) | 
+CosineSimilarity | Artificial intelligence | Number | CosineSimilarity(v1; v2) | CosineSimilarity(v1; v2) | 
+Count | Aggregate | Number | Count(field...) | Count(field) | 
+CryptAuthCode | Container | Container | CryptAuthCode(data; algorithm; key) | CryptAuthCode(data; algorithm; key) | 
+CryptDecrypt | Container | Any | CryptDecrypt(container; key) | CryptDecrypt(container; key) | 
+CryptDecryptBase64 | Container | Any | CryptDecryptBase64(text; key) | CryptDecryptBase64(text; key) | 
+CryptDigest | Container | Container | CryptDigest(data; algorithm) | CryptDigest(data; algorithm) | 
+CryptEncrypt | Container | Container | CryptEncrypt(data; key) | CryptEncrypt(data; key) | 
+CryptEncryptBase64 | Container | Text | CryptEncryptBase64(data; key) | CryptEncryptBase64(data; key) | 
+CryptGenerateSignature | Container | Container | CryptGenerateSignature(data; algorithm; privateRSAKey; keyPassword) | CryptGenerateSignature(data; algorithm; privateRSAKey; keyPassword) | 
+CryptVerifySignature | Container | Number | CryptVerifySignature(data; algorithm; publicRSAKey; signature) | CryptVerifySignature(data; algorithm; publicRSAKey; signature) | 
+DatabaseNames | Design | Text | DatabaseNames() | DatabaseNames() | 
+Date | Date | Date | Date(month; day; year) | Date(month; day; year) | 
+Day | Date | Number | Day(date) | Day(date) | 
+DayName | Date | Text | DayName(date) | DayName(date) | 
+DayNameJ | Japanese | Text | DayNameJ(date) | DayNameJ(date) | 
+DayOfWeek | Date | Number | DayOfWeek(date) | DayOfWeek(date) | 
+DayOfYear | Date | Number | DayOfYear(date) | DayOfYear(date) | 
+Degrees | Trigonometric | Number | Degrees(angleInRadians) | Degrees(angleInRadians) | 
+Div | Number | Number | Div(number; divisor) | Div(number; divisor) | 
+Evaluate | Logical | Any | Evaluate(expression; [fields]) | Evaluate(expression; fields) | 
+EvaluationError | Logical | Number | EvaluationError(expression) | EvaluationError(expression) | 
+Exact | Text | Number | Exact(originalText; comparisonText) | Exact(originalText; comparisonText) | 
+ExecuteSQL | Logical | Text | ExecuteSQL(sqlQuery; fieldSeparator; rowSeparator; [arguments...]) | ExecuteSQL(sqlQuery; fieldSeparator; rowSeparator; arguments) | 
+ExecuteSQLe | Logical | Text | ExecuteSQLe(sqlQuery; fieldSeparator; rowSeparator; [arguments...]) | ExecuteSQLe(sqlQuery; fieldSeparator; rowSeparator; arguments) | 
+Exp | Number | Number | Exp(number) | Exp(number) | 
+Extend | Repeating | Any | Extend(nonRepeatingField) | Extend(nonRepeatingField) | 
+Factorial | Number | Number | Factorial(number; [numberOfFactors]) | Factorial(number; numberOfFactors) | 
+FieldAnnotation | Design | Text | FieldAnnotation(fileName; fieldName) | FieldAnnotation(fileName; fieldName) | 
+FieldBounds | Design | Text | FieldBounds(fileName; layoutName; fieldName) | FieldBounds(fileName; layoutName; fieldName) | 
+FieldComment | Design | Text | FieldComment(fileName; fieldName) | FieldComment(fileName; fieldName) | 
+FieldDisplayNames | Design | Text | FieldDisplayNames(fileName; fieldName) | FieldDisplayNames(fileName; fieldName) | 
+FieldIDs | Design | Text | FieldIDs(fileName; layoutName) | FieldIDs(fileName; layoutName) | 
+FieldNames | Design | Text | FieldNames(fileName; layoutName) | FieldNames(fileName; layoutName) | 
+FieldRepetitions | Design | Text | FieldRepetitions(fileName; layoutName; fieldName) | FieldRepetitions(fileName; layoutName; fieldName) | 
+FieldStyle | Design | Text | FieldStyle(fileName; layoutName; fieldName) | FieldStyle(fileName; layoutName; fieldName) | 
+FieldType | Design | Text | FieldType(fileName; fieldName) | FieldType(fileName; fieldName) | 
+Filter | Text | Text | Filter(textToFilter; filterText) | Filter(textToFilter; filterText) | 
+FilterValues | Text | Text | FilterValues(textToFilter; filterValues) | FilterValues(textToFilter; filterValues) | 
+Floor | Number | Number | Floor(number) | Floor(number) | 
+Furigana | Japanese | Text | Furigana(text; [option]) | Furigana(text; option) | 
+FV | Financial | Number | FV(payment; interestRate; periods) | FV(payment; interestRate; periods) | 
+Get | Get | Any | Get(name) | Get(name) | 
+GetAddonInfo | Miscellaneous | Text | GetAddonInfo(addonID) | GetAddonInfo(addonID) | 
+GetAsBoolean | Logical | Number | GetAsBoolean(data) | GetAsBoolean(data) | 
+GetAsCSS | Text | Text | GetAsCSS(text) | GetAsCSS(text) | 
+GetAsDate | Text | Date | GetAsDate(text) | GetAsDate(text) | 
+GetAsNumber | Text | Number | GetAsNumber(text) | GetAsNumber(text) | 
+GetAsSVG | Text | Text | GetAsSVG(text) | GetAsSVG(text) | 
+GetAsText | Text | Text | GetAsText(data) | GetAsText(data) | 
+GetAsTime | Text | Time | GetAsTime(text) | GetAsTime(text) | 
+GetAsTimestamp | Text | Timestamp | GetAsTimestamp(text) | GetAsTimestamp(text) | 
+GetAsURLEncoded | Text | Text | GetAsURLEncoded(text) | GetAsURLEncoded(text) | 
+GetAVPlayerAttribute | Mobile | Any | GetAVPlayerAttribute(attributeName) | GetAVPlayerAttribute(attributeName) | 
+GetBaseTableName | Miscellaneous | Text | GetBaseTableName(field) | GetBaseTableName(field) | 
+GetContainerAttribute | Container | Any | GetContainerAttribute(field; attributeName) | GetContainerAttribute(field; attributeName) | 
+GetEmbedding | Artificial intelligence | Container | GetEmbedding(account; model; input) | GetEmbedding(account; model; input) | 
+GetEmbeddingAsFile | Artificial intelligence | Container | GetEmbeddingAsFile(text; [fileNameWithExtension]) | GetEmbeddingAsFile(text; fileNameWithExtension) | 
+GetEmbeddingAsText | Artificial intelligence | Text | GetEmbeddingAsText(data) | GetEmbeddingAsText(data) | 
+GetField | Logical | Any | GetField(fieldName) | GetField(fieldName) | 
+GetFieldName | Miscellaneous | Text | GetFieldName(field) | GetFieldName(field) | 
+GetFieldsOnLayout | Artificial intelligence | Text | GetFieldsOnLayout(layoutName) | GetFieldsOnLayout(layoutName) | 
+GetHeight | Container | Number | GetHeight(field) | GetHeight(field) | 
+GetLayoutObjectAttribute | Miscellaneous | Text | GetLayoutObjectAttribute(objectName; attributeName; [repetitionNumber]; [portalRowNumber]) | GetLayoutObjectAttribute(objectName; attributeName; repetitionNumber; portalRowNumber) | 
+GetLayoutObjectOwnerInfo | Miscellaneous | Text | GetLayoutObjectOwnerInfo(objectID) | GetLayoutObjectOwnerInfo(objectID) | 
+GetLiveText | Container | Text | GetLiveText(container; language) | GetLiveText(container; language) | 
+GetLiveTextAsJSON | Container | Text | GetLiveTextAsJSON(container; language) | GetLiveTextAsJSON(container; language) | 
+GetModelAttributes | Artificial intelligence | Text | GetModelAttributes(modelName) | GetModelAttributes(modelName) | 
+GetNextSerialValue | Design | Text | GetNextSerialValue(fileName; fieldName) | GetNextSerialValue(fileName; fieldName) | 
+GetNthRecord | Logical | Any | GetNthRecord(field; recordNumber) | GetNthRecord(field; recordNumber) | 
+GetPersistentData | Miscellaneous | Any | GetPersistentData(name; instanceID) | GetPersistentData(name; instanceID) | 
+GetRAGSpaceInfo | Artificial intelligence | Text | GetRAGSpaceInfo(ragAccountName; [spaceID]) | GetRAGSpaceInfo(ragAccountName; spaceID) | 
+GetRecordIDsFromFoundSet | Miscellaneous | Text | GetRecordIDsFromFoundSet(type; [tableOccurrenceOrPortal]) | GetRecordIDsFromFoundSet(type; tableOccurrenceOrPortal) | 
+GetRepetition | Repeating | Any | GetRepetition(repeatingField; number) | GetRepetition(repeatingField; number) | 
+GetSensor | Mobile | Any | GetSensor(sensorName; [option1]; [option2]) | GetSensor(sensorName; option1; option2) | 
+GetSummary | Logical | Any | GetSummary(summaryField; breakField) | GetSummary(summaryField; breakField) | 
+GetTableDDL | Artificial intelligence | Text | GetTableDDL(tableOccurrenceNames; ignoreError) | GetTableDDL(tableOccurrenceNames; ignoreError) | 
+GetTextFromPDF | Container | Text | GetTextFromPDF(container) | GetTextFromPDF(container) | 
+GetThumbnail | Container | Container | GetThumbnail(field; width; height) | GetThumbnail(field; width; height) | 
+GetTokenCount | Artificial intelligence | Number | GetTokenCount(text) | GetTokenCount(text) | 
+GetValue | Text | Text | GetValue(listOfValues; valueNumber) | GetValue(listOfValues; valueNumber) | 
+GetWidth | Container | Number | GetWidth(field) | GetWidth(field) | 
+HexDecode | Container | Any | HexDecode(data; [fileNameWithExtension]) | HexDecode(data; fileNameWithExtension) | 
+HexEncode | Container | Text | HexEncode(data) | HexEncode(data) | 
+Hiragana | Japanese | Text | Hiragana(text) | Hiragana(text) | 
+Hour | Time | Number | Hour(time) | Hour(time) | 
+If | Logical | Any | If(test; result1; [result2]) | If(test; result1; result2) | 
+Int | Number | Number | Int(number) | Int(number) | 
+IsEmpty | Logical | Number | IsEmpty(field) | IsEmpty(field) | 
+IsValid | Logical | Number | IsValid(field) | IsValid(field) | 
+IsValidExpression | Logical | Number | IsValidExpression(expression) | IsValidExpression(expression) | 
+JSONDeleteElement | JSON | Text | JSONDeleteElement(json; keyOrIndexOrPath) | JSONDeleteElement(json; keyOrIndexOrPath) | 
+JSONFormatElements | JSON | Text | JSONFormatElements(json) | JSONFormatElements(json) | 
+JSONGetElement | JSON | Any | JSONGetElement(json; keyOrIndexOrPath) | JSONGetElement(json; keyOrIndexOrPath) | 
+JSONGetElementType | JSON | Any | JSONGetElementType(json; keyOrIndexOrPath) | JSONGetElementType(json; keyOrIndexOrPath) | 
+JSONListKeys | JSON | Text | JSONListKeys(json; keyOrIndexOrPath) | JSONListKeys(json; keyOrIndexOrPath) | 
+JSONListValues | JSON | Text | JSONListValues(json; keyOrIndexOrPath) | JSONListValues(json; keyOrIndexOrPath) | 
+JSONMakeArray | JSON | Text | JSONMakeArray(listOfValues; separator; type) | JSONMakeArray(listOfValues; separator; type) | 
+JSONParse | JSON | Text | JSONParse(json) | JSONParse(json) | 
+JSONParsedState | JSON | Number | JSONParsedState(json) | JSONParsedState(json) | 
+JSONSetElement | JSON | Text | JSONSetElement(json; keyOrIndexOrPath...; value...; type...) | JSONSetElement(json; keyOrIndexOrPath; value; type) | 
+KanaHankaku | Japanese | Text | KanaHankaku(text) | KanaHankaku(text) | 
+KanaZenkaku | Japanese | Text | KanaZenkaku(text) | KanaZenkaku(text) | 
+KanjiNumeral | Japanese | Text | KanjiNumeral(text) | KanjiNumeral(text) | 
+Katakana | Japanese | Text | Katakana(text) | Katakana(text) | 
+Last | Repeating | Any | Last(repeatingField) | Last(repeatingField) | 
+LayoutIDs | Design | Text | LayoutIDs(fileName) | LayoutIDs(fileName) | 
+LayoutNames | Design | Text | LayoutNames(fileName) | LayoutNames(fileName) | 
+LayoutObjectNames | Design | Text | LayoutObjectNames(fileName; layoutName) | LayoutObjectNames(fileName; layoutName) | 
+LayoutObjectUUID | Miscellaneous | Text | LayoutObjectUUID() | LayoutObjectUUID() | 
+Left | Text | Text | Left(text; numberOfCharacters) | Left(text; numberOfCharacters) | 
+LeftValues | Text | Text | LeftValues(text; numberOfValues) | LeftValues(text; numberOfValues) | 
+LeftWords | Text | Text | LeftWords(text; numberOfWords) | LeftWords(text; numberOfWords) | 
+Length | Text | Number | Length(text) | Length(text) | 
+Let | Logical | Any | Let(bindings; calculation) | Let(bindings; calculation) | 
+Lg | Number | Number | Lg(number) | Lg(number) | 
+List | Aggregate | Text | List(field...) | List(field) | 
+ListPersistentDataIDs | Miscellaneous | Text | ListPersistentDataIDs(name) | ListPersistentDataIDs(name) | 
+Ln | Number | Number | Ln(number) | Ln(number) | 
+Location | Mobile | Text | Location(accuracy; [timeout]) | Location(accuracy; timeout) | 
+LocationValues | Mobile | Text | LocationValues(accuracy; [timeout]) | LocationValues(accuracy; timeout) | 
+Log | Number | Number | Log(number) | Log(number) | 
+Lookup | Logical | Any | Lookup(sourceField; [failExpression]) | Lookup(sourceField; failExpression) | 
+LookupNext | Logical | Any | LookupNext(sourceField; lowerOrHigherFlag) | LookupNext(sourceField; lowerOrHigherFlag) | 
+Lower | Text | Text | Lower(text) | Lower(text) | 
+Max | Aggregate | Any | Max(field...) | Max(field) | 
+Middle | Text | Text | Middle(text; start; numberOfCharacters) | Middle(text; start; numberOfCharacters) | 
+MiddleValues | Text | Text | MiddleValues(text; startingValue; numberOfValues) | MiddleValues(text; startingValue; numberOfValues) | 
+MiddleWords | Text | Text | MiddleWords(text; startingWord; numberOfWords) | MiddleWords(text; startingWord; numberOfWords) | 
+Min | Aggregate | Any | Min(field...) | Min(field) | 
+Minute | Time | Number | Minute(time) | Minute(time) | 
+Mod | Number | Number | Mod(number; divisor) | Mod(number; divisor) | 
+Month | Date | Number | Month(date) | Month(date) | 
+MonthName | Date | Text | MonthName(date) | MonthName(date) | 
+MonthNameJ | Japanese | Text | MonthNameJ(date) | MonthNameJ(date) | 
+NormalizeEmbedding | Artificial intelligence | Any | NormalizeEmbedding(data; [dimension]) | NormalizeEmbedding(data; dimension) | 
+NPV | Financial | Number | NPV(payment; interestRate) | NPV(payment; interestRate) | 
+NumToJText | Japanese | Text | NumToJText(number; separator; characterType) | NumToJText(number; separator; characterType) | 
+PatternCount | Text | Number | PatternCount(text; searchString) | PatternCount(text; searchString) | 
+Pi | Trigonometric | Number | Pi() | Pi() | 
+PMT | Financial | Number | PMT(principal; interestRate; term) | PMT(principal; interestRate; term) | 
+Position | Text | Number | Position(text; searchString; start; occurrence) | Position(text; searchString; start; occurrence) | 
+PredictFromModel | Artificial intelligence | Number | PredictFromModel(modelName; v1) | PredictFromModel(modelName; v1) | 
+Proper | Text | Text | Proper(text) | Proper(text) | 
+PV | Financial | Number | PV(payment; interestRate; periods) | PV(payment; interestRate; periods) | 
+Quote | Text | Text | Quote(text) | Quote(text) | 
+Radians | Trigonometric | Number | Radians(angleInDegrees) | Radians(angleInDegrees) | 
+Random | Number | Number | Random() | Random() | 
+RangeBeacons | Mobile | Text | RangeBeacons(UUID; [timeout]; [major]; [minor]) | RangeBeacons(UUID; timeout; major; minor) | 
+ReadQRCode | Container | Text | ReadQRCode(container) | ReadQRCode(container) | 
+RelationInfo | Design | Text | RelationInfo(fileName; tableName) | RelationInfo(fileName; tableName) | 
+Replace | Text | Text | Replace(text; start; numberOfCharacters; replacementText) | Replace(text; start; numberOfCharacters; replacementText) | 
+RGB | Text formatting | Number | RGB(red; green; blue) | RGB(red; green; blue) | 
+Right | Text | Text | Right(text; numberOfCharacters) | Right(text; numberOfCharacters) | 
+RightValues | Text | Text | RightValues(text; numberOfValues) | RightValues(text; numberOfValues) | 
+RightWords | Text | Text | RightWords(text; numberOfWords) | RightWords(text; numberOfWords) | 
+RomanHankaku | Japanese | Text | RomanHankaku(text) | RomanHankaku(text) | 
+RomanZenkaku | Japanese | Text | RomanZenkaku(text) | RomanZenkaku(text) | 
+Round | Number | Number | Round(number; precision) | Round(number; precision) | 
+ScriptIDs | Design | Text | ScriptIDs(fileName) | ScriptIDs(fileName) | 
+ScriptNames | Design | Text | ScriptNames(fileName) | ScriptNames(fileName) | 
+Seconds | Time | Number | Seconds(time) | Seconds(time) | 
+Self | Logical | Any | Self() | Self() | 
+SerialIncrement | Text | Text | SerialIncrement(text; incrementBy) | SerialIncrement(text; incrementBy) | 
+SetPrecision | Number | Number | SetPrecision(expression; precision) | SetPrecision(expression; precision) | 
+SetRecursion | Logical | Any | SetRecursion(expression; maxIterations) | SetRecursion(expression; maxIterations) | 
+Sign | Number | Number | Sign(number) | Sign(number) | 
+Sin | Trigonometric | Number | Sin(angleInRadians) | Sin(angleInRadians) | 
+SortValues | Text | Text | SortValues(values; [datatype]; [locale]) | SortValues(values; datatype; locale) | 
+Sqrt | Number | Number | Sqrt(number) | Sqrt(number) | 
+StDev | Aggregate | Number | StDev(field...) | StDev(field) | 
+StDevP | Aggregate | Number | StDevP(field...) | StDevP(field) | 
+Substitute | Text | Text | Substitute(text; searchString...; replaceString...) | Substitute(text; searchString; replaceString) | 
+SubtractEmbeddings | Artificial intelligence | Any | SubtractEmbeddings(v1; v2) | SubtractEmbeddings(v1; v2) | 
+Sum | Aggregate | Number | Sum(field...) | Sum(field) | 
+TableIDs | Design | Text | TableIDs(fileName) | TableIDs(fileName) | 
+TableNames | Design | Text | TableNames(fileName) | TableNames(fileName) | 
+Tan | Trigonometric | Number | Tan(angleInRadians) | Tan(angleInRadians) | 
+TextColor | Text formatting | Text | TextColor(text; rgb) | TextColor(text; rgb) | 
+TextColorRemove | Text formatting | Text | TextColorRemove(text; [rgb]) | TextColorRemove(text; rgb) | 
+TextDecode | Container | Text | TextDecode(container; encoding) | TextDecode(container; encoding) | 
+TextEncode | Container | Container | TextEncode(text; encoding; lineEndings) | TextEncode(text; encoding; lineEndings) | 
+TextFont | Text formatting | Text | TextFont(text; fontName) | TextFont(text; fontName) | 
+TextFontRemove | Text formatting | Text | TextFontRemove(text; [fontToRemove]) | TextFontRemove(text; fontToRemove) | 
+TextFormatRemove | Text formatting | Text | TextFormatRemove(text) | TextFormatRemove(text) | 
+TextSize | Text formatting | Any | TextSize(text; fontSize) | TextSize(text; fontSize) | 
+TextSizeRemove | Text formatting | Text | TextSizeRemove(text; [sizeToRemove]) | TextSizeRemove(text; sizeToRemove) | 
+TextStyleAdd | Text formatting | Text | TextStyleAdd(text; styles) | TextStyleAdd(text; styles) | 
+TextStyleRemove | Text formatting | Text | TextStyleRemove(text; styles) | TextStyleRemove(text; styles) | 
+Time | Time | Time | Time(hours; minutes; seconds) | Time(hours; minutes; seconds) | 
+Timestamp | Timestamp | Timestamp | Timestamp(date; time) | Timestamp(date; time) | 
+Trim | Text | Text | Trim(text) | Trim(text) | 
+TrimAll | Text | Text | TrimAll(text; trimSpaces; trimType) | TrimAll(text; trimSpaces; trimType) | 
+Truncate | Number | Number | Truncate(number; precision) | Truncate(number; precision) | 
+UniqueValues | Text | Text | UniqueValues(values; [datatype]; [locale]) | UniqueValues(values; datatype; locale) | 
+Upper | Text | Text | Upper(text) | Upper(text) | 
+ValueCount | Text | Number | ValueCount(text) | ValueCount(text) | 
+ValueListIDs | Design | Text | ValueListIDs(fileName) | ValueListIDs(fileName) | 
+ValueListItems | Design | Text | ValueListItems(fileName; valueList) | ValueListItems(fileName; valueList) | 
+ValueListNames | Design | Text | ValueListNames(fileName) | ValueListNames(fileName) | 
+Variance | Aggregate | Number | Variance(field...) | Variance(field) | 
+VarianceP | Aggregate | Number | VarianceP(field...) | VarianceP(field) | 
+VerifyContainer | Container | Text | VerifyContainer(field) | VerifyContainer(field) | 
+WeekOfYear | Date | Number | WeekOfYear(date) | WeekOfYear(date) | 
+WeekOfYearFiscal | Date | Number | WeekOfYearFiscal(date; startingDay) | WeekOfYearFiscal(date; startingDay) | 
+While | Logical | Any | While(initialVariable; condition; logic; result) | While(initialVariable; condition; logic; result) | 
+WindowNames | Design | Text | WindowNames([fileName]) | WindowNames(fileName) | 
+WordCount | Text | Number | WordCount(text) | WordCount(text) | 
+Year | Date | Number | Year(date) | Year(date) | 
+YearName | Japanese | Text | YearName(date; format) | YearName(date; format) | 

@@ -12,29 +12,36 @@ import java.util.stream.Collectors;
 /**
  * Central registry of FileMaker functions and their parameter metadata.
  *
- * The data itself lives in the repository's {@code shared/data/filemaker-functions.json}, which the
- * VS Code extension also reads. Add or correct functions there, not here.
+ * The data is the repository's {@code shared/data/fm-calc-catalogue.json}, vendored from fmscriptinventory by
+ * {@code shared/tools/sync-calc-catalogue.mjs} (docs/fm-calc-catalogue-contract.md), which the VS Code extension
+ * also reads. It lists every built-in function, so a name that is not here is a custom or plug-in function.
  */
 public final class FileMakerFunctionRegistry {
 
-    public static final String CAT_LOGICAL = "Logical";
-    public static final String CAT_TEXT = "Text";
-    public static final String CAT_MATH = "Math";
-    public static final String CAT_DATE_TIME = "Date/Time";
-    public static final String CAT_AGGREGATE = "Aggregate";
-    public static final String CAT_DATA = "Data/Fields";
-    public static final String CAT_LIST = "List";
-    public static final String CAT_SYSTEM = "Get()";
+    /**
+     * Display names for the catalogue's data types. Must match vscode/src/core/FileMakerFunctionRegistry.ts and
+     * shared/tools/generate-function-signatures.mjs, which writes the shared baseline.
+     */
+    private static final Map<String, String> TYPE_LABELS = Map.ofEntries(
+            Map.entry("text", "Text"),
+            Map.entry("number", "Number"),
+            Map.entry("date", "Date"),
+            Map.entry("time", "Time"),
+            Map.entry("timestamp", "Timestamp"),
+            Map.entry("container", "Container"),
+            Map.entry("boolean", "Boolean"),
+            Map.entry("json", "JSON"),
+            Map.entry("any", "Any"),
+            Map.entry("expression", "Expression"),
+            Map.entry("fieldReference", "Field"),
+            Map.entry("variableBindings", "Bindings"));
 
     private static final Map<String, FunctionMetadata> BY_NAME;
     private static final Map<String, List<FunctionMetadata>> BY_CATEGORY;
-    private static final boolean COMPLETE;
 
     static {
         Map<String, FunctionMetadata> map = new LinkedHashMap<>();
-        JsonObject root = SharedData.readJson(SharedData.FILEMAKER_FUNCTIONS);
-        COMPLETE = root.get("complete").getAsBoolean();
-        for (FunctionMetadata m : parse(root)) {
+        for (FunctionMetadata m : parse(SharedData.readJson(SharedData.CALC_CATALOGUE))) {
             add(map, m);
         }
         BY_NAME = Collections.unmodifiableMap(map);
@@ -43,8 +50,22 @@ public final class FileMakerFunctionRegistry {
 
     private FileMakerFunctionRegistry() {}
 
-    /** Converts the shared {@code filemaker-functions.json} document into metadata objects, preserving file order. */
+    static @NotNull String typeLabel(@NotNull String type) {
+        return TYPE_LABELS.getOrDefault(type, type);
+    }
+
+    /** "Text functions" -> "Text" */
+    static @NotNull String categoryLabel(@NotNull String label) {
+        return label.replaceFirst("(?i) functions$", "");
+    }
+
+    /** Converts the vendored catalogue into metadata objects, preserving its order (sorted by name). */
     static @NotNull List<FunctionMetadata> parse(@NotNull JsonObject root) {
+        Map<String, String> categories = new HashMap<>();
+        for (JsonElement ce : root.getAsJsonArray("categories")) {
+            JsonObject c = ce.getAsJsonObject();
+            categories.put(c.get("key").getAsString(), categoryLabel(c.get("label").getAsString()));
+        }
         List<FunctionMetadata> out = new ArrayList<>();
         for (JsonElement fe : root.getAsJsonArray("functions")) {
             JsonObject f = fe.getAsJsonObject();
@@ -53,15 +74,20 @@ public final class FileMakerFunctionRegistry {
                 JsonObject p = pe.getAsJsonObject();
                 params.add(new FunctionParameter(
                         p.get("name").getAsString(),
-                        p.get("type").getAsString(),
-                        p.has("optional") && p.get("optional").getAsBoolean(),
-                        p.has("repeating") && p.get("repeating").getAsBoolean()));
+                        typeLabel(p.get("type").getAsString()),
+                        p.get("optional").getAsBoolean(),
+                        p.get("repeatable").getAsBoolean(),
+                        p.has("group") ? p.get("group").getAsString() : null));
             }
+            String category = f.get("category").getAsString();
+            JsonElement max = f.get("maxArgs");
             out.add(new FunctionMetadata.Builder(f.get("name").getAsString())
                     .parameters(params)
-                    .category(f.get("category").getAsString())
-                    .returnType(f.get("returnType").getAsString())
-                    .description(f.has("description") ? f.get("description").getAsString() : "")
+                    .category(categories.getOrDefault(category, category))
+                    .returnType(typeLabel(f.get("returnType").getAsString()))
+                    .description(f.has("summary") ? f.get("summary").getAsString() : "")
+                    .argumentCounts(f.get("minArgs").getAsInt(), max == null || max.isJsonNull() ? null : max.getAsInt())
+                    .helpUrl(f.get("helpUrl").getAsString())
                     .build());
         }
         return out;
@@ -76,9 +102,6 @@ public final class FileMakerFunctionRegistry {
     }
 
     public static int size() { return BY_NAME.size(); }
-
-    /** True only when the shared data lists every FileMaker function, so an unknown name is really unknown. */
-    public static boolean isComplete() { return COMPLETE; }
 
     public static @Nullable FunctionMetadata findByName(@NotNull String name) {
         return BY_NAME.get(name.toLowerCase(Locale.ROOT));

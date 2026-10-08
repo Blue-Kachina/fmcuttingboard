@@ -109,7 +109,7 @@ describe('FMCuttingBoard extension', () => {
         'vscode.executeCompletionItemProvider', doc.uri, doc.positionAt(source.length));
       const left = list.items.find((i) => (typeof i.label === 'string' ? i.label : i.label.label) === 'Left');
       assert.ok(left, 'Left offered');
-      assert.equal((left.insertText as vscode.SnippetString).value, 'Left(${1:text}; ${2:count})');
+      assert.equal((left.insertText as vscode.SnippetString).value, 'Left(${1:text}; ${2:numberOfCharacters})');
     });
 
     it('offers Get() constants inside Get ( … )', async () => {
@@ -123,7 +123,7 @@ describe('FMCuttingBoard extension', () => {
       const hovers = await vscode.commands.executeCommand<vscode.Hover[]>(
         'vscode.executeHoverProvider', doc.uri, doc.positionAt(source.indexOf('Left') + 1));
       const text = hovers.flatMap((h) => h.contents.map((c) => (c as vscode.MarkdownString).value)).join('\n');
-      assert.match(text, /Left\(text; count\)/);
+      assert.match(text, /Left\(text; numberOfCharacters\)/);
     });
 
     it('reports the same diagnostics as the JetBrains annotator', async () => {
@@ -145,10 +145,30 @@ describe('FMCuttingBoard extension', () => {
       ]);
     });
 
+    it('formats the document (Claris spacing, top Let variables flush, tabs from the editor)', async () => {
+      const uri = vscode.Uri.joinPath(root(), 'format.fmcalc');
+      await vscode.workspace.fs.writeFile(uri, new TextEncoder().encode('Let([a=1;b=2];If(a>b;"x";"y"))'));
+      const editor = await vscode.window.showTextDocument(uri);
+      editor.options = { insertSpaces: false, tabSize: 4 };
+      await vscode.commands.executeCommand('editor.action.formatDocument');
+      // The editor applies its own line endings (CRLF for a new file on Windows)
+      assert.equal(editor.document.getText().replace(/\r\n/g, '\n'), 'Let ( [\na = 1 ;\nb = 2\n] ;\n\tIf ( a > b ; "x" ; "y" )\n)');
+      await vscode.commands.executeCommand('workbench.action.revertAndCloseActiveEditor');
+    });
+
+    it('folds multi-line Let/Case/If/While calls and lists, keeping closing brackets visible', async () => {
+      const uri = vscode.Uri.joinPath(root(), 'fold.fmcalc');
+      await vscode.workspace.fs.writeFile(uri, new TextEncoder().encode('Let ( [\na = 1 ;\nb = 2\n] ;\n\ta + b\n)'));
+      const doc = await vscode.workspace.openTextDocument(uri);
+      const ranges = await vscode.commands.executeCommand<vscode.FoldingRange[]>('vscode.executeFoldingRangeProvider', doc.uri);
+      // VS Code keeps one fold per start line (the outer one), so the [ list on the Let line is not a separate fold
+      assert.deepEqual(ranges.map((r) => [r.start, r.end]), [[0, 4]]);
+    });
+
     it('shows signature help for the current argument', async () => {
       const help = await vscode.commands.executeCommand<vscode.SignatureHelp>(
         'vscode.executeSignatureHelpProvider', doc.uri, doc.positionAt(source.length));
-      assert.equal(help.signatures[0].label, 'If(test; resultTrue; [resultFalse])');
+      assert.equal(help.signatures[0].label, 'If(test; result1; [result2])');
       assert.equal(help.activeParameter, 2);
     });
   });

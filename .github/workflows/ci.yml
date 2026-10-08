@@ -20,15 +20,12 @@ jobs:
           set -euo pipefail
           validate() { npx --yes ajv-cli@5.0.0 validate --spec=draft7 --errors=text -s "$1" -d "$2"; }
           validate shared/schemas/clipboard-formats.schema.json   shared/data/clipboard-formats.json
-          validate shared/schemas/filemaker-functions.schema.json shared/data/filemaker-functions.json
+          validate shared/schemas/fm-calc-catalogue.schema.json   shared/data/fm-calc-catalogue.json
           validate shared/schemas/golden-snippets.schema.json     shared/fixtures/golden/snippets.generated.json
           validate shared/schemas/golden-cases.schema.json        shared/fixtures/golden/cases.json
           validate shared/schemas/fm-calc-catalogue.schema.json   shared/fixtures/calc-catalogue/example.illustrative.json
-          npx --yes ajv-cli@5.0.0 validate --spec=draft7 --errors=text -s shared/schemas/calc-language.schema.json \
-            -r shared/schemas/fm-calc-catalogue.schema.json -d shared/data/calc-language.json
-          if [ -f shared/data/fm-calc-catalogue.json ]; then
-            validate shared/schemas/fm-calc-catalogue.schema.json shared/data/fm-calc-catalogue.json
-          fi
+          # The vendored catalogue must come from a committed fmscriptinventory tree (sync-calc-catalogue.mjs checks too)
+          node -e "if (require('./shared/data/fm-calc-catalogue.json').generator.dirty) { console.error('fm-calc-catalogue.json was exported from uncommitted changes'); process.exit(1) }"
           if find shared/fixtures/clipboard -name capture.json | grep -q .; then
             find shared/fixtures/clipboard -name capture.json -print0 | while IFS= read -r -d '' f; do
               validate shared/schemas/capture.schema.json "$f"
@@ -42,6 +39,9 @@ jobs:
             echo "::error::shared/fixtures/golden/snippets.generated.json is stale. Run 'node shared/tools/generate-golden.mjs' and commit the result."
             exit 1
           fi
+
+      - name: Check function signature baseline matches the vendored catalogue
+        run: node shared/tools/generate-function-signatures.mjs --check
 
   jetbrains:
     needs: shared-validation

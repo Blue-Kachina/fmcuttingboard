@@ -12,7 +12,7 @@ case, change the spec, the fixtures and **both** plugins in the same PR.
 | `fmcalc/*.fmcalc` | FileMaker calculation samples for the `.fmcalc` language support |
 | `golden/snippets.generated.json` | Per-snippet expectations. **Generated**: run `node shared/tools/generate-golden.mjs` after adding or changing a snippet |
 | `golden/cases.json` | Hand-written edge cases (detection, normalization, decoding, extraction, XML validation, file naming) |
-| `golden/function-signatures.txt` | How each function in `shared/data/filemaker-functions.json` is displayed (name, category, return type, signatures, description). Update it deliberately when that data changes |
+| `golden/function-signatures.txt` | How each function in `shared/data/fm-calc-catalogue.json` is displayed (name, category, return type, signatures, summary). **Generated**: run `node shared/tools/generate-function-signatures.mjs` after vendoring a catalogue, and review the diff |
 | `clipboard/<type>/<capture>/` | Raw bytes captured from real FileMaker (see below) |
 
 Fixture text files must use LF line endings. `.gitattributes` enforces this, and the generator checks it.
@@ -61,6 +61,12 @@ variant's bytes as described in `build`, then:
 **`cases.json` → `diagnostics`**: every diagnostic the plugin reports for `calc` (JetBrains: the annotator's
 highlights; VS Code: `diagnose()`) must equal `expect` in any order: severity, message, and start/end offsets in
 UTF-16 code units. The messages are user-facing, so the wording must match exactly.
+
+**`cases.json` → `formatting`**: `format(input, formattingDefaults + options)` must equal `expect` (`null` = left
+unformatted), and formatting `expect` again must return it unchanged. JetBrains also runs the cases through the
+IDE's Reformat Code. The rules are in `docs/fmcalc-formatting.md`.
+
+**`cases.json` → `folding`**: the fold regions (start/end offsets and placeholder, in any order) must equal `expect`.
 
 **`cases.json` → `fileNaming`**: `uniqueFileName(resolveFileName(pattern, extension, nowMillis), name ∈ existing)`
 must equal `expect`. A `null` pattern means the setting is unset.

@@ -22,8 +22,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   - `let`/`if`/`case` snippets;
   - function, `Get()` constant and named constant completion;
   - hover and signature help;
-  - problems reported as you type: unmatched brackets, unterminated strings, wrong argument counts, and
-    `Let`/`While` variables used outside their scope (the same checks and messages as the JetBrains plugin).
+  - problems reported as you type: unmatched brackets, unterminated strings, wrong argument counts, unknown
+    functions, and `Let`/`While` variables used outside their scope (the same checks and messages as the
+    JetBrains plugin);
+  - every FileMaker function (231), `Get ( … )` constant (138) and named constant (46), from the calculation
+    catalogue built from Claris's help by fmscriptinventory; hovers link to the function's Claris help page;
+  - **Format Document**, with the same output as the JetBrains plugin. It uses Claris spacing
+    (`If ( a > b ; "x" ; "y" )`) and pretty-prints `Let` variables, `Case` pairs, `While` and long calls (settings
+    `fmcuttingboard.format.maxLineLength` and `fmcuttingboard.format.doNotIndentTopLetVariables`);
+  - folding of multi-line `Let`/`Case`/`If`/`While` calls, `[ … ]` lists and block comments.
 - Project scaffold (TypeScript, esbuild, Vitest).
 - Port of the JetBrains plugin's platform-independent core: fmxmlsnippet detection and validation,
   FileMaker clipboard payload encoding/decoding, file naming, and the FileMaker function registry. Verified

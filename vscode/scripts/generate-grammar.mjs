@@ -1,6 +1,6 @@
 #!/usr/bin/env node
-// Generates syntaxes/fmcalc.tmLanguage.json (the .fmcalc TextMate grammar) from shared data, so highlighting
-// improves automatically when shared/data grows (e.g. when the fmscriptinventory catalogue is vendored).
+// Generates syntaxes/fmcalc.tmLanguage.json (the .fmcalc TextMate grammar) from the vendored fmscriptinventory
+// catalogue (shared/data/fm-calc-catalogue.json), so highlighting follows every catalogue update.
 //   node scripts/generate-grammar.mjs           write the grammar
 //   node scripts/generate-grammar.mjs --check   fail if the committed grammar is stale (used in CI)
 import { readFileSync, writeFileSync } from 'node:fs';
@@ -11,8 +11,8 @@ const vscodeDir = join(dirname(fileURLToPath(import.meta.url)), '..');
 const sharedData = join(vscodeDir, '..', 'shared', 'data');
 const target = join(vscodeDir, 'syntaxes', 'fmcalc.tmLanguage.json');
 
-const functions = JSON.parse(readFileSync(join(sharedData, 'filemaker-functions.json'), 'utf8')).functions;
-const language = JSON.parse(readFileSync(join(sharedData, 'calc-language.json'), 'utf8'));
+const language = JSON.parse(readFileSync(join(sharedData, 'fm-calc-catalogue.json'), 'utf8'));
+const functions = language.functions;
 
 const escape = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 // Longest first, so e.g. "GetValue" is not cut short by "Get"

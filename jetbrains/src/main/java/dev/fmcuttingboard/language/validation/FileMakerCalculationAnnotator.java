@@ -11,10 +11,10 @@ import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import com.intellij.psi.util.PsiTreeUtil;
 import dev.fmcuttingboard.language.FileMakerCalculationElementType;
 import dev.fmcuttingboard.language.FunctionMetadata;
-import dev.fmcuttingboard.language.FunctionParameter;
 import dev.fmcuttingboard.language.FileMakerFunctionRegistry;
 import dev.fmcuttingboard.language.psi.FileMakerPsiElements;
 import com.intellij.psi.tree.IElementType;
@@ -38,29 +38,12 @@ public class FileMakerCalculationAnnotator implements Annotator {
         CharSequence text = element.getContainingFile().getViewProvider().getContents();
 
         // Token-based checks, so brackets and control characters inside strings and comments are ignored
-        Lexer lexer = new FileMakerCalculationLexerAdapter();
-        lexer.start(text);
-        int round = 0, square = 0, curly = 0;
-        for (IElementType t = lexer.getTokenType(); t != null; lexer.advance(), t = lexer.getTokenType()) {
-            int start = lexer.getTokenStart();
-            if (t == FileMakerCalculationTokenType.LPAREN) round++;
-            else if (t == FileMakerCalculationTokenType.LBRACKET) square++;
-            else if (t == FileMakerCalculationTokenType.LBRACE) curly++;
-            else if (t == FileMakerCalculationTokenType.RPAREN && --round < 0) { annotateUnmatched(holder, start, ")"); return; }
-            else if (t == FileMakerCalculationTokenType.RBRACKET && --square < 0) { annotateUnmatched(holder, start, "]"); return; }
-            else if (t == FileMakerCalculationTokenType.RBRACE && --curly < 0) { annotateUnmatched(holder, start, "}"); return; }
-            else if (t == FileMakerCalculationTokenType.STRING && !isTerminatedString(text, start, lexer.getTokenEnd())) {
-                holder.newAnnotation(HighlightSeverity.ERROR, "Unterminated text constant (missing closing quotation mark)")
-                        .range(new TextRange(start, start + 1))
-                        .create();
-                return;
-            } else if (t == TokenType.BAD_CHARACTER && text.charAt(start) < 32) {
-                // Tab, CR and LF are whitespace tokens, so any control character here is invalid
-                holder.newAnnotation(HighlightSeverity.ERROR, "Invalid control character")
-                        .range(new TextRange(start, start + 1))
-                        .create();
-                return;
-            }
+        LexicalProblem problem = firstLexicalProblem(text);
+        if (problem != null) {
+            holder.newAnnotation(HighlightSeverity.ERROR, problem.message())
+                    .range(new TextRange(problem.offset(), problem.offset() + 1))
+                    .create();
+            return;
         }
         // Do not flag unmatched opening here to reduce noise; IDE brace matcher highlights it already.
 
@@ -71,18 +54,37 @@ public class FileMakerCalculationAnnotator implements Annotator {
         validateFunctionVariableScopes(element, holder);
     }
 
+    /** The first syntax problem the lexer can see; after it, nothing else is reported (and nothing is formatted). */
+    public record LexicalProblem(int offset, @NotNull String message) {}
+
+    public static @Nullable LexicalProblem firstLexicalProblem(@NotNull CharSequence text) {
+        Lexer lexer = new FileMakerCalculationLexerAdapter();
+        lexer.start(text);
+        int round = 0, square = 0, curly = 0;
+        for (IElementType t = lexer.getTokenType(); t != null; lexer.advance(), t = lexer.getTokenType()) {
+            int start = lexer.getTokenStart();
+            if (t == FileMakerCalculationTokenType.LPAREN) round++;
+            else if (t == FileMakerCalculationTokenType.LBRACKET) square++;
+            else if (t == FileMakerCalculationTokenType.LBRACE) curly++;
+            else if (t == FileMakerCalculationTokenType.RPAREN && --round < 0) return new LexicalProblem(start, "Unmatched closing )");
+            else if (t == FileMakerCalculationTokenType.RBRACKET && --square < 0) return new LexicalProblem(start, "Unmatched closing ]");
+            else if (t == FileMakerCalculationTokenType.RBRACE && --curly < 0) return new LexicalProblem(start, "Unmatched closing }");
+            else if (t == FileMakerCalculationTokenType.STRING && !isTerminatedString(text, start, lexer.getTokenEnd())) {
+                return new LexicalProblem(start, "Unterminated text constant (missing closing quotation mark)");
+            } else if (t == TokenType.BAD_CHARACTER && text.charAt(start) < 32) {
+                // Tab, CR and LF are whitespace tokens, so any control character here is invalid
+                return new LexicalProblem(start, "Invalid control character");
+            }
+        }
+        return null;
+    }
+
     /** A string token ends with a closing quote that is not escaped by an odd run of backslashes. */
     static boolean isTerminatedString(CharSequence text, int start, int end) {
         if (end - start < 2 || text.charAt(end - 1) != '"') return false;
         int backslashes = 0;
         for (int i = end - 2; i > start && text.charAt(i) == '\\'; i--) backslashes++;
         return backslashes % 2 == 0;
-    }
-
-    private static void annotateUnmatched(AnnotationHolder holder, int offset, String brace) {
-        holder.newAnnotation(HighlightSeverity.ERROR, "Unmatched closing " + brace)
-                .range(new TextRange(offset, offset + 1))
-                .create();
     }
 
     /**
@@ -106,32 +108,18 @@ public class FileMakerCalculationAnnotator implements Annotator {
 
             FunctionMetadata meta = FileMakerFunctionRegistry.findByName(fnName);
             if (meta == null) {
-                // Only claim "unknown" when the function list is complete (otherwise most real functions, and every
-                // custom function, would be flagged); shared/data/filemaker-functions.json "complete"
-                if (FileMakerFunctionRegistry.isComplete()) {
-                    holder.newAnnotation(HighlightSeverity.WEAK_WARNING, "Unknown function '" + fnName + "'")
-                            .range(call.getTextRange())
-                            .create();
-                }
+                // The catalogue lists every built-in, so this is a custom function, a plug-in function or a typo
+                holder.newAnnotation(HighlightSeverity.WEAK_WARNING, "Unknown function '" + fnName + "'")
+                        .range(call.getTextRange())
+                        .create();
                 continue;
             }
 
             int argCount = countArguments(call);
-            // Compute min/max based on metadata
-            int min = 0;
-            int max = 0;
-            boolean hasRepeating = false;
-            for (FunctionParameter p : meta.getParameters()) {
-                if (!p.isOptional() && !p.isRepeating()) min++;
-                if (p.isRepeating()) {
-                    hasRepeating = true;
-                } else {
-                    max++;
-                }
-            }
-            if (hasRepeating) {
-                max = Integer.MAX_VALUE;
-            }
+            // Argument counts come straight from the catalogue (maxArgs null = unlimited)
+            int min = meta.getMinArgs();
+            boolean unlimited = meta.getMaxArgs() == null;
+            int max = unlimited ? Integer.MAX_VALUE : meta.getMaxArgs();
 
             if (argCount < min) {
                 String msg = String.format("Too few arguments for %s: expected at least %d, got %d", meta.getName(), min, argCount);
@@ -139,7 +127,7 @@ public class FileMakerCalculationAnnotator implements Annotator {
                         .range(call.getTextRange())
                         .create();
             } else if (argCount > max) {
-                String expected = hasRepeating ? (min + "+") : String.valueOf(max);
+                String expected = unlimited ? (min + "+") : String.valueOf(max);
                 String msg = String.format("Too many arguments for %s: expected %s, got %d", meta.getName(), expected, argCount);
                 holder.newAnnotation(HighlightSeverity.ERROR, msg)
                         .range(call.getTextRange())

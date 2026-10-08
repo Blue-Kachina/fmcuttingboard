@@ -14,7 +14,10 @@
     "fmSnippetDetectTypes",
     "fileNaming",
     "lexer",
-    "diagnostics"
+    "diagnostics",
+    "formatting",
+    "formattingDefaults",
+    "folding"
   ],
   "definitions": {
     "nullableString": {
@@ -517,6 +520,133 @@
                 "end": {
                   "type": "integer",
                   "minimum": 0
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "formattingDefaults": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "indentUnit": {
+          "type": "string",
+          "pattern": "^(\t| +)$"
+        },
+        "indentWidth": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "maxWidth": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "doNotIndentTopLetVariables": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "indentUnit",
+        "indentWidth",
+        "maxWidth",
+        "doNotIndentTopLetVariables"
+      ]
+    },
+    "formatting": {
+      "type": "array",
+      "description": "format(input, formattingDefaults + options) must equal expect (null = left unformatted); formatting expect again must not change it",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "input",
+          "expect"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "input": {
+            "type": "string"
+          },
+          "note": {
+            "type": "string"
+          },
+          "options": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "indentUnit": {
+                "type": "string",
+                "pattern": "^(\t| +)$"
+              },
+              "indentWidth": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "maxWidth": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "doNotIndentTopLetVariables": {
+                "type": "boolean"
+              }
+            }
+          },
+          "expect": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      }
+    },
+    "folding": {
+      "type": "array",
+      "description": "Fold regions (offsets, any order) and their placeholders",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "calc",
+          "expect"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "calc": {
+            "type": "string"
+          },
+          "note": {
+            "type": "string"
+          },
+          "expect": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "start",
+                "end",
+                "placeholder"
+              ],
+              "properties": {
+                "start": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "end": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "placeholder": {
+                  "type": "string"
                 }
               }
             }

@@ -8,7 +8,7 @@ Legend: ✅ done · ⚠️ partial (see note) · ⏸ deliberately off for now (s
 that has the feature in that plugin.
 
 Shared foundations (both plugins must pass them, see `shared/fixtures/README.md`):
-`shared/data/clipboard-formats.json`, `shared/data/filemaker-functions.json`, `shared/fixtures/`.
+`shared/data/clipboard-formats.json`, `shared/data/fm-calc-catalogue.json` (vendored from fmscriptinventory), `shared/fixtures/`.
 
 | Foundation | JetBrains | VS Code | Notes |
 |---|:---:|:---:|---|
@@ -57,19 +57,19 @@ Shared foundations (both plugins must pass them, see `shared/fixtures/README.md`
 | Capability | JetBrains | VS Code | Notes |
 |---|:---:|:---:|---|
 | File type / language registration | ✅ 1.0.0 | ✅ Unreleased | |
-| Syntax highlighting | ✅ Unreleased (⚠️ 1.0.0) | ✅ Unreleased | Same rules in both, driven by shared data: any call is a function (case-insensitive), `Get ( X )` for any X, constants from `calc-language.json`, `Table::Field`, `${ }`, `¶`, `$`/`$$` variables, Unicode names. Only difference: VS Code also colors `\"` escapes inside strings |
+| Syntax highlighting | ✅ Unreleased (⚠️ 1.0.0) | ✅ Unreleased | Same rules in both, driven by shared data: any call is a function (case-insensitive), `Get ( X )` for any X, constants from `fm-calc-catalogue.json`, `Table::Field`, `${ }`, `¶`, `$`/`$$` variables, Unicode names. Only difference: VS Code also colors `\"` escapes inside strings |
 | Comment toggling (`//`, `/* */`) | ✅ 1.0.0 | ✅ Unreleased | |
 | Brace matching / auto-closing | ✅ 1.0.0 | ✅ Unreleased | |
-| Function completion | ✅ 1.0.0 | ✅ Unreleased | Same items, type text and `Name(p1; p2)` template. `Get()` constants come from `calc-language.json` in both. VS Code also completes named constants (`JSONString`, `Bold`, …): JetBrains ⚠️ for that part |
+| Function completion | ✅ 1.0.0 | ✅ Unreleased | Same items, type text and `Name(p1; p2)` template. `Get()` constants come from `fm-calc-catalogue.json` in both. VS Code also completes named constants (`JSONString`, `Bold`, …): JetBrains ⚠️ for that part |
 | Signature help / parameter info | ❌ | ✅ Unreleased | JetBrains handler exists but is disabled in `plugin.xml` |
 | Hover documentation | ❌ | ✅ Unreleased | Functions, `Get()` constants, named constants |
 | Snippets / live templates (`let`, `if`, `case`) | ✅ 1.0.0 | ✅ Unreleased | A VS Code test fails if the snippets drift from the JetBrains live templates |
-| Folding of `Let` / `Case` / `If` | ✅ 1.0.0 | ❌ | Post-v1 |
+| Folding: multi-line `Let` / `Case` / `If` / `While`, `[ … ]` lists, block comments | ✅ Unreleased (⚠️ 1.0.x: text search, missed nested calls, `Let (` with a space and `While`) | ✅ Unreleased | Same regions in both (golden `folding` cases); VS Code shows one fold per start line. See `docs/fmcalc-formatting.md` |
 | Diagnostics: unmatched brackets, unterminated strings, invalid control characters | ✅ Unreleased (⚠️ 1.0.x: never ran) | ✅ Unreleased | Brackets inside strings and comments are ignored. Same results in both IDEs (golden "diagnostics" cases) |
-| Diagnostics: argument-count errors | ✅ Unreleased (⚠️ 1.0.x: never ran) | ✅ Unreleased | Only as good as `filemaker-functions.json` |
-| Diagnostics: unknown functions | ⏸ | ⏸ | Off in both until `filemaker-functions.json` says `"complete": true` (the fmscriptinventory catalogue) |
+| Diagnostics: argument-count errors | ✅ Unreleased (⚠️ 1.0.x: never ran) | ✅ Unreleased | `minArgs`/`maxArgs` from `fm-calc-catalogue.json` (all 231 functions); a `[ … ]` group counts as one argument |
+| Diagnostics: unknown functions | ✅ Unreleased | ✅ Unreleased | Weak warning; the catalogue lists every built-in, so custom and plug-in functions are flagged too |
 | Diagnostics: `Let`/`While` variable used outside its scope | ✅ Unreleased | ✅ Unreleased | Follows Claris's scoping rules; unknown names are never reported (they are usually fields). JetBrains weak warning = VS Code Information |
-| Formatter + code style options (incl. `DO_NOT_INDENT_TOP_LET_VARIABLES`) | ✅ 1.0.0 | ❌ | Post-v1 |
+| Formatter: Claris spacing, pretty-printed, indentation, max line length, "Do not indent top let variables" | ✅ Unreleased (⚠️ 1.0.x: inconsistent indentation; most options had no effect) | ✅ Unreleased | Identical output in both (golden `formatting` cases, checked through JetBrains Reformat Code too). JetBrains can also format a selection; VS Code formats the whole document. See `docs/fmcalc-formatting.md` |
 | Quick fixes: comma → semicolon, insert missing semicolons | ✅ 1.0.0 | ❌ | Post-v1 |
 
 ### JetBrains lexer follow-ups: done (Unreleased)
@@ -84,7 +84,7 @@ All of the gaps found while building the VS Code grammar are fixed:
 
 The same change also fixed the following:
 
-- **Parser precedence:** it now comes from `calc-language.json` (Claris's order). `&`, `^`, `xor`, `<>`, `<=` and `>=` no longer stop the parser, and unary `-`/`+` parse.
+- **Parser precedence:** it now comes from shared data (Claris's order; today `fm-calc-catalogue.json`). `&`, `^`, `xor`, `<>`, `<=` and `>=` no longer stop the parser, and unary `-`/`+` parse.
 - **Annotator:** brackets and control characters inside strings and comments no longer cause false errors, and an unterminated string is reported.
 - **No new undefined-variable warnings:** `Get()` arguments, named constants and field references are no longer treated as possible undefined variables.
 
@@ -102,7 +102,7 @@ of either plugin: copy each type in FileMaker → get it into the IDE → push i
 
 | Snippet type | FileMaker version | JetBrains | VS Code | Date |
 |---|---|:---:|:---:|---|
-| Script | | | | |
+| Script | 26.03 | ✅ | ✅ | 2026-10-07 |
 | Script steps | | | | |
 | Fields | | | | |
 | Tables | | | | |

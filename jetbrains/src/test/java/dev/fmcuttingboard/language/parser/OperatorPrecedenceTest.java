@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-/** Precedence comes from shared/data/calc-language.json (Claris "Using operators in formulas"). */
+/** Precedence comes from shared/data/fm-calc-catalogue.json (Claris "Using operators in formulas"). */
 public class OperatorPrecedenceTest {
 
     @Test

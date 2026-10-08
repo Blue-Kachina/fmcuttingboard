@@ -67,6 +67,7 @@ export function hoverMarkdown(word: string, followedByParen: boolean, insideGetC
     const lines = ['```fmcalc', meta.getSignature(), '```'];
     if (meta.description) lines.push('', escapeMarkdown(meta.description));
     lines.push('', `*${meta.category}* · returns *${meta.returnType}*`);
+    if (meta.helpUrl) lines.push('', `[Open Claris help](${meta.helpUrl})`);
     return lines.join('\n');
   }
   const constant = findConstant(word);

@@ -28,8 +28,10 @@ public class AnnotatorHighlightingTest extends BasePlatformTestCase {
         check("Substitute ( t ; \"a\" ; \"A\" ) & Substitute ( t ; [ \"a\" ; \"A\" ] ) & Substitute ( t ; [ \"a\" ; \"A\" ] ; [ \"b\" ; \"B\" ] )");
     }
 
-    public void testUnknownFunctionsAreNotReportedWhileTheListIsIncomplete() {
-        check("PatternCount ( t ; \"a\" ) + MyCustomFunction ( 1 ) + JSONGetElement ( j ; \"k\" )");
+    public void testUnknownFunctionsAreReported() {
+        // The vendored catalogue lists every built-in, so anything else is a custom or plug-in function (or a typo)
+        check("PatternCount ( t ; \"a\" ) + <weak_warning descr=\"Unknown function 'MyCustomFunction'\">MyCustomFunction ( 1 )</weak_warning>"
+                + " + JSONGetElement ( j ; \"k\" )");
     }
 
     public void testBracketsInsideStringsAndCommentsAreIgnored() {

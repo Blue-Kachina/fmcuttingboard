@@ -1,8 +1,7 @@
-// The one place .fmcalc features get their language facts from. Today: functions from
-// shared/data/filemaker-functions.json, everything else from shared/data/calc-language.json. When the
-// fmscriptinventory catalogue is vendored (shared/data/fm-calc-catalogue.json, docs/fm-calc-catalogue-contract.md),
-// switch these imports to it; callers don't change. scripts/generate-grammar.mjs reads the same files.
-import language from '../../../shared/data/calc-language.json';
+// The one place .fmcalc features get their language facts from: the fmscriptinventory catalogue vendored at
+// shared/data/fm-calc-catalogue.json (docs/fm-calc-catalogue-contract.md). Functions go through
+// FileMakerFunctionRegistry; scripts/generate-grammar.mjs reads the same file.
+import language from '../../../shared/data/fm-calc-catalogue.json';
 import { findByName, getAll, type FunctionMetadata } from './FileMakerFunctionRegistry';
 
 export interface CalcConstant {

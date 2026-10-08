@@ -7,6 +7,8 @@ adheres to Semantic Versioning as the plugin matures.
 
 ## [Unreleased]
 ### Added
+- `.fmcalc` now knows every FileMaker function (231), `Get ( … )` constant (138) and named constant (46), from the calculation catalogue built from Claris's help by fmscriptinventory. Completion lists them all, and argument counts are checked for every function.
+- `.fmcalc`: calls to functions that are not FileMaker built-ins (custom functions, plug-in functions, typos) get an "Unknown function" weak warning.
 - Diagnostics: new **Save Raw Clipboard Capture** action (Windows; visible when diagnostics are enabled). It saves the raw bytes of every clipboard format to `<cutting board folder>/captures/`, so they can be used as test fixtures.
 
 ### Fixed
@@ -34,10 +36,24 @@ adheres to Semantic Versioning as the plugin matures.
 - The "Script variable may be undefined" and "Undefined variable (not bound in any Let())" warnings. A plain
   name in a calculation is usually a field, and `$`/`$$` variables are set by scripts, so neither can be known
   from the calculation alone.
-- "Unknown function" warnings are off until the shared function list is complete. Today it covers only some
-  functions, so most real functions and every custom function would be flagged.
+- Code style options that never affected `.fmcalc` formatting: the Spaces and Blank Lines tabs, and the
+  continuation indent.
 
 ### Changed
+- `.fmcalc` formatting (Reformat Code) is rewritten. It uses Claris spacing (`If ( a > b ; "x" ; "y" )`) and
+  pretty-prints:
+  - `Let` variables, one per line;
+  - `Case` pairs, one per line;
+  - `While`, one argument per line;
+  - long calls, one argument per line (they break at *Hard wrap at*);
+  - consistent indentation from the Tabs and Indents settings.
+
+  *Do not indent top let variables* now works. Calculations that aren't well-formed are left untouched. Same
+  output as the VS Code extension; see `docs/fmcalc-formatting.md`.
+- `.fmcalc` folding now uses the syntax tree. Nested calls, `Let (` written with a space, any letter case and
+  `While` now fold, as do multi-line `[ … ]` lists and block comments. Parentheses inside strings no longer
+  confuse it.
+- A block comment is now a single token.
 - `.fmcalc` color settings: named constants (True, JSON types, text styles) now use the color scheme's
   *Constant* color (key `FM_CALC_CONSTANT`) instead of the keyword color. New keys: `FM_CALC_GET_CONSTANT`,
   `FM_CALC_FIELD` and `FM_CALC_PARAGRAPH_MARK`. `FM_CALC_KEYWORD_CONTROL_FLOW` and `FM_CALC_KEYWORD_TYPE` are removed.

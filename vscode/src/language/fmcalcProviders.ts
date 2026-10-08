@@ -2,6 +2,8 @@
 import * as vscode from 'vscode';
 import { completions, hoverMarkdown, signatureAt, type CompletionKind } from '../core/CalcAssist';
 import { diagnose, type Severity } from '../core/CalcDiagnostics';
+import { foldRegions } from '../core/CalcFolding';
+import { format } from '../core/CalcFormatter';
 import { cursorContext } from '../core/CallContext';
 
 export const FMCALC: vscode.DocumentSelector = { language: 'fmcalc' };
@@ -63,8 +65,52 @@ function registerFmcalcDiagnostics(context: vscode.ExtensionContext): void {
   );
 }
 
+/** Format Document: the shared formatter (src/core/CalcFormatter.ts), with indentation from the editor's settings. */
+function registerFmcalcFormatter(context: vscode.ExtensionContext): void {
+  context.subscriptions.push(
+    vscode.languages.registerDocumentFormattingEditProvider(FMCALC, {
+      provideDocumentFormattingEdits(doc, editorOptions) {
+        const config = vscode.workspace.getConfiguration('fmcuttingboard.format', doc.uri);
+        const formatted = format(doc.getText(), {
+          indentUnit: editorOptions.insertSpaces ? ' '.repeat(editorOptions.tabSize) : '\t',
+          indentWidth: editorOptions.tabSize,
+          maxWidth: config.get<number>('maxLineLength', 120),
+          doNotIndentTopLetVariables: config.get<boolean>('doNotIndentTopLetVariables', true),
+        });
+        if (formatted === null) return []; // not well-formed: leave it alone (the problems are reported separately)
+        const all = new vscode.Range(doc.positionAt(0), doc.positionAt(doc.getText().length));
+        return formatted === doc.getText() ? [] : [vscode.TextEdit.replace(all, formatted)];
+      },
+    }),
+  );
+}
+
+/** Folding regions shared with JetBrains (src/core/CalcFolding.ts); closing brackets stay visible. */
+function registerFmcalcFolding(context: vscode.ExtensionContext): void {
+  context.subscriptions.push(
+    vscode.languages.registerFoldingRangeProvider(FMCALC, {
+      provideFoldingRanges(doc) {
+        const ranges: vscode.FoldingRange[] = [];
+        for (const r of foldRegions(doc.getText())) {
+          const start = doc.positionAt(r.start).line;
+          const endPos = doc.positionAt(r.end);
+          let end = endPos.line;
+          // For brackets, keep the line with the closing bracket visible
+          if (r.kind === 'region' && doc.lineAt(endPos.line).text.substring(0, endPos.character).trim() === '') end--;
+          if (end > start) {
+            ranges.push(new vscode.FoldingRange(start, end, r.kind === 'comment' ? vscode.FoldingRangeKind.Comment : undefined));
+          }
+        }
+        return ranges;
+      },
+    }),
+  );
+}
+
 export function registerFmcalcProviders(context: vscode.ExtensionContext): void {
   registerFmcalcDiagnostics(context);
+  registerFmcalcFormatter(context);
+  registerFmcalcFolding(context);
   context.subscriptions.push(
     vscode.languages.registerCompletionItemProvider(FMCALC, {
       provideCompletionItems(doc, position) {

@@ -15,7 +15,7 @@ import java.util.Set;
  *   <li>a name followed by {@code (} is a function call ({@link FileMakerCalculationTokenType#KEYWORD_FUNCTION}),
  *       whether or not it is a known built-in (custom functions look the same);</li>
  *   <li>a name inside {@code Get ( … )} is a {@link FileMakerCalculationTokenType#GET_CONSTANT};</li>
- *   <li>a name listed in shared/data/calc-language.json constants (True, JSONString, Bold, …) is a
+ *   <li>a name listed in shared/data/fm-calc-catalogue.json constants (True, JSONString, Bold, …) is a
  *       {@link FileMakerCalculationTokenType#CONSTANT}.</li>
  * </ul>
  * All checks are case-insensitive, as in FileMaker. The classification depends only on the buffer, so the lexer
@@ -28,7 +28,7 @@ public class FileMakerCalculationLexerAdapter extends FlexAdapter {
 
         private static Set<String> load() {
             Set<String> names = new HashSet<>();
-            for (JsonElement e : SharedData.readJson(SharedData.CALC_LANGUAGE).getAsJsonArray("constants")) {
+            for (JsonElement e : SharedData.readJson(SharedData.CALC_CATALOGUE).getAsJsonArray("constants")) {
                 names.add(e.getAsJsonObject().get("name").getAsString().toLowerCase(Locale.ROOT));
             }
             return names;

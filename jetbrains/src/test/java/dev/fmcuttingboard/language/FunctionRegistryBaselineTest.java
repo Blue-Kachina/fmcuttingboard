@@ -11,11 +11,11 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Guards the move of function data from hardcoded Java into shared/data/filemaker-functions.json.
+ * Pins how every function in shared/data/fm-calc-catalogue.json is displayed.
  *
- * shared/fixtures/golden/function-signatures.txt was generated from the hardcoded registry (plugin 1.0.6)
- * before the move; the VS Code extension checks the same file. If you deliberately change
- * shared/data/filemaker-functions.json, update that file to match.
+ * shared/fixtures/golden/function-signatures.txt is written by shared/tools/generate-function-signatures.mjs, an
+ * implementation independent of both plugins; the VS Code extension checks the same file. After vendoring a new
+ * catalogue, regenerate it and review the diff.
  */
 public class FunctionRegistryBaselineTest {
 

@@ -2,7 +2,7 @@
 // IDEs see the same structure (argument counts depend on it). Mimics PsiBuilder: whitespace and comments are
 // skipped, markers close to the last consumed token, and a later-closed marker with the same span is the parent.
 // Pinned by shared/fixtures/golden/cases.json "diagnostics".
-import language from '../../../shared/data/calc-language.json';
+import language from '../../../shared/data/fm-calc-catalogue.json';
 import { tokenize, type Token, type TokenType } from './CalcLexer';
 
 export type NodeType =
@@ -26,7 +26,7 @@ export interface ParsedCalc {
   root: CalcNode;
 }
 
-/** Binary precedence (higher binds tighter) from shared/data/calc-language.json, keyed by lowercase symbol. */
+/** Binary precedence (higher binds tighter) from shared/data/fm-calc-catalogue.json, keyed by lowercase symbol. */
 const BINARY_PRECEDENCE = new Map<string, number>();
 for (const op of language.operators) {
   if (op.arity !== 2) continue;

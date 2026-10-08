@@ -63,7 +63,8 @@ public class FileMakerCalculationParameterInfoHandler implements ParameterInfoHa
         if (at == null && editor.getCaretModel().getOffset() > 0) at = file.findElementAt(editor.getCaretModel().getOffset() - 1);
         FileMakerPsiUtil.FunctionCallInfo call = FileMakerPsiUtil.getEnclosingFunctionCall(at);
         int paramIndex = (call != null && call.argIndex >= 0) ? call.argIndex : 0;
-        context.setCurrentParameter(paramIndex);
+        FunctionMetadata meta = call != null ? FileMakerFunctionRegistry.findByName(call.name.trim()) : null;
+        context.setCurrentParameter(meta != null ? meta.activeParameterIndex(paramIndex) : paramIndex);
     }
 
     @Override

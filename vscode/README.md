@@ -28,6 +28,9 @@ The `.fmCuttingBoard` folder gets its own `.gitignore`, so clipboard snippets ne
 - Signature help while typing arguments, and hovers on functions and constants
 - Problems as you type: unmatched brackets, unterminated strings, wrong argument counts, and `Let`/`While`
   variables used outside their scope
+- **Format Document** (same output as the JetBrains plugin): Claris spacing (`If ( a > b ; "x" ; "y" )`),
+  one `Let` variable / `Case` pair per line, long calls broken one argument per line
+- Folding of multi-line `Let`, `Case`, `If` and `While` calls, `[ … ]` lists and block comments
 - `let`, `if` and `case` snippets, comment toggling, bracket matching
 
 ## Settings
@@ -37,6 +40,8 @@ The `.fmCuttingBoard` folder gets its own `.gitignore`, so clipboard snippets ne
 | `fmcuttingboard.baseDirName` | `.fmCuttingBoard` | Folder (in the workspace folder) where clipboard content is saved |
 | `fmcuttingboard.fileNamePattern` | `{timestamp}` | File name without extension; `{timestamp}` is the current time in milliseconds |
 | `fmcuttingboard.previewBeforeClipboardWrite` | `false` | Ask for confirmation, with a preview, before replacing the clipboard |
+| `fmcuttingboard.format.maxLineLength` | `120` | `.fmcalc` formatting: a call that fits within this many columns stays on one line |
+| `fmcuttingboard.format.doNotIndentTopLetVariables` | `true` | `.fmcalc` formatting: keep the outermost `Let`'s variables flush with the `Let` |
 | `fmcuttingboard.enableDiagnostics` | `false` | Show the **Dump Clipboard Formats** and **Save Raw Clipboard Capture** commands |
 
 For detailed logs, set the **FMCuttingBoard** output channel's level with **Developer: Set Log Level…**.

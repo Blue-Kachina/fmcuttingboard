@@ -23,7 +23,6 @@ import com.intellij.psi.tree.IElementType;
 %eof{
   return;
 %eof}
-%state COMMENT
 
 NAME_START = [:letter:] | "_"
 NAME_PART  = [:letter:] | [:digit:] | [_.]
@@ -37,7 +36,12 @@ WS         = [ \t\f\r\n]
 
   // Comments
   "//"[^\n\r]*                { return FileMakerCalculationTokenType.LINE_COMMENT; }
-  "/*"                        { yybegin(COMMENT); return FileMakerCalculationTokenType.BLOCK_COMMENT; }
+  // Block comments are one token each (an unterminated one runs to the end of the file); longest match picks the
+  // terminated form whenever the comment is closed
+  "/*" ( [^*] | "*"+ [^*/] )* "*"+ "/"
+                              { return FileMakerCalculationTokenType.BLOCK_COMMENT; }
+  "/*" ( [^*] | "*"+ [^*/] )* "*"*
+                              { return FileMakerCalculationTokenType.BLOCK_COMMENT; }
 
   // Text constants: double quotes only, may span lines, \x escapes any character (\" \\ \¶).
   // An unterminated string runs to the end of the file (the annotator reports it).
@@ -82,9 +86,4 @@ WS         = [ \t\f\r\n]
   {NAME}                      { return FileMakerCalculationTokenType.IDENTIFIER; }
 
   [^]                         { return TokenType.BAD_CHARACTER; }
-}
-
-<COMMENT>{
-  "*/"                        { yybegin(YYINITIAL); return FileMakerCalculationTokenType.BLOCK_COMMENT; }
-  [^]                         { return FileMakerCalculationTokenType.BLOCK_COMMENT; }
 }

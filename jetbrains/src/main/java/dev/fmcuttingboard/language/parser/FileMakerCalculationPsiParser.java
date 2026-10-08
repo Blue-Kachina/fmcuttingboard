@@ -25,7 +25,7 @@ import java.util.Map;
 public class FileMakerCalculationPsiParser implements PsiParser {
 
     /**
-     * Binary operator precedence (higher binds tighter) from shared/data/calc-language.json, which follows Claris's
+     * Binary operator precedence (higher binds tighter) from shared/data/fm-calc-catalogue.json, which follows Claris's
      * "Using operators in formulas" order. Keys are lowercase symbols, including alternates such as {@code <>}.
      */
     private static final class Precedence {
@@ -33,7 +33,7 @@ public class FileMakerCalculationPsiParser implements PsiParser {
 
         private static Map<String, Integer> load() {
             Map<String, Integer> map = new HashMap<>();
-            for (JsonElement e : SharedData.readJson(SharedData.CALC_LANGUAGE).getAsJsonArray("operators")) {
+            for (JsonElement e : SharedData.readJson(SharedData.CALC_CATALOGUE).getAsJsonArray("operators")) {
                 JsonObject op = e.getAsJsonObject();
                 if (op.get("arity").getAsInt() != 2) continue;
                 int prec = op.get("precedence").getAsInt();

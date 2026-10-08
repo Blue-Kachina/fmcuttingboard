@@ -19,9 +19,9 @@ import java.nio.charset.StandardCharsets;
  */
 public final class SharedData {
 
-    public static final String FILEMAKER_FUNCTIONS = "filemaker-functions.json";
     public static final String CLIPBOARD_FORMATS = "clipboard-formats.json";
-    public static final String CALC_LANGUAGE = "calc-language.json";
+    /** The FileMaker calculation catalogue vendored from fmscriptinventory (docs/fm-calc-catalogue-contract.md) */
+    public static final String CALC_CATALOGUE = "fm-calc-catalogue.json";
 
     private SharedData() {}
 

@@ -51,17 +51,21 @@ describe('activeParameterIndex', () => {
   it('clamps to the last parameter', () => {
     expect(activeParameterIndex([{ repeating: false }, { repeating: false }], 4)).toBe(1);
   });
+  it('cycles through a repeating group', () => {
+    const jsonSet = [{ repeating: false }, ...['key', 'value', 'type'].map(() => ({ repeating: true, group: 'element' }))];
+    expect([1, 2, 3, 4, 5, 6, 7].map((i) => activeParameterIndex(jsonSet, i))).toEqual([1, 2, 3, 1, 2, 3, 1]);
+  });
 });
 
 describe('completions (mirrors the JetBrains completion contributor)', () => {
   it('inserts the same template as JetBrains: Name(p1; p2) without [] or ...', () => {
-    expect(functionSnippet(findFunction('If')!)).toBe('If(${1:test}; ${2:resultTrue}; ${3:resultFalse})');
-    expect(functionSnippet(findFunction('Sum')!)).toBe('Sum(${1:field}; ${2:field})');
+    expect(functionSnippet(findFunction('If')!)).toBe('If(${1:test}; ${2:result1}; ${3:result2})');
+    expect(functionSnippet(findFunction('Sum')!)).toBe('Sum(${1:field})');
   });
 
   it('labels functions with category → return type and the simple signature', () => {
     const left = completions(...at('|')).find((c) => c.label === 'Left')!;
-    expect(left).toMatchObject({ kind: 'function', detail: 'Text → Text', description: 'Left(text; count)' });
+    expect(left).toMatchObject({ kind: 'function', detail: 'Text → Text', description: 'Left(text; numberOfCharacters)' });
   });
 
   it('offers Get() constants only inside Get ( … )', () => {
@@ -78,7 +82,8 @@ describe('completions (mirrors the JetBrains completion contributor)', () => {
 describe('hover', () => {
   it('shows a function signature and category for calls only', () => {
     expect(hoverMarkdown('if', true, false)).toBe(
-      '```fmcalc\nIf(test; resultTrue; [resultFalse])\n```\n\nIf(test; resultTrue; \\[resultFalse\\])\n\n*Logical* · returns *Any*',
+      '```fmcalc\nIf(test; result1; [result2])\n```\n\n*Logical* · returns *Any*\n\n' +
+        '[Open Claris help](https://help.claris.com/en/pro-help/content/if-function.html)',
     );
     expect(hoverMarkdown('Left', false, false)).toBeUndefined();
   });
@@ -93,8 +98,8 @@ describe('hover', () => {
 describe('signature help', () => {
   it('highlights the current parameter', () => {
     expect(signatureAt(...at('If ( a > 1 ; "x" ; |'))).toMatchObject({
-      label: 'If(test; resultTrue; [resultFalse])',
-      parameters: ['test', 'resultTrue', '[resultFalse]'],
+      label: 'If(test; result1; [result2])',
+      parameters: ['test', 'result1', '[result2]'],
       activeParameter: 2,
     });
   });

@@ -27,6 +27,9 @@ text), run `FMCB_CLIPBOARD_TESTS=1 npx vitest run test/powershellBridge.test.ts`
   the JetBrains lexer (+ adapter), parser (including its recovery quirks) and annotator. Argument counts depend on
   the exact parse, so change them only together with the Java side; the golden `lexer` and `diagnostics` cases in
   `shared/fixtures/golden/cases.json` fail otherwise.
+- `.fmcalc` formatting and folding: `src/core/CalcFormatter.ts` and `CalcFolding.ts` mirror the Java
+  `FmCalcFormatter` and `FileMakerCalculationFoldingBuilder` line for line. The rules are in
+  `docs/fmcalc-formatting.md`, and the golden `formatting` and `folding` cases pin both implementations.
 - `src/clipboard/` decides what to read and write; `resources/fmclipboard.ps1` only moves bytes.
 - `src/core/` is a 1:1 TypeScript port of the JetBrains plugin's platform-independent logic. File names match the
   Java class names (e.g. `FmClipboardCodec.ts` ↔ `FmClipboardCodec.java`). It must not import `vscode`, so it can

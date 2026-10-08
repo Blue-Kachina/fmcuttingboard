@@ -55,16 +55,18 @@ it to also produce a **calculation catalogue**, which FMCuttingBoard (and `fmscr
 
 - `shared/tools/sync-calc-catalogue.mjs` validates an export (schema plus licensing guard), refuses exports from
   uncommitted changes, and writes `shared/data/fm-calc-catalogue.json`. CI validates the vendored file on every push.
-- Until the catalogue lands, the language facts come from the hand-curated `shared/data/calc-language.json`
-  (Get constants, named constants, operators with Claris's precedence, syntax rules, each with a `helpUrl`) and
-  `shared/data/filemaker-functions.json` (functions). Its shapes match the catalogue's, so switching is mechanical.
-- VS Code reads them through one adapter (`vscode/src/core/CalcLanguage.ts`) plus the grammar generator
-  (`vscode/scripts/generate-grammar.mjs`). JetBrains reads the same files through `SharedData`.
-- When the catalogue lands, `shared/data/filemaker-functions.json` will be retired, and its baseline
-  `shared/fixtures/golden/function-signatures.txt` will be regenerated deliberately.
-- **Unknown-function diagnostics are off until then.** `filemaker-functions.json` has `"complete": false`, and
-  both plugins only report unknown functions when their function source is complete. A full catalogue export
-  counts as complete, so vendoring it switches that warning on.
+- **The catalogue is the only source of calculation facts** (since 2026-10-07; it replaced the hand-curated
+  `calc-language.json` and `filemaker-functions.json`). VS Code reads it through `vscode/src/core/CalcLanguage.ts`
+  and `FileMakerFunctionRegistry.ts` plus the grammar generator (`vscode/scripts/generate-grammar.mjs`); JetBrains
+  reads it through `SharedData.CALC_CATALOGUE` (`FileMakerFunctionRegistry`, lexer adapter, parser, completion).
+- Argument-count errors use `minArgs`/`maxArgs` directly. A `[ … ]` group counts as one argument, which is why
+  Substitute and JSONSetElement have `minArgs: 2` and no maximum.
+- **Unknown-function diagnostics are on** (weak warning): the catalogue lists every built-in, so an unknown name
+  is a custom function, a plug-in function or a typo.
+- After every sync: run `node shared/tools/generate-function-signatures.mjs` (rewrites
+  `shared/fixtures/golden/function-signatures.txt`, which both plugins' registry tests check) and
+  `npm run generate:grammar` in `vscode/`, and review both diffs. CI fails if either is stale, or if the vendored
+  file says `dirty: true`.
 
 ## Open questions
 
