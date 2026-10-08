@@ -66,6 +66,9 @@ WS         = [ \t\f\r\n]
   ("$$"|"$") ({NAME_START}|"~") ({NAME_PART}|"~")*
                               { return FileMakerCalculationTokenType.IDENTIFIER; }
 
+  // Let variables may also start with "~" (a common convention for calc-local names)
+  "~" ({NAME_PART}|"~")*      { return FileMakerCalculationTokenType.IDENTIFIER; }
+
   // Paragraph mark (a return) outside strings
   "¶"                         { return FileMakerCalculationTokenType.PARAGRAPH_MARK; }
 

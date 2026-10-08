@@ -29,6 +29,7 @@ const RULES: [RegExp, TokenType][] = [
   [new RegExp(`${NAME}[ \\t]*::[ \\t]*${NAME}`, 'uy'), 'FIELD_REFERENCE'],
   [/(?:and|or|xor|not)/iuy, 'KEYWORD_LOGICAL'],
   [/\$\$?[\p{L}_~][\p{L}\p{Nd}_.~]*/uy, 'IDENTIFIER'],
+  [/~[\p{L}\p{Nd}_.~]*/uy, 'IDENTIFIER'],
   [/¶/uy, 'PARAGRAPH_MARK'],
   [/(?:<=|>=|<>|≠|≤|≥|::)/uy, 'OPERATOR'],
   [/[+\-*/=^<>&;,]/uy, 'OPERATOR'],

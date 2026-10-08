@@ -14,7 +14,7 @@ const KINDS: Record<CompletionKind, vscode.CompletionItemKind> = {
   constant: vscode.CompletionItemKind.EnumMember,
 };
 
-const WORD = /\$\$?[\p{L}_~][\p{L}\p{N}_.~]*|[\p{L}_][\p{L}\p{N}_]*/u;
+const WORD = /\$\$?[\p{L}_~][\p{L}\p{N}_.~]*|~[\p{L}\p{N}_.~]*|[\p{L}_][\p{L}\p{N}_]*/u;
 
 // JetBrains severities → VS Code (a weak warning is subtler than a warning)
 const SEVERITY: Record<Severity, vscode.DiagnosticSeverity> = {

@@ -862,6 +862,18 @@
       "expect": []
     },
     {
+      "id": "let-tilde-variable-after-let",
+      "calc": "Let ( [ ~x = 1 ; ~y = ~x ] ; ~y ) & ~x",
+      "expect": [
+        {
+          "severity": "weak_warning",
+          "message": "'~x' is used outside the Let() that defines it (here it refers to a field)",
+          "start": 36,
+          "end": 38
+        }
+      ]
+    },
+    {
       "id": "script-variables-ignored",
       "calc": "Let ( [ $x = 1 ; $$y = 2 ] ; $x ) & $x & $$y",
       "expect": []
@@ -1022,6 +1034,15 @@
         "IDENTIFIER:$~x",
         "OPERATOR:&",
         "BAD_CHARACTER:$"
+      ]
+    },
+    {
+      "id": "tilde-let-variables",
+      "calc": "~x & ~sub.total~2",
+      "tokens": [
+        "IDENTIFIER:~x",
+        "OPERATOR:&",
+        "IDENTIFIER:~sub.total~2"
       ]
     },
     {

@@ -100,6 +100,7 @@ const grammar = {
       patterns: [
         { name: 'variable.other.global.fmcalc', match: '\\$\\$[\\p{L}_~][\\p{L}\\p{N}_.~]*' },
         { name: 'variable.other.local.fmcalc', match: '\\$[\\p{L}_~][\\p{L}\\p{N}_.~]*' },
+        { name: 'variable.other.let.fmcalc', match: '~[\\p{L}\\p{N}_.~]*' },
       ],
     },
     constants: {
