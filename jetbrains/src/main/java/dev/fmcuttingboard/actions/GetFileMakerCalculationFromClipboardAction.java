@@ -5,7 +5,7 @@ import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.fileEditor.FileEditorManager;
+import com.intellij.openapi.fileEditor.OpenFileDescriptor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VfsUtil;
@@ -111,7 +111,7 @@ public class GetFileMakerCalculationFromClipboardAction extends AnAction {
                             if (parent != null) {
                                 VfsUtil.markDirtyAndRefresh(false, true, true, parent);
                             }
-                            FileEditorManager.getInstance(project).openFile(vFile, true);
+                            new OpenFileDescriptor(project, vFile).navigate(true);
                         } else {
                             Path parentPath = file.getParent();
                             if (parentPath != null) {

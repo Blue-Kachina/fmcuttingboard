@@ -5,7 +5,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.notification.NotificationType;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.fileEditor.FileEditorManager;
+import com.intellij.openapi.fileEditor.OpenFileDescriptor;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VfsUtil;
@@ -116,7 +116,7 @@ public class ReadClipboardIntoNewXmlFileAction extends AnAction {
                                 VfsUtil.markDirtyAndRefresh(false, true, true, parent);
                             }
                             // Open the newly created file in the editor
-                            FileEditorManager.getInstance(project).openFile(vFile, true);
+                            new OpenFileDescriptor(project, vFile).navigate(true);
                         } else {
                             // As a fallback, refresh parent dir by path
                             Path parentPath = file.getParent();
